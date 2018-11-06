@@ -1,0 +1,326 @@
+@import: exdesign
+
+module ArticleJa : sig
+
+
+val b5paper : (|
+            page-width : length;
+            page-height : length;
+            top-space : length;
+            bottom-space : length;
+            left-space : length;
+            right-space : length;
+            header-left-space : length;
+            header-right-space : length;
+            header-height : length;
+            footer-left-space : length;
+            footer-right-space : length;
+            footer-height : length;
+            titlepage-top-space : length;
+            titlepage-bottom-space : length;
+            titlepage-left-space : length;
+            titlepage-right-space : length;
+            tocpage-top-space : length;
+            tocpage-bottom-space : length;
+            tocpage-left-space : length;
+            tocpage-right-space : length;
+            normal-fontsize : length;
+            language-japanese : bool;
+        |)
+
+val a4paper : (|
+            page-width : length;
+            page-height : length;
+            top-space : length;
+            bottom-space : length;
+            left-space : length;
+            right-space : length;
+            header-left-space : length;
+            header-right-space : length;
+            header-height : length;
+            footer-left-space : length;
+            footer-right-space : length;
+            footer-height : length;
+            titlepage-top-space : length;
+            titlepage-bottom-space : length;
+            titlepage-left-space : length;
+            titlepage-right-space : length;
+            tocpage-top-space : length;
+            tocpage-bottom-space : length;
+            tocpage-left-space : length;
+            tocpage-right-space : length;
+            normal-fontsize : length;
+            language-japanese : bool;
+        |)
+
+val article : (|
+           titlepage : bool;
+            title-fontsize : length;
+            author-fontsize : length;
+            date-fontsize : length;
+
+            tocpage : bool;
+
+            toc-fontsize : length;
+            toc-line-text-part : inline-text;
+            toc-line-text-chapter : inline-text;
+            toc-line-text-section : inline-text;
+            toc-line-text-subsection : inline-text;
+            toc-line-text-subsubsection : inline-text;
+            toc-line-space-part : length;
+            toc-line-space-chapter : length;
+            toc-line-space-section : length;
+            toc-line-space-subsection : length;
+            toc-line-space-subsubsection : length;
+            toc-depth : int;
+
+            part-fontsize : length;
+            part-text-1 : string;
+            part-text-2 : string;
+            show-num-part : bool;
+            part-text-3 : string;
+            part-text-4 : string;
+            part-top-space : length;
+            part-bottom-space : length;
+            part-left-space : length;
+            part-right-space : length;
+
+            chapter-fontsize : length;
+            chapter-text-1 : string;
+            chapter-text-2 : string;
+            show-num-chapter : bool;
+            chapter-text-3 : string;
+            chapter-text-4 : string;
+            chapter-top-space : length;
+            chapter-bottom-space : length;
+            chapter-left-space : length;
+            chapter-right-space : length;
+
+            section-fontsize : length;
+            section-text-1 : string;
+            section-text-2 : string;
+            show-num-chapter-sec : bool;
+            section-text-3 : string;
+            show-num-section : bool;
+            section-text-4 : string;
+            section-text-5 : string;
+            section-top-space : length;
+            section-bottom-space : length;
+            section-left-space : length;
+            section-right-space : length;
+
+            subsection-fontsize : length;
+            subsection-text-1 : string;
+            subsection-text-2 : string;
+            show-num-chapter-subsec : bool;
+            subsection-text-3 : string;
+            show-num-section-subsec : bool;
+            subsection-text-4 : string;
+            show-num-subsection : bool;
+            subsection-text-5 : string;
+            subsection-text-6 : string;
+            subsection-top-space : length;
+            subsection-bottom-space : length;
+            subsection-left-space : length;
+            subsection-right-space : length;
+
+            subsubsection-fontsize : length;
+            subsubsection-text-1 : string;
+            subsubsection-text-2 : string;
+            show-num-chapter-subsubsec : bool;
+            subsubsection-text-3 : string;
+            show-num-section-subsubsec : bool;
+            subsubsection-text-4 : string;
+            show-num-subsection-subsubsec : bool;
+            subsubsection-text-5 : string;
+            show-num-subsubsection : bool;
+            subsubsection-text-6 : string;
+            subsubsection-text-7 : string;
+            subsubsection-top-space : length;
+            subsubsection-bottom-space : length;
+            subsubsection-left-space : length;
+            subsubsection-right-space : length;
+        |)
+
+val normalHF : (|
+            lhead : inline-text;
+            chead : inline-text;
+            rhead : inline-text;
+            header-line : length;
+            lfoot : inline-text;
+            cfoot : inline-text;
+            rfoot : inline-text;
+            footer-line : length;
+
+            tocpage-lhead : inline-text;
+            tocpage-chead : inline-text;
+            tocpage-rhead : inline-text;
+            tocpage-header-line : length;
+            tocpage-lfoot : inline-text;
+            tocpage-cfoot : inline-text;
+            tocpage-rfoot : inline-text;
+            tocpage-footer-line : length;
+        |)
+
+end = struct
+
+let b5paper = (|
+        page-width = (182mm);
+        page-height = (257mm);
+        top-space = (21.845mm);
+        bottom-space = (21.845mm);
+        left-space = (16.495mm);
+        right-space = (16.495mm);
+        header-left-space = (16.495mm);
+        header-right-space = (16.495mm);
+        header-height = (0mm);
+        footer-left-space = (20mm);
+        footer-right-space = (20mm);
+        footer-height = (8mm);
+        titlepage-top-space = (21.845mm);
+        titlepage-bottom-space = (21.845mm);
+        titlepage-left-space = (16.495mm);
+        titlepage-right-space = (16.495mm);
+        tocpage-top-space = (21.845mm);
+        tocpage-bottom-space = (21.845mm);
+        tocpage-left-space = (16.495mm);
+        tocpage-right-space = (16.495mm);
+        normal-fontsize = (12pt);
+        language-japanese = true;
+      |)
+
+let a4paper = (|
+        page-width = (210mm);
+        page-height = (297mm);
+        top-space = (25.245mm);
+        bottom-space = (25.245mm);
+        left-space = (30.495mm);
+        right-space = (30.495mm);
+        header-left-space = (30.495mm);
+        header-right-space = (30.495mm);
+        header-height = (10mm);
+        footer-left-space = (30.495mm);
+        footer-right-space = (30.495mm);
+        footer-height = (10mm);
+        titlepage-top-space = (25.245mm);
+        titlepage-bottom-space = (25.245mm);
+        titlepage-left-space = (30.495mm);
+        titlepage-right-space = (30.495mm);
+        tocpage-top-space = (25.245mm);
+        tocpage-bottom-space = (25.245mm);
+        tocpage-left-space = (30.495mm);
+        tocpage-right-space = (30.495mm);
+        normal-fontsize = (12pt);
+        language-japanese = true;
+      |)
+
+let article = (|
+           titlepage = false;
+            title-fontsize = 40pt;
+            author-fontsize = 20pt;
+            date-fontsize = 20pt;
+
+            tocpage = false;
+
+            toc-fontsize = 20pt;
+            toc-line-text-part = {};
+            toc-line-text-chapter = {};
+            toc-line-text-section = {.};
+            toc-line-text-subsection = {.};
+            toc-line-text-subsubsection = {};
+            toc-line-space-part = 20pt;
+            toc-line-space-chapter = 25pt;
+            toc-line-space-section = 35pt;
+            toc-line-space-subsection = 45pt;
+            toc-line-space-subsubsection = 53pt;
+            toc-depth = 3;
+
+            part-fontsize = 30pt;
+            part-text-1 = `第`;
+            part-text-2 = ` `;
+            show-num-part = true;
+            part-text-3 = ` `;
+            part-text-4 = `部`;
+            part-top-space = 40pt;
+            part-bottom-space = 25pt;
+            part-left-space = 0pt;
+            part-right-space = 30pt;
+
+            chapter-fontsize = 25pt;
+            chapter-text-1 = `第`;
+            chapter-text-2 = ` `;
+            show-num-chapter = true;
+            chapter-text-3 = ` `;
+            chapter-text-4 = `章`;
+            chapter-top-space = 35pt;
+            chapter-bottom-space = 30pt;
+            chapter-left-space = 0pt;
+            chapter-right-space = 25pt;
+
+            section-fontsize = 18pt;
+            section-text-1 = ` `;
+            section-text-2 = ` `;
+            show-num-chapter-sec = false;
+            section-text-3 = ` `;
+            show-num-section = true;
+            section-text-4 = ` `;
+            section-text-5 = ` `;
+            section-top-space = 25pt;
+            section-bottom-space = 15pt;
+            section-left-space = 0pt;
+            section-right-space = 18pt;
+
+            subsection-fontsize = 15pt;
+            subsection-text-1 = ` `;
+            subsection-text-2 = ` `;
+            show-num-chapter-subsec = false;
+            subsection-text-3 = ` `;
+            show-num-section-subsec = true;
+            subsection-text-4 = `.`;
+            show-num-subsection = true;
+            subsection-text-5 = ` `;
+            subsection-text-6 = ` `;
+            subsection-top-space = 20pt;
+            subsection-bottom-space = 15pt;
+            subsection-left-space = 0pt;
+            subsection-right-space = 15pt;
+
+            subsubsection-fontsize = 13pt;
+            subsubsection-text-1 = ` `;
+            subsubsection-text-2 = ` `;
+            show-num-chapter-subsubsec = false;
+            subsubsection-text-3 = ` `;
+            show-num-section-subsubsec = true;
+            subsubsection-text-4 = `.`;
+            show-num-subsection-subsubsec = true;
+            subsubsection-text-5 = `.`;
+            show-num-subsubsection = true;
+            subsubsection-text-6 = ` `;
+            subsubsection-text-7 = ` `;
+            subsubsection-top-space = 15pt;
+            subsubsection-bottom-space = 10pt;
+            subsubsection-left-space = 0pt;
+            subsubsection-right-space = 13pt;
+        |)
+
+let normalHF = (|
+            lhead = {};
+            chead = {};
+            rhead = {};
+            header-line = (0pt);
+            lfoot =  {};
+            cfoot = {\pagenum;};
+            rfoot = {};
+            footer-line = (0pt);
+
+            tocpage-lhead = {};
+            tocpage-chead = {};
+            tocpage-rhead = {};
+            tocpage-header-line = (0pt);
+            tocpage-lfoot = {};
+            tocpage-cfoot = {};
+            tocpage-rfoot = {};
+            tocpage-footer-line = (0pt);
+      |)
+
+end
