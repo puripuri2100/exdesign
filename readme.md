@@ -5,6 +5,12 @@ SATySFiに付属するstdjaやstdjabook等のクラスファイルをかなり�
 
 さらに、このクラスファイルに付属する補助パッケージを使用することで、ある程度楽にカスタマイズできるようになっています。
 
+# 動作する環境
+
+[SATySFi v0.0.3](https://github.com/gfngfn/SATySFi/releases/tag/v0.0.3)と、[SATySFi for Windows Version 20180708](https://github.com/qnighy/satysfi-cross-windows/releases/tag/20180708)での動作を確認しています。
+
+ただし、近い将来SATySFi for Windowsではまだ提供されていない機能を用いたコマンド等を提供する予定ですので、SATySFi for Windows版も出そうと考えています。
+
 # 導入のしかた
 
 `exdesign.satyh`と補助パッケージをSATySFiの読み込める場所においてください。
