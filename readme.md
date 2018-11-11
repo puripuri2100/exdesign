@@ -20,7 +20,7 @@ SATySFiに付属するstdjaやstdjabook等のクラスファイルをかなり�
 # 使い方
 
 ~~~
-@import: exdesign
+@require: exdesign
 @import: article-ja
 
 document (|
