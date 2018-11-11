@@ -1,13 +1,12 @@
 %UTF-8
 %(c) Naoki Kaneko and T. Suwa  2018
 %https://github.com/puripuri2100/exdesign
-%v0.1
+%SATySFi for Windows Version
 
 @require: math
 @require: list
 @require: gr
 @require: color
-@require: footnote-scheme
 
 module ExDesign : sig
 
@@ -935,7 +934,6 @@ let document record inner =
     in
 
     let pagecontf pbinfo =
-        let () = FootnoteScheme.start-page () in
         let () = page-number <- pbinfo#page-number in
         let hgtfb = height-of-float-boxes pbinfo#page-number in
         let (txtorgx, txtorgy) =
@@ -1377,28 +1375,7 @@ let-inline ctx \textgt it =
     in
 read-inline ctxgt it
 
-  let-inline ctx \footnote it =
-    let size = get-font-size ctx in
-    let ibf num =
-      let it-num = embed-string (arabic num) in
-      let ctx =
-        ctx |> set-font-size (size *' 0.75)
-            |> set-manual-rising (size *' 0.25)
-      in
-        read-inline ctx {\*#it-num;}
-    in
-    let bbf num =
-      let it-num = embed-string (arabic num) in
-      let ctx =
-        ctx |> set-font-size (size *' 0.9)
-            |> set-leading (size *' 1.2)
-            |> set-paragraph-margin (size *' 0.5) (size *' 0.5)
-          %temporary
-      in
-        line-break false false ctx (read-inline ctx {#it-num; #it;} ++ inline-fil)
-    in
-      FootnoteScheme.main ctx ibf bbf
-
+  let-inline ctx \footnote it = inline-nil
 
 let-inline \pagenum = if !titlepage-ref then embed-string(arabic (!page-number - 1)) else embed-string(arabic !page-number)
 
