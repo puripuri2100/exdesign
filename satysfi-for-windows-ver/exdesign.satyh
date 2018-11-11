@@ -1,0 +1,1384 @@
+%UTF-8
+%(c) Naoki Kaneko and T. Suwa  2018
+%https://github.com/puripuri2100/exdesign
+%SATySFi for Windows Version
+
+@require: math
+@require: list
+@require: gr
+@require: color
+
+module ExDesign : sig
+
+val document : 'a -> block-text -> document
+    constraint 'a :: (|
+        title : inline-text;
+        author : inline-text;
+        date : inline-text;
+        show-title : bool;
+        show-toc : bool;
+        style : (|
+            page-width : length;
+            page-height : length;
+            top-space : length;
+            bottom-space : length;
+            left-space : length;
+            right-space : length;
+            header-left-space : length;
+            header-right-space : length;
+            header-height : length;
+            footer-left-space : length;
+            footer-right-space : length;
+            footer-height : length;
+            titlepage-top-space : length;
+            titlepage-bottom-space : length;
+            titlepage-left-space : length;
+            titlepage-right-space : length;
+            tocpage-top-space : length;
+            tocpage-bottom-space : length;
+            tocpage-left-space : length;
+            tocpage-right-space : length;
+            normal-fontsize : length;
+            language-japanese : bool;
+        |);
+        design : (|
+            oneside : bool;
+
+            titlepage : bool;
+            title-fontsize : length;
+            author-fontsize : length;
+            date-fontsize : length;
+
+            tocpage : bool;
+
+            toc-fontsize : length;
+            toc-line-text-part : inline-text;
+            toc-line-text-chapter : inline-text;
+            toc-line-text-section : inline-text;
+            toc-line-text-subsection : inline-text;
+            toc-line-text-subsubsection : inline-text;
+            toc-line-space-part : length;
+            toc-line-space-chapter : length;
+            toc-line-space-section : length;
+            toc-line-space-subsection : length;
+            toc-line-space-subsubsection : length;
+            toc-depth : int;
+
+            part-fontsize : length;
+            part-text-1 : string;
+            part-text-2 : string;
+            show-num-part : bool;
+            part-text-3 : string;
+            part-text-4 : string;
+            part-top-space : length;
+            part-bottom-space : length;
+            part-left-space : length;
+            part-right-space : length;
+
+            chapter-fontsize : length;
+            chapter-text-1 : string;
+            chapter-text-2 : string;
+            show-num-chapter : bool;
+            chapter-text-3 : string;
+            chapter-text-4 : string;
+            chapter-top-space : length;
+            chapter-bottom-space : length;
+            chapter-left-space : length;
+            chapter-right-space : length;
+
+            section-fontsize : length;
+            section-text-1 : string;
+            section-text-2 : string;
+            show-num-chapter-sec : bool;
+            section-text-3 : string;
+            show-num-section : bool;
+            section-text-4 : string;
+            section-text-5 : string;
+            section-top-space : length;
+            section-bottom-space : length;
+            section-left-space : length;
+            section-right-space : length;
+
+            subsection-fontsize : length;
+            subsection-text-1 : string;
+            subsection-text-2 : string;
+            show-num-chapter-subsec : bool;
+            subsection-text-3 : string;
+            show-num-section-subsec : bool;
+            subsection-text-4 : string;
+            show-num-subsection : bool;
+            subsection-text-5 : string;
+            subsection-text-6 : string;
+            subsection-top-space : length;
+            subsection-bottom-space : length;
+            subsection-left-space : length;
+            subsection-right-space : length;
+
+            subsubsection-fontsize : length;
+            subsubsection-text-1 : string;
+            subsubsection-text-2 : string;
+            show-num-chapter-subsubsec : bool;
+            subsubsection-text-3 : string;
+            show-num-section-subsubsec : bool;
+            subsubsection-text-4 : string;
+            show-num-subsection-subsubsec : bool;
+            subsubsection-text-5 : string;
+            show-num-subsubsection : bool;
+            subsubsection-text-6 : string;
+            subsubsection-text-7 : string;
+            subsubsection-top-space : length;
+            subsubsection-bottom-space : length;
+            subsubsection-left-space : length;
+            subsubsection-right-space : length;
+        |);
+        header-footer : (|
+            lhead : inline-text;
+            chead : inline-text;
+            rhead : inline-text;
+            header-line : length;
+            lfoot : inline-text;
+            cfoot : inline-text;
+            rfoot : inline-text;
+            footer-line : length;
+
+            tocpage-lhead : inline-text;
+            tocpage-chead : inline-text;
+            tocpage-rhead : inline-text;
+            tocpage-header-line : length;
+            tocpage-lfoot : inline-text;
+            tocpage-cfoot : inline-text;
+            tocpage-rfoot : inline-text;
+            tocpage-footer-line : length;
+        |)
+    |)
+
+% 提供コマンド
+
+
+direct +part : [string?; inline-text; block-text] block-cmd
+direct +chapter : [string?; inline-text; block-text] block-cmd
+direct +section : [string?; inline-text; block-text] block-cmd
+direct +subsection : [string?; inline-text; block-text] block-cmd
+direct +subsubsection : [string?; inline-text; block-text] block-cmd
+direct +p-ja : [inline-text] block-cmd
+direct +p-en : [inline-text] block-cmd
+direct +p : [inline-text] block-cmd
+direct +pn : [inline-text] block-cmd
+direct \textrm : [inline-text] inline-cmd
+direct \textbf : [inline-text] inline-cmd
+direct \textit : [inline-text] inline-cmd
+direct \textsf : [inline-text] inline-cmd
+direct \textmc : [inline-text] inline-cmd
+direct \textgt : [inline-text] inline-cmd
+direct \footnote : [inline-text] inline-cmd
+direct \pagenum : [] inline-cmd
+
+    val title-ref : inline-text ref
+    val author-ref : inline-text ref
+    val date-ref : inline-text ref
+    val show-title-ref : bool ref
+    val  show-toc-ref : bool ref
+    val page-width-ref : length ref
+    val page-height-ref : length ref
+    val top-space-ref : length ref
+    val bottom-space-ref : length ref
+    val left-space-ref : length ref
+    val right-space-ref : length ref
+    val header-left-space-ref : length ref
+    val header-right-space-ref : length ref
+    val header-height-ref : length ref
+    val footer-left-space-ref : length ref
+    val footer-right-space-ref : length ref
+    val footer-height-ref : length ref
+    val titlepage-top-space-ref : length ref
+    val titlepage-bottom-space-ref : length ref
+    val titlepage-left-space-ref : length ref
+    val titlepage-right-space-ref : length ref
+    val tocpage-top-space-ref : length ref
+    val tocpage-bottom-space-ref : length ref
+    val tocpage-left-space-ref : length ref
+    val tocpage-right-space-ref : length ref
+    val normal-fontsize-ref : length ref
+    val language-japanese-ref : bool ref
+
+%% design
+    val titlepage-ref : bool ref
+    val title-fontsize-ref : length ref
+    val author-fontsize-ref : length ref
+    val date-fontsize-ref : length ref
+
+    val tocpage-ref : bool ref
+    val toc-fontsize-ref : length ref
+
+    val part-fontsize-ref : length ref
+    val part-text-1-ref : string ref
+    val part-text-2-ref : string ref
+    val show-num-part-ref : bool ref
+    val part-text-3-ref : string ref
+    val part-text-4-ref : string ref
+    val part-top-space-ref : length ref
+    val part-bottom-space-ref : length ref
+    val part-left-space-ref : length ref
+    val part-right-space-ref : length ref
+
+    val chapter-fontsize-ref : length ref
+    val chapter-text-1-ref : string ref
+    val chapter-text-2-ref : string ref
+    val show-num-chapter-ref : bool ref
+    val chapter-text-3-ref : string ref
+    val chapter-text-4-ref : string ref
+    val chapter-top-space-ref : length ref
+    val chapter-bottom-space-ref : length ref
+    val chapter-left-space-ref : length ref
+    val chapter-right-space-ref : length ref
+
+    val section-fontsize-ref : length ref
+    val section-text-1-ref : string ref
+    val section-text-2-ref : string ref
+    val show-num-chapter-sec-ref : bool ref
+    val section-text-3-ref : string ref
+    val show-num-section-ref : bool ref
+    val section-text-4-ref : string ref
+    val section-text-5-ref : string ref
+    val section-top-space-ref : length ref
+    val section-bottom-space-ref : length ref
+    val section-left-space-ref : length ref
+    val section-right-space-ref : length ref
+
+    val subsection-fontsize-ref : length ref
+    val subsection-text-1-ref : string ref
+    val subsection-text-2-ref : string ref
+    val show-num-chapter-subsec-ref : bool ref
+    val subsection-text-3-ref : string ref
+    val show-num-section-subsec-ref : bool ref
+    val subsection-text-4-ref : string ref
+    val show-num-subsection-ref : bool ref
+    val subsection-text-5-ref : string ref
+    val subsection-text-6-ref : string ref
+    val subsection-top-space-ref : length ref
+    val subsection-bottom-space-ref : length ref
+    val subsection-left-space-ref : length ref
+    val subsection-right-space-ref : length ref
+
+    val subsubsection-fontsize-ref : length ref
+    val subsubsection-text-1-ref : string ref
+    val subsubsection-text-2-ref : string ref
+    val show-num-chapter-subsubsec-ref : bool ref
+    val subsubsection-text-3-ref : string ref
+    val show-num-section-subsubsec-ref : bool ref
+    val subsubsection-text-4-ref : string ref
+    val show-num-subsection-subsubsec-ref : bool ref
+    val subsubsection-text-5-ref : string ref
+    val show-num-subsubsection-ref : bool ref
+    val subsubsection-text-6-ref : string ref
+    val subsubsection-text-7-ref : string ref
+    val subsubsection-top-space-ref : length ref
+    val subsubsection-bottom-space-ref : length ref
+    val subsubsection-left-space-ref : length ref
+    val subsubsection-right-space-ref : length ref
+
+%% header-footer
+    val lhead-ref : inline-text ref
+    val chead-ref : inline-text ref
+    val rhead-ref : inline-text ref
+    val header-line-ref : length ref
+    val lfoot-ref : inline-text ref
+    val cfoot-ref : inline-text ref
+    val rfoot-ref : inline-text ref
+    val footer-line-ref : length ref
+
+    val tocpage-lhead-ref : inline-text ref
+    val tocpage-chead-ref : inline-text ref
+    val tocpage-rhead-ref : inline-text ref
+    val tocpage-header-line-ref : length ref
+    val tocpage-lfoot-ref : inline-text ref
+    val tocpage-cfoot-ref : inline-text ref
+    val tocpage-rfoot-ref : inline-text ref
+    val tocpage-footer-line-ref : length ref
+
+%% その他
+    val text-org-ref : (length * length) ref
+    val text-width-ref : length ref
+    val text-height-ref : length ref
+    val hdrorg-ref : (length * length) ref
+    val ftrorg-ref : (length * length) ref
+    val hdrwid-ref : length ref
+    val ftrwid-ref : length ref
+    val header-thickness-ref : length ref
+    val footer-thickness-ref : length ref
+%%% titlepage用
+    val titlepage-text-org-ref : (length * length) ref
+    val titlepage-text-width-ref : length ref
+    val titlepage-text-height-ref : length ref
+    val titlepage-hdrorg-ref : (length * length) ref
+    val titlepage-ftrorg-ref : (length * length) ref
+    val titlepage-hdrwid-ref : length ref
+    val titlepage-ftrwid-ref : length ref
+%%% tocpage用
+    val tocpage-text-org-ref : (length * length) ref
+    val tocpage-text-width-ref : length ref
+    val tocpage-text-height-ref : length ref
+    val tocpage-titlepage-hdrorg-ref : (length * length) ref
+    val tocpage-hdrorg-ref : (length * length) ref
+    val tocpage-ftrorg-ref : (length * length) ref
+    val tocpage-hdrwid-ref : length ref
+    val tocpage-ftrwid-ref : length ref
+    val tocpage-header-thickness-ref : length ref
+    val tocpage-footer-thickness-ref : length ref
+
+    val  page-number : int ref
+
+end = struct
+
+
+% フォント設定
+
+%% 拡大率
+    let font-ratio-latin = 1.
+    let font-ratio-cjk = 0.88
+
+%% ベースライン補正
+    let font-correction-latin = 0.
+    let font-correction-cjk = 0.
+
+%% フォント設定
+    let font-latin-roman = (`Junicode` , font-ratio-latin , font-correction-latin)
+    let font-latin-bold = (`Junicode-b` , font-ratio-latin , font-correction-latin)
+    let font-latin-italic = (`Junicode-it` , font-ratio-latin , font-correction-latin)
+    let font-latin-sans = (`lmsans` , font-ratio-latin , font-correction-latin)
+    let font-latin-mono = (`lmmono` , font-ratio-latin, font-correction-latin)
+    let font-cjk-mincho = (`ipaexm` , font-ratio-cjk, font-correction-cjk)
+    let font-cjk-gothic = (`ipaexg` , font-ratio-cjk, font-correction-cjk)
+
+%% フォント設定用の関数
+    let set-latin-font font ctx =
+        ctx |> set-font Latin font
+    let set-cjk-font font ctx =
+        ctx |> set-font Kana font
+            |> set-font HanIdeographic font
+
+% 色々な準備
+
+%% ブロック読み込みの準備
+    let get-standard-context wid =
+        get-initial-context wid (command \math)
+            |> set-dominant-wide-script Kana
+            |> set-language Kana Japanese
+            |> set-language HanIdeographic Japanese
+            |> set-dominant-narrow-script Latin
+            |> set-language Latin English
+            |> set-font Kana font-cjk-mincho
+            |> set-font HanIdeographic font-cjk-mincho
+            |> set-font Latin font-latin-roman
+            |> set-math-font `lmodern`
+            |> set-hyphen-penalty 100
+
+%% 目次の準備
+    let-mutable toc-acc-ref <- []
+    type toc-type =
+        | TocPart of string * inline-text
+        | TocChapter of string * inline-text
+        | TocSection of string * inline-text
+        | TocSubSection of string * inline-text
+        | TocSubSubSection of string * inline-text
+
+    let get-cross-reference-number label =
+        match get-cross-reference (label ^ `:num`) with
+            | None -> `?`
+            | Some(s) -> s
+
+
+    let get-cross-reference-page label =
+        match get-cross-reference (label ^ `:page`) with
+            | None -> `?`
+            | Some(s) -> s
+
+    let generate-fresh-label =
+        let-mutable count <- 0 in
+        (fun () -> (
+            let () = count <- !count + 1 in
+            `generated:` ^ (arabic (!count))
+        ))
+
+    let-rec repeat-inline n ib =
+        if n <= 0 then inline-nil else
+        ib ++ (repeat-inline (n - 1) ib)
+
+    let make-toc-line ctx width s =
+        let ib = read-inline ctx {#s;} ++ inline-skip 1.5pt in
+        let wid-text = get-natural-width ib in
+        let n = round (width /' wid-text) in
+        inline-fil ++ (repeat-inline n ib) ++ inline-fil
+
+
+% document内の値を入れるための可変参照の設定
+    let-mutable title-ref <- {}
+    let-mutable author-ref <- {}
+    let-mutable date-ref <- {}
+    let-mutable show-title-ref <- true
+    let-mutable show-toc-ref <- true
+%% style
+    let-mutable page-width-ref <- 0pt
+    let-mutable page-height-ref <- 0pt
+    let-mutable top-space-ref <- 0pt
+    let-mutable bottom-space-ref <- 0pt
+    let-mutable left-space-ref <- 0pt
+    let-mutable right-space-ref <- 0pt
+    let-mutable header-left-space-ref <- 0pt
+    let-mutable header-right-space-ref <- 0pt
+    let-mutable header-height-ref <- 0pt
+    let-mutable footer-left-space-ref <- 0pt
+    let-mutable footer-right-space-ref <- 0pt
+    let-mutable footer-height-ref <-  0pt
+    let-mutable titlepage-top-space-ref <- 0pt
+    let-mutable titlepage-bottom-space-ref <- 0pt
+    let-mutable titlepage-left-space-ref <- 0pt
+    let-mutable titlepage-right-space-ref <-  0pt
+    let-mutable tocpage-top-space-ref <- 0pt
+    let-mutable tocpage-bottom-space-ref <-  0pt
+    let-mutable tocpage-left-space-ref <- 0pt
+    let-mutable tocpage-right-space-ref <- 0pt
+    let-mutable normal-fontsize-ref <- 0pt
+    let-mutable language-japanese-ref <- true
+
+%% design
+    let-mutable oneside-ref <- true
+
+    let-mutable titlepage-ref <- true
+    let-mutable title-fontsize-ref <- 0pt
+    let-mutable author-fontsize-ref <- 0pt
+    let-mutable date-fontsize-ref <- 0pt
+
+    let-mutable tocpage-ref <- true
+    let-mutable toc-fontsize-ref <- 0pt
+    let-mutable toc-line-text-part-ref <- {}
+    let-mutable toc-line-text-chapter-ref <- {}
+    let-mutable toc-line-text-section-ref <- {}
+    let-mutable toc-line-text-subsection-ref <- {}
+    let-mutable toc-line-text-subsubsection-ref <- {}
+    let-mutable toc-line-space-part-ref <- 0pt
+    let-mutable toc-line-space-chapter-ref <- 0pt
+    let-mutable toc-line-space-section-ref <- 0pt
+    let-mutable toc-line-space-subsection-ref <- 0pt
+    let-mutable toc-line-space-subsubsection-ref <- 0pt
+    let-mutable toc-depth-ref <- 0
+
+    let-mutable part-fontsize-ref <- 0pt
+    let-mutable part-text-1-ref <- ` `
+    let-mutable part-text-2-ref <- ` `
+    let-mutable show-num-part-ref <- true
+    let-mutable part-text-3-ref <- ` `
+    let-mutable part-text-4-ref <- ` `
+    let-mutable part-top-space-ref <- 0pt
+    let-mutable part-bottom-space-ref <- 0pt
+    let-mutable part-left-space-ref <- 0pt
+    let-mutable part-right-space-ref <- 0pt
+
+    let-mutable chapter-fontsize-ref <- 0pt
+    let-mutable chapter-text-1-ref <- ` `
+    let-mutable chapter-text-2-ref <- ` `
+    let-mutable show-num-chapter-ref <- true
+    let-mutable chapter-text-3-ref <- ` `
+    let-mutable chapter-text-4-ref <- ` `
+    let-mutable chapter-top-space-ref <- 0pt
+    let-mutable chapter-bottom-space-ref <- 0pt
+    let-mutable chapter-left-space-ref <- 0pt
+    let-mutable chapter-right-space-ref <- 0pt
+
+    let-mutable section-fontsize-ref <- 0pt
+    let-mutable section-text-1-ref <- ` `
+    let-mutable section-text-2-ref <- ` `
+    let-mutable show-num-chapter-sec-ref <- true
+    let-mutable section-text-3-ref <- ` `
+    let-mutable show-num-section-ref <- true
+    let-mutable section-text-4-ref <- ` `
+    let-mutable section-text-5-ref <- ` `
+    let-mutable section-top-space-ref <- 0pt
+    let-mutable section-bottom-space-ref <- 0pt
+    let-mutable section-left-space-ref <- 0pt
+    let-mutable section-right-space-ref <- 0pt
+
+    let-mutable subsection-fontsize-ref <- 0pt
+    let-mutable subsection-text-1-ref <- ` `
+    let-mutable subsection-text-2-ref <- ` `
+    let-mutable show-num-chapter-subsec-ref <- true
+    let-mutable subsection-text-3-ref <- ` `
+    let-mutable show-num-section-subsec-ref <- true
+    let-mutable subsection-text-4-ref <- ` `
+    let-mutable show-num-subsection-ref <- true
+    let-mutable subsection-text-5-ref <- ` `
+    let-mutable subsection-text-6-ref <- ` `
+    let-mutable subsection-top-space-ref <- 0pt
+    let-mutable subsection-bottom-space-ref <- 0pt
+    let-mutable subsection-left-space-ref <- 0pt
+    let-mutable subsection-right-space-ref <- 0pt
+
+    let-mutable subsubsection-fontsize-ref <- 0pt
+    let-mutable subsubsection-text-1-ref <- ` `
+    let-mutable subsubsection-text-2-ref <- ` `
+    let-mutable show-num-chapter-subsubsec-ref <- true
+    let-mutable subsubsection-text-3-ref <- ` `
+    let-mutable show-num-section-subsubsec-ref <- true
+    let-mutable subsubsection-text-4-ref <- ` `
+    let-mutable show-num-subsection-subsubsec-ref <- true
+    let-mutable subsubsection-text-5-ref <- ` `
+    let-mutable show-num-subsubsection-ref <- true
+    let-mutable subsubsection-text-6-ref <- ` `
+    let-mutable subsubsection-text-7-ref <- ` `
+    let-mutable subsubsection-top-space-ref <- 0pt
+    let-mutable subsubsection-bottom-space-ref <- 0pt
+    let-mutable subsubsection-left-space-ref <- 0pt
+    let-mutable subsubsection-right-space-ref <- 0pt
+
+%% header-footer
+    let-mutable lhead-ref <- {}
+    let-mutable chead-ref <- {}
+    let-mutable rhead-ref <- {}
+    let-mutable header-line-ref <- 0pt
+    let-mutable lfoot-ref <- {}
+    let-mutable cfoot-ref <- {}
+    let-mutable rfoot-ref <- {}
+    let-mutable footer-line-ref <- 0pt
+
+    let-mutable tocpage-lhead-ref <- {}
+    let-mutable tocpage-chead-ref <- {}
+    let-mutable tocpage-rhead-ref <- {}
+    let-mutable tocpage-header-line-ref <- 0pt
+    let-mutable tocpage-lfoot-ref <- {}
+    let-mutable tocpage-cfoot-ref <- {}
+    let-mutable tocpage-rfoot-ref <- {}
+    let-mutable tocpage-footer-line-ref <- 0pt
+
+%% その他
+    let-mutable text-org-ref <- (0pt, 0pt)
+    let-mutable text-org-odd-ref <- (0pt, 0pt)
+    let-mutable text-width-ref <- 0pt
+    let-mutable text-height-ref <- 0pt
+    let-mutable hdrorg-ref <- (0pt, 0pt)
+    let-mutable hdrorg-odd-ref <- (0pt, 0pt)
+    let-mutable ftrorg-ref <- (0pt, 0pt)
+    let-mutable ftrorg-odd-ref <- (0pt, 0pt)
+    let-mutable hdrwid-ref <- 0pt
+    let-mutable ftrwid-ref <- 0pt
+    let-mutable header-thickness-ref <- 0pt
+    let-mutable footer-thickness-ref <- 0pt
+%%% titlepage用
+    let-mutable titlepage-text-org-ref <- (0pt, 0pt)
+    let-mutable titlepage-text-width-ref <- 0pt
+    let-mutable titlepage-text-height-ref <- 0pt
+    let-mutable titlepage-hdrorg-ref <- (0pt, 0pt)
+    let-mutable titlepage-ftrorg-ref <- (0pt, 0pt)
+    let-mutable titlepage-hdrwid-ref <- 0pt
+    let-mutable titlepage-ftrwid-ref <- 0pt
+%%% tocpage用
+    let-mutable tocpage-text-org-ref <- (0pt, 0pt)
+    let-mutable tocpage-text-width-ref <- 0pt
+    let-mutable tocpage-text-height-ref <- 0pt
+    let-mutable tocpage-titlepage-hdrorg-ref <- (0pt, 0pt)
+    let-mutable tocpage-hdrorg-ref <- (0pt, 0pt)
+    let-mutable tocpage-ftrorg-ref <- (0pt, 0pt)
+    let-mutable tocpage-hdrwid-ref <- 0pt
+    let-mutable tocpage-ftrwid-ref <- 0pt
+    let-mutable tocpage-header-thickness-ref <- 0pt
+    let-mutable tocpage-footer-thickness-ref <- 0pt
+
+    let-mutable  page-number <- 0
+    let-mutable  toc-page-number <- 0
+
+% -----------------------------------------------------------------------
+
+% documentの設定
+
+let document record inner =
+%% 可変参照に値を入れる
+    let () = title-ref <- record#title in
+    let () = author-ref <- record#author in
+    let () = date-ref <- record#date in
+    let () = show-title-ref <- record#show-title in
+    let () = show-toc-ref <- record#show-toc in
+%%% style
+    let () = page-width-ref <- record#style#page-width in
+    let () = page-height-ref <- record#style#page-height in
+    let () = top-space-ref <- record#style#top-space in
+    let () = bottom-space-ref <- record#style#bottom-space in
+    let () = left-space-ref <- record#style#left-space in
+    let () = right-space-ref <- record#style#right-space in
+    let () = header-left-space-ref <- record#style#header-left-space in
+    let () = header-right-space-ref <- record#style#header-right-space in
+    let () = header-height-ref <- record#style#header-height in
+    let () = footer-left-space-ref <- record#style#footer-left-space in
+    let () = footer-right-space-ref <- record#style#footer-right-space in
+    let () = footer-height-ref <-  record#style#footer-height in
+    let () = titlepage-top-space-ref <- record#style#titlepage-top-space in
+    let () = titlepage-bottom-space-ref <- record#style#titlepage-bottom-space in
+    let () = titlepage-left-space-ref <- record#style#titlepage-left-space in
+    let () = titlepage-right-space-ref <-  record#style#titlepage-right-space in
+    let () = tocpage-top-space-ref <- record#style#tocpage-top-space in
+    let () = tocpage-bottom-space-ref <-  record#style#tocpage-bottom-space in
+    let () = tocpage-left-space-ref <- record#style#tocpage-left-space in
+    let () = tocpage-right-space-ref <- record#style#tocpage-right-space in
+    let () = normal-fontsize-ref <- record#style#normal-fontsize in
+    let () = language-japanese-ref <- record#style#language-japanese in
+
+%%% design
+    let () = oneside-ref <- record#design#oneside in
+
+    let () = titlepage-ref <- record#design#titlepage in
+    let () = title-fontsize-ref <- record#design#title-fontsize in
+    let () = author-fontsize-ref <- record#design#author-fontsize in
+    let () = date-fontsize-ref <- record#design#date-fontsize in
+
+    let () = tocpage-ref <- record#design#tocpage in
+    let () = toc-fontsize-ref <- record#design#toc-fontsize in
+    let () = toc-line-text-part-ref <- record#design#toc-line-text-part in
+    let () = toc-line-text-chapter-ref <- record#design#toc-line-text-chapter in
+    let () = toc-line-text-section-ref <- record#design#toc-line-text-section in
+    let () = toc-line-text-subsection-ref <- record#design#toc-line-text-subsection in
+    let () = toc-line-text-subsubsection-ref <- record#design#toc-line-text-subsubsection in
+    let () = toc-line-space-part-ref <- record#design#toc-line-space-part in
+    let () = toc-line-space-chapter-ref <- record#design#toc-line-space-chapter in
+    let () = toc-line-space-section-ref <- record#design#toc-line-space-section in
+    let () = toc-line-space-subsection-ref <- record#design#toc-line-space-subsection in
+    let () = toc-line-space-subsubsection-ref <- record#design#toc-line-space-subsubsection in
+    let () = toc-depth-ref <- record#design#toc-depth in
+
+
+    let () = part-fontsize-ref <- record#design#part-fontsize in
+    let () = part-text-1-ref <- record#design#part-text-1 in
+    let () = part-text-2-ref <- record#design#part-text-2 in
+    let () = show-num-part-ref <- record#design#show-num-part in
+    let () = part-text-3-ref <- record#design#part-text-3 in
+    let () = part-text-4-ref <- record#design#part-text-4 in
+    let () = part-top-space-ref <- record#design#part-top-space in
+    let () = part-bottom-space-ref <- record#design#part-bottom-space in
+    let () = part-left-space-ref <- record#design#part-left-space in
+    let () = part-right-space-ref <- record#design#part-right-space in
+
+    let () = chapter-fontsize-ref <- record#design#chapter-fontsize in
+    let () = chapter-text-1-ref <- record#design#chapter-text-1 in
+    let () = chapter-text-2-ref <- record#design#chapter-text-2 in
+    let () = show-num-chapter-ref <- record#design#show-num-chapter in
+    let () = chapter-text-3-ref <- record#design#chapter-text-3 in
+    let () = chapter-text-4-ref <- record#design#chapter-text-4 in
+    let () = chapter-top-space-ref <- record#design#chapter-top-space in
+    let () = chapter-bottom-space-ref <- record#design#chapter-bottom-space in
+    let () = chapter-left-space-ref <- record#design#chapter-left-space in
+    let () = chapter-right-space-ref <- record#design#chapter-right-space in
+
+    let () = section-fontsize-ref <- record#design#section-fontsize in
+    let () = section-text-1-ref <- record#design#section-text-1 in
+    let () = section-text-2-ref <- record#design#section-text-2 in
+    let () = show-num-chapter-sec-ref <- record#design#show-num-chapter-sec in
+    let () = section-text-3-ref <- record#design#section-text-3 in
+    let () = show-num-section-ref <- record#design#show-num-section in
+    let () = section-text-4-ref <- record#design#section-text-4 in
+    let () = section-text-5-ref <- record#design#section-text-5 in
+    let () = section-top-space-ref <- record#design#section-top-space in
+    let () = section-bottom-space-ref <- record#design#section-bottom-space in
+    let () = section-left-space-ref <- record#design#section-left-space in
+    let () = section-right-space-ref <- record#design#section-right-space in
+
+    let () = subsection-fontsize-ref <- record#design#subsection-fontsize in
+    let () = subsection-text-1-ref <- record#design#subsection-text-1 in
+    let () = subsection-text-2-ref <- record#design#subsection-text-2 in
+    let () = show-num-chapter-subsec-ref <- record#design#show-num-chapter-subsec in
+    let () = subsection-text-3-ref <- record#design#subsection-text-3 in
+    let () = show-num-section-subsec-ref <- record#design#show-num-section-subsec in
+    let () = subsection-text-4-ref <- record#design#subsection-text-4 in
+    let () = show-num-subsection-ref <- record#design#show-num-subsection in
+    let () = subsection-text-5-ref <- record#design#subsection-text-5 in
+    let () = subsection-text-6-ref <- record#design#subsection-text-6 in
+    let () = subsection-top-space-ref <- record#design#subsection-top-space in
+    let () = subsection-bottom-space-ref <- record#design#subsection-bottom-space in
+    let () = subsection-left-space-ref <- record#design#subsection-left-space in
+    let () = subsection-right-space-ref <- record#design#subsection-right-space in
+
+    let () = subsubsection-fontsize-ref <- record#design#subsubsection-fontsize in
+    let () = subsubsection-text-1-ref <- record#design#subsubsection-text-1 in
+    let () = subsubsection-text-2-ref <- record#design#subsubsection-text-2 in
+    let () = show-num-chapter-subsubsec-ref <- record#design#show-num-chapter-subsubsec in
+    let () = subsubsection-text-3-ref <- record#design#subsubsection-text-3 in
+    let () = show-num-section-subsubsec-ref <- record#design#show-num-section-subsubsec in
+    let () = subsubsection-text-4-ref <- record#design#subsubsection-text-4 in
+    let () = show-num-subsection-subsubsec-ref <- record#design#show-num-subsection-subsubsec in
+    let () = subsubsection-text-5-ref <- record#design#subsubsection-text-5 in
+    let () = show-num-subsubsection-ref <- record#design#show-num-subsubsection in
+    let () = subsubsection-text-6-ref <- record#design#subsubsection-text-6 in
+    let () = subsubsection-text-7-ref <- record#design#subsubsection-text-7 in
+    let () = subsubsection-top-space-ref <- record#design#subsubsection-top-space in
+    let () = subsubsection-bottom-space-ref <- record#design#subsubsection-bottom-space in
+    let () = subsubsection-left-space-ref <- record#design#subsubsection-left-space in
+    let () = subsubsection-right-space-ref <- record#design#subsubsection-right-space in
+
+%%% header-footer
+    let () = lhead-ref <- record#header-footer#lhead in
+    let () = chead-ref <- record#header-footer#chead in
+    let () = rhead-ref <- record#header-footer#rhead in
+    let () = header-line-ref <- record#header-footer#header-line in
+    let () = lfoot-ref <- record#header-footer#lfoot in
+    let () = cfoot-ref <- record#header-footer#cfoot in
+    let () = rfoot-ref <- record#header-footer#rfoot in
+    let () = footer-line-ref <- record#header-footer#footer-line in
+
+    let () = tocpage-lhead-ref <- record#header-footer#tocpage-lhead in
+    let () = tocpage-chead-ref <- record#header-footer#tocpage-chead in
+    let () = tocpage-rhead-ref <- record#header-footer#tocpage-rhead in
+    let () = tocpage-header-line-ref <- record#header-footer#tocpage-header-line in
+    let () = tocpage-lfoot-ref <- record#header-footer#tocpage-lfoot in
+    let () = tocpage-cfoot-ref <- record#header-footer#tocpage-cfoot in
+    let () = tocpage-rfoot-ref <- record#header-footer#tocpage-rfoot in
+    let () = tocpage-footer-line-ref <- record#header-footer#tocpage-footer-line in
+
+%% 値計算
+    let () = text-org-ref <- ( !left-space-ref , (!top-space-ref +' !header-height-ref)) in
+    let () = text-org-odd-ref <- ( !right-space-ref , (!top-space-ref +' !header-height-ref)) in
+    let () = text-width-ref <- ((!page-width-ref -' !left-space-ref) -' !right-space-ref) in
+    let () = text-height-ref <- (!page-height-ref -' !top-space-ref -' !header-height-ref -' !footer-height-ref -' !bottom-space-ref) in
+    let () = hdrorg-ref <- ( !header-left-space-ref  , !top-space-ref) in
+    let () = hdrorg-odd-ref <- ( !header-right-space-ref  , !top-space-ref) in
+    let () = ftrorg-ref <- (!footer-left-space-ref , ((!page-height-ref -' !bottom-space-ref) -' !footer-height-ref)) in
+    let () = ftrorg-odd-ref <- (!footer-right-space-ref , ((!page-height-ref -' !bottom-space-ref) -' !footer-height-ref)) in
+    let () = hdrwid-ref <- ((!page-width-ref -' !header-left-space-ref)  -' !header-right-space-ref) in
+    let () = ftrwid-ref <- ((!page-width-ref -' !footer-left-space-ref) -' !footer-right-space-ref) in
+    let () = header-thickness-ref <- !header-line-ref in
+    let () = footer-thickness-ref <- !footer-line-ref in
+%%% titlepageでの計算
+    let () = titlepage-text-org-ref <- ( !titlepage-left-space-ref, (!titlepage-top-space-ref +' !header-height-ref)) in
+    let () = titlepage-text-width-ref <- ((!page-width-ref -' !titlepage-left-space-ref) -' !titlepage-right-space-ref) in
+    let () = titlepage-text-height-ref <- (!page-height-ref -' !titlepage-top-space-ref -' !header-height-ref -' !footer-height-ref -' !titlepage-bottom-space-ref) in
+    let () = titlepage-hdrorg-ref <- ( !header-left-space-ref  , !titlepage-top-space-ref) in
+    let () = titlepage-ftrorg-ref <- (!footer-left-space-ref , ((!page-height-ref -' !titlepage-bottom-space-ref) -' !footer-height-ref)) in
+    let () = titlepage-hdrwid-ref <- ((!page-width-ref -' !header-left-space-ref)  -' !header-right-space-ref) in
+    let () = titlepage-ftrwid-ref <- ((!page-width-ref -' !footer-left-space-ref) -' !footer-right-space-ref) in
+
+%%% tocpageでの計算
+    let () = tocpage-text-org-ref <- ( !tocpage-left-space-ref, (!tocpage-top-space-ref +' !header-height-ref)) in
+    let () = tocpage-text-width-ref <- ((!page-width-ref -' !tocpage-left-space-ref) -' !tocpage-right-space-ref) in
+    let () = tocpage-text-height-ref <- (!page-height-ref -' !tocpage-top-space-ref -' !header-height-ref -' !footer-height-ref -' !bottom-space-ref) in
+    let () = tocpage-hdrorg-ref <- ( !header-left-space-ref  , !tocpage-top-space-ref) in
+    let () = tocpage-ftrorg-ref <- (!footer-left-space-ref , ((!page-height-ref -' !tocpage-bottom-space-ref) -' !footer-height-ref)) in
+    let () = tocpage-hdrwid-ref <- ((!page-width-ref -' !header-left-space-ref)  -' !header-right-space-ref) in
+    let () = tocpage-ftrwid-ref <- ((!page-width-ref -' !footer-left-space-ref) -' !footer-right-space-ref) in
+    let () = tocpage-header-thickness-ref <- !tocpage-header-line-ref in
+    let () = tocpage-footer-thickness-ref <- !tocpage-footer-line-ref in
+
+%% 構築のための準備
+    let ctx-doc = get-standard-context !text-width-ref in
+    let ctx-header = get-standard-context !hdrwid-ref in
+    let ctx-footer = get-standard-context !ftrwid-ref in
+
+    let ctx-titlepage = get-standard-context !titlepage-text-width-ref in
+    let ctx-titlepage-header = get-standard-context !titlepage-hdrwid-ref in
+    let ctx-titlepage-footer = get-standard-context !titlepage-ftrwid-ref in
+
+    let ctx-tocpage = get-standard-context !tocpage-text-width-ref in
+    let ctx-tocpage-header = get-standard-context !tocpage-hdrwid-ref in
+    let ctx-tocpage-footer = get-standard-context !tocpage-ftrwid-ref in
+
+%% メイン部分読み込み
+    let bb-main = read-block ctx-doc inner in
+
+%% タイトル
+    let bb-title =
+    if not !show-title-ref then
+        block-nil
+    else
+      if !titlepage-ref then
+        let bb-title-main =
+          let ctx =
+            ctx-doc |> set-font-size !title-fontsize-ref
+          in
+            line-break false false ctx
+              (inline-fil ++ read-inline ctx !title-ref ++ inline-fil)
+        in
+        let bb-author =
+          let ctx =
+            ctx-doc |> set-font-size !author-fontsize-ref
+          in
+            line-break false false ctx
+              (inline-fil ++ read-inline ctx !author-ref ++ inline-fil)
+        in
+        let bb-date =
+          let ctx =
+            ctx-doc |> set-font-size !date-fontsize-ref
+          in
+            line-break false false ctx
+              (inline-fil ++ read-inline ctx !date-ref ++ inline-fil)
+        in
+          bb-title-main +++ bb-author +++ bb-date +++ clear-page
+
+       else
+
+        let bb-title-main =
+          let ctx =
+            ctx-doc |> set-font-size !title-fontsize-ref
+          in
+            line-break false false ctx
+              (inline-fil ++ read-inline ctx !title-ref ++ inline-fil)
+        in
+        let bb-author =
+          let ctx =
+            ctx-doc |> set-font-size !author-fontsize-ref
+          in
+            line-break false false ctx
+              (inline-fil ++ read-inline ctx !author-ref ++ inline-fil)
+        in
+        let bb-date =
+          let ctx =
+            ctx-doc |> set-font-size !date-fontsize-ref
+          in
+            line-break false false ctx
+              (inline-fil ++ read-inline ctx !date-ref ++ inline-fil)
+        in
+          bb-title-main +++ bb-author +++ bb-date
+    in
+
+%% 目次
+    let make-toc-title ctx =
+        ctx |> set-font-size !toc-fontsize-ref
+            |> set-font Latin font-latin-sans
+            |> set-cjk-font font-cjk-gothic
+    in
+
+    let bb-toc =
+        if not !show-toc-ref then
+            block-nil
+        else
+                let bb-toc-title =
+                line-break true false ctx-doc (read-inline (make-toc-title ctx-doc) {目次} ++ inline-fil)
+                in
+                let bb-toc-main =
+                (!toc-acc-ref) |> List.reverse |> List.fold-left (fun bbacc tocelem -> (
+                    match tocelem with
+                    | TocPart(label, title) ->
+                        let it-num = embed-string (get-cross-reference-number label) in
+                        let it-page = embed-string (get-cross-reference-page label) in
+                        let ib-title = read-inline ctx-doc {#it-num; #title;} ++ inline-skip 3pt in
+                        let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
+                        let toc-line-part =
+                            let w = (get-text-width ctx-doc) -' !toc-line-space-part-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
+                            if w <' 0pt then inline-fil else
+                            make-toc-line ctx-doc w !toc-line-text-part-ref
+                        in
+                        bbacc +++ line-break true true ctx-doc
+                            (inline-skip !toc-line-space-part-ref ++ ib-title ++ inline-fil ++ toc-line-part ++ inline-fil ++ ib-page)
+
+                    | TocChapter(label, title) ->
+                        let it-num = embed-string (get-cross-reference-number label) in
+                        let it-page = embed-string (get-cross-reference-page label) in
+                        let ib-title = read-inline ctx-doc {#it-num; #title;} ++ inline-skip 3pt in
+                        let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
+                        let toc-line-chapter =
+                            let w = (get-text-width ctx-doc) -' !toc-line-space-chapter-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
+                            if w <' 0pt then inline-fil else
+                            make-toc-line ctx-doc w !toc-line-text-chapter-ref
+                        in
+                        bbacc +++ line-break true true ctx-doc
+                            (inline-skip !toc-line-space-chapter-ref ++ ib-title ++ inline-fil ++ toc-line-chapter ++ inline-fil ++ ib-page)
+
+                    | TocSection(label, title) ->
+                        let it-num = embed-string (get-cross-reference-number label) in
+                        let it-page = embed-string (get-cross-reference-page label) in
+                        let ib-title = read-inline ctx-doc {#it-num; #title;} ++ inline-skip 3pt in
+                        let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
+                        let toc-line-section =
+                            let w = (get-text-width ctx-doc) -' !toc-line-space-section-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
+                            if w <' 0pt then inline-fil else
+                            make-toc-line ctx-doc w !toc-line-text-section-ref
+                        in
+                        bbacc +++ line-break true true ctx-doc
+                            (inline-skip !toc-line-space-section-ref ++ ib-title ++ inline-fil ++ toc-line-section ++ inline-fil ++ ib-page)
+
+                | TocSubSection(label, title) ->
+                        let it-num = embed-string (get-cross-reference-number label) in
+                        let it-page = embed-string (get-cross-reference-page label) in
+                        let ib-title = read-inline ctx-doc {#it-num; #title;} ++ inline-skip 3pt in
+                        let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
+                        let toc-line-subsection =
+                            let w = (get-text-width ctx-doc) -' !toc-line-space-subsection-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
+                            if w <' 0pt then inline-fil else
+                            make-toc-line ctx-doc w !toc-line-text-subsection-ref
+                        in
+                        bbacc +++ line-break true true ctx-doc
+                            (inline-skip !toc-line-space-subsection-ref ++ ib-title ++ inline-fil ++ toc-line-subsection ++ inline-fil ++ ib-page)
+
+                    | TocSubSubSection(label, title) ->
+                        let it-num = embed-string (get-cross-reference-number label) in
+                        let it-page = embed-string (get-cross-reference-page label) in
+                        let ib-title = read-inline ctx-doc {#it-num; #title;} ++ inline-skip 3pt in
+                        let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
+                        let toc-line-subsubsection =
+                            let w = (get-text-width ctx-doc) -' !toc-line-space-subsubsection-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
+                            if w <' 0pt then inline-fil else
+                            make-toc-line ctx-doc w !toc-line-text-subsubsection-ref
+                        in
+                        bbacc +++ line-break true true ctx-doc
+                            (inline-skip !toc-line-space-subsubsection-ref ++ ib-title ++ inline-fil ++ toc-line-subsubsection ++ inline-fil ++ ib-page)
+                )) block-nil
+                in
+        if !tocpage-ref then
+            bb-toc-title +++ bb-toc-main +++ clear-page
+        else
+            bb-toc-title +++ bb-toc-main
+    in
+%ページについてセッティング
+%% page
+    let page = UserDefinedPaper(!page-width-ref , !page-height-ref) in
+
+%% pagecontf
+    let-mutable ref-float-boxes <- [] in
+    let height-of-float-boxes pageno =
+        (!ref-float-boxes) |> List.fold-left (fun h (pn, bb) -> (
+        if pn < pageno then h +' (get-natural-length bb) else h
+        )) 0pt
+    in
+
+    let pagecontf pbinfo =
+        let () = page-number <- pbinfo#page-number in
+        let hgtfb = height-of-float-boxes pbinfo#page-number in
+        let (txtorgx, txtorgy) =
+            if !oneside-ref then
+                !text-org-ref
+            else
+                if pbinfo#page-number mod 2 == 0 then
+                    !text-org-ref
+                else
+                    !text-org-odd-ref
+        in
+      (|
+        text-origin = (txtorgx, txtorgy +' hgtfb);
+        text-height = !text-height-ref -' hgtfb;
+      |)
+    in
+
+%% pagepartsf
+    let pagepartsf pbinfo =
+%%% header
+      let header =
+        if !titlepage-ref then
+            if pbinfo#page-number == 1 then
+                block-nil
+            else
+                let lhead = !lhead-ref in
+                let chead = !chead-ref in
+                let rhead = !rhead-ref in
+                let header-text =
+                    if !oneside-ref then
+                        (inline-skip 5pt ++ (read-inline ctx-header {#lhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#rhead;}) ++ inline-skip 5pt)
+                    else
+                        if pbinfo#page-number mod 2 == 0 then
+                            (inline-skip 5pt ++ (read-inline ctx-header {#lhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#rhead;}) ++ inline-skip 5pt)
+                        else
+                            (inline-skip 5pt ++ (read-inline ctx-header {#rhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#lhead;}) ++ inline-skip 5pt)
+                in
+                line-break true true ctx-header header-text
+                            +++ line-break true true (ctx-header |> set-paragraph-margin 0pt 0pt)
+                    ((inline-graphics !hdrwid-ref !header-thickness-ref 0pt
+                        (fun (x, y) -> [ fill Color.black (Gr.rectangle (x, y) (x +' !hdrwid-ref, y +' !header-thickness-ref))])) ++ inline-fil)
+        else
+            if !show-title-ref then
+                if pbinfo#page-number == 1 then
+                    block-nil
+                else
+                    let lhead = !lhead-ref in
+                    let chead = !chead-ref in
+                    let rhead = !rhead-ref in
+                    let header-text =
+                        if !oneside-ref then
+                            (inline-skip 5pt ++ (read-inline ctx-header {#lhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#rhead;}) ++ inline-skip 5pt)
+                        else
+                            if pbinfo#page-number mod 2 == 0 then
+                                (inline-skip 5pt ++ (read-inline ctx-header {#lhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#rhead;}) ++ inline-skip 5pt)
+                            else
+                                (inline-skip 5pt ++ (read-inline ctx-header {#rhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#lhead;}) ++ inline-skip 5pt)
+                    in
+                    line-break true true ctx-header header-text
+                                +++ line-break true true (ctx-header |> set-paragraph-margin 0pt 0pt)
+                        ((inline-graphics !hdrwid-ref !header-thickness-ref 0pt
+                            (fun (x, y) -> [ fill Color.black (Gr.rectangle (x, y) (x +' !hdrwid-ref, y +' !header-thickness-ref))])) ++ inline-fil)
+            else
+                let lhead = !lhead-ref in
+                let chead = !chead-ref in
+                let rhead = !rhead-ref in
+                let header-text =
+                    if !oneside-ref then
+                        (inline-skip 5pt ++ (read-inline ctx-header {#lhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#rhead;}) ++ inline-skip 5pt)
+                    else
+                        if pbinfo#page-number mod 2 == 0 then
+                            (inline-skip 5pt ++ (read-inline ctx-header {#lhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#rhead;}) ++ inline-skip 5pt)
+                        else
+                            (inline-skip 5pt ++ (read-inline ctx-header {#rhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#lhead;}) ++ inline-skip 5pt)
+                in
+                line-break true true ctx-header header-text
+                            +++ line-break true true (ctx-header |> set-paragraph-margin 0pt 0pt)
+                    ((inline-graphics !hdrwid-ref !header-thickness-ref 0pt
+                        (fun (x, y) -> [ fill Color.black (Gr.rectangle (x, y) (x +' !hdrwid-ref, y +' !header-thickness-ref))])) ++ inline-fil)
+      in
+%%% footer
+      let footer =
+        if !titlepage-ref then
+            if pbinfo#page-number == 1 then
+                block-nil
+            else
+                let lfoot = !lfoot-ref in
+                let cfoot = !cfoot-ref in
+                let rfoot = !rfoot-ref in
+                let footer-text =
+                    if !oneside-ref then
+                        (inline-skip 5pt ++ (read-inline ctx-header {#lfoot;}) ++ inline-fil ++ (read-inline ctx-header {#cfoot;}) ++ inline-fil ++ (read-inline ctx-header {#rfoot;}) ++ inline-skip 5pt)
+                    else
+                        if pbinfo#page-number mod 2 == 0 then
+                            (inline-skip 5pt ++ (read-inline ctx-header {#lfoot;}) ++ inline-fil ++ (read-inline ctx-header {#cfoot;}) ++ inline-fil ++ (read-inline ctx-header {#rfoot;}) ++ inline-skip 5pt)
+                        else
+                            (inline-skip 5pt ++ (read-inline ctx-header {#rfoot;}) ++ inline-fil ++ (read-inline ctx-header {#cfoot;}) ++ inline-fil ++ (read-inline ctx-header {#lfoot;}) ++ inline-skip 5pt)
+                in (block-skip 1pt) +++
+                    line-break true true (ctx-footer |> set-paragraph-margin 0pt 0pt)
+                    ((inline-graphics !hdrwid-ref !footer-thickness-ref 0pt
+                        (fun (x, y) -> [ fill Color.black (Gr.rectangle (x, y) (x +' !hdrwid-ref, y +' !footer-thickness-ref))])) ++ inline-fil)
+                        +++ (block-skip 5pt)
+                        +++ line-break true true ctx-footer footer-text
+        else
+            let lfoot = !lfoot-ref in
+            let cfoot = !cfoot-ref in
+            let rfoot = !rfoot-ref in
+            let footer-text =
+                if !oneside-ref then
+                    (inline-skip 5pt ++ (read-inline ctx-header {#lfoot;}) ++ inline-fil ++ (read-inline ctx-header {#cfoot;}) ++ inline-fil ++ (read-inline ctx-header {#rfoot;}) ++ inline-skip 5pt)
+                else
+                    if pbinfo#page-number mod 2 == 0 then
+                        (inline-skip 5pt ++ (read-inline ctx-header {#lfoot;}) ++ inline-fil ++ (read-inline ctx-header {#cfoot;}) ++ inline-fil ++ (read-inline ctx-header {#rfoot;}) ++ inline-skip 5pt)
+                    else
+                        (inline-skip 5pt ++ (read-inline ctx-header {#rfoot;}) ++ inline-fil ++ (read-inline ctx-header {#cfoot;}) ++ inline-fil ++ (read-inline ctx-header {#lfoot;}) ++ inline-skip 5pt)
+            in (block-skip 1pt) +++
+                line-break true true (ctx-footer |> set-paragraph-margin 0pt 0pt)
+                ((inline-graphics !hdrwid-ref !footer-thickness-ref 0pt
+                    (fun (x, y) -> [ fill Color.black (Gr.rectangle (x, y) (x +' !hdrwid-ref, y +' !footer-thickness-ref))])) ++ inline-fil)
+                    +++ (block-skip 5pt)
+                    +++ line-break true true ctx-footer footer-text
+            in
+
+            let header-origin =
+                if !oneside-ref then
+                    !hdrorg-ref
+                else
+                    if pbinfo#page-number mod 2 == 0 then
+                        !hdrorg-ref
+                    else
+                        !hdrorg-odd-ref
+            in
+            let footer-origin =
+                if !oneside-ref then
+                    !ftrorg-ref
+                else
+                    if pbinfo#page-number mod 2 == 0 then
+                        !ftrorg-ref
+                    else
+                        !ftrorg-odd-ref
+            in
+        (|
+          header-origin  = header-origin;
+
+          header-content = header;
+          footer-origin  = footer-origin;
+          footer-content = footer;
+        |)
+        in
+        page-break page pagecontf pagepartsf (bb-title +++ bb-toc +++ bb-main)
+
+% -----------------------------------------------------------------------
+
+% コマンド等の実装
+
+%% +sectionとかの実装
+
+%%% title部分の設定
+    let make-part-title ctx =
+    ctx |> set-font-size !part-fontsize-ref
+        |> set-latin-font font-latin-sans
+        |> set-cjk-font font-cjk-gothic
+
+  let make-chapter-title ctx =
+    ctx |> set-font-size !chapter-fontsize-ref
+        |> set-latin-font font-latin-sans
+        |> set-cjk-font font-cjk-gothic
+
+  let make-section-title ctx =
+    ctx |> set-font-size !section-fontsize-ref
+        |> set-latin-font font-latin-sans
+        |> set-cjk-font font-cjk-gothic
+
+
+  let make-subsection-title ctx =
+    ctx |> set-font-size !subsection-fontsize-ref
+        |> set-latin-font font-latin-sans
+        |> set-cjk-font font-cjk-gothic
+
+
+  let make-subsubsection-title ctx =
+    ctx |> set-font-size !subsubsection-fontsize-ref
+        |> set-latin-font font-latin-sans
+        |> set-cjk-font font-cjk-gothic
+
+%%% 必要な可変参照設定
+  let-mutable needs-indentation-ref <- true
+  let-mutable num-part-ref <- 0
+  let-mutable num-chapter-ref <- 0
+  let-mutable num-section-ref <- 0
+  let-mutable num-subsection-ref <- 0
+  let-mutable num-subsubsection-ref <- 0
+
+%%% それぞれの要素の設定
+  let part-scheme ctx label title inner =
+    let ctx-title = make-part-title ctx in
+    let () = num-part-ref <- !num-part-ref + 1 in
+    let () = num-chapter-ref <- 0 in
+    let () = needs-indentation-ref <- false in
+      let num-part = if !show-num-part-ref then arabic (!num-part-ref) else ` ` in
+    let part-title = !part-text-1-ref ^ !part-text-2-ref ^ (num-part) ^ !part-text-3-ref ^ !part-text-4-ref in
+    let () = register-cross-reference (label ^ `:num`) part-title in
+    let () = if !toc-depth-ref < 0 then toc-acc-ref <- !toc-acc-ref else toc-acc-ref <- (TocPart(label, title)) :: !toc-acc-ref in
+    let ib-num =
+      read-inline ctx-title (embed-string (part-title))
+        ++ hook-page-break (fun pbinfo _ -> register-cross-reference (label ^ `:page`) (arabic pbinfo#page-number))
+    in
+    let ib-title = read-inline ctx-title title in
+    let bb-title =
+      line-break true false (ctx |> set-paragraph-margin !part-top-space-ref !part-bottom-space-ref)
+        ((inline-skip !part-left-space-ref) ++ ib-num ++ (inline-skip !part-right-space-ref) ++ ib-title ++ (inline-fil))
+    in
+    let bb-inner = read-block ctx inner in
+      bb-title +++ bb-inner
+
+
+  let chapter-scheme ctx label title inner =
+    let ctx-title = make-chapter-title ctx in
+    let () = num-chapter-ref <- !num-chapter-ref + 1 in
+    let () = num-section-ref <- 0 in
+    let () = needs-indentation-ref <- false in
+      let num-chapter = if !show-num-chapter-ref then arabic (!num-chapter-ref) else ` ` in
+    let chapter-title = !chapter-text-1-ref ^ !chapter-text-2-ref ^ (num-chapter) ^ !chapter-text-3-ref ^ !chapter-text-4-ref in
+    let () = register-cross-reference (label ^ `:num`) chapter-title in
+    let () = if !toc-depth-ref < 1 then toc-acc-ref <- !toc-acc-ref else toc-acc-ref <- (TocChapter(label, title)) :: !toc-acc-ref in
+    let ib-num =
+      read-inline ctx-title (embed-string (chapter-title))
+        ++ hook-page-break (fun pbinfo _ -> register-cross-reference (label ^ `:page`) (arabic pbinfo#page-number))
+    in
+    let ib-title = read-inline ctx-title title in
+    let bb-title =
+      line-break true false (ctx |> set-paragraph-margin !chapter-top-space-ref !chapter-bottom-space-ref)
+        ((inline-skip !chapter-left-space-ref) ++ ib-num ++ (inline-skip !chapter-right-space-ref) ++ ib-title ++ (inline-fil))
+    in
+    let bb-inner = read-block ctx inner in
+      bb-title +++ bb-inner
+
+
+  let section-scheme ctx label title inner =
+    let ctx-title = make-section-title ctx in
+    let () = num-section-ref <- !num-section-ref + 1 in
+    let () = num-subsection-ref <- 0 in
+    let () = needs-indentation-ref <- false in
+      let num-chapter-sec = if !show-num-chapter-sec-ref then arabic(!num-chapter-ref) else ` ` in
+      let num-section = if !show-num-section-ref then arabic(!num-section-ref) else ` ` in
+    let section-title = !section-text-1-ref ^ !section-text-2-ref ^ (num-chapter-sec) ^ !section-text-3-ref ^ (num-section) ^ !section-text-4-ref ^ !section-text-5-ref in
+    let () = register-cross-reference (label ^ `:num`) section-title in
+    let () = if !toc-depth-ref < 2 then toc-acc-ref <- !toc-acc-ref else toc-acc-ref <- (TocSection(label, title)) :: !toc-acc-ref in
+    let ib-num =
+      read-inline ctx-title (embed-string (section-title))
+        ++ hook-page-break (fun pbinfo _ -> register-cross-reference (label ^ `:page`) (arabic pbinfo#page-number))
+    in
+    let ib-title = read-inline ctx-title title in
+    let bb-title =
+      line-break true false (ctx |> set-paragraph-margin !section-top-space-ref !section-bottom-space-ref)
+        ((inline-skip !section-left-space-ref) ++ ib-num ++ (inline-skip !section-right-space-ref) ++ ib-title ++ (inline-fil))
+    in
+    let bb-inner = read-block ctx inner in
+      bb-title +++ bb-inner
+
+
+  let subsection-scheme ctx label title inner =
+    let ctx-title = make-subsection-title ctx in
+    let () = num-subsection-ref <- !num-subsection-ref + 1 in
+    let () = num-subsubsection-ref <- 0 in
+    let () = needs-indentation-ref <- false in
+      let num-chapter-subsec = if !show-num-chapter-subsec-ref then arabic(!num-chapter-ref) else ` ` in
+      let num-section-subsec = if !show-num-section-subsec-ref then arabic(!num-section-ref) else ` ` in
+      let num-subsection = if !show-num-subsection-ref then arabic(!num-subsection-ref) else ` ` in
+    let subsection-title = !subsection-text-1-ref ^ !subsection-text-2-ref ^ (num-chapter-subsec) ^ !subsection-text-3-ref ^ (num-section-subsec) ^ !subsection-text-4-ref ^ (num-subsection) ^ !subsection-text-5-ref ^ !subsection-text-6-ref in
+    let () = register-cross-reference (label ^ `:num`) subsection-title in
+    let () = if !toc-depth-ref < 3 then toc-acc-ref <- !toc-acc-ref else toc-acc-ref <- (TocSubSection(label, title)) :: !toc-acc-ref in
+    let ib-num =
+      read-inline ctx-title (embed-string (subsection-title))
+        ++ hook-page-break (fun pbinfo _ -> register-cross-reference (label ^ `:page`) (arabic pbinfo#page-number))
+    in
+    let ib-title = read-inline ctx-title title in
+    let bb-title =
+      line-break true false (ctx |> set-paragraph-margin !subsection-top-space-ref !subsection-bottom-space-ref)
+        ((inline-skip !subsection-left-space-ref) ++ ib-num ++ (inline-skip !subsection-right-space-ref) ++ ib-title ++ (inline-fil))
+    in
+    let bb-inner = read-block ctx inner in
+      bb-title +++ bb-inner
+
+
+  let subsubsection-scheme ctx label title inner =
+    let ctx-title = make-subsubsection-title ctx in
+    let () = num-subsubsection-ref <- !num-subsubsection-ref + 1 in
+    let () = needs-indentation-ref <- false in
+      let num-chapter-subsubsec = if !show-num-chapter-subsubsec-ref then arabic(!num-chapter-ref) else ` ` in
+      let num-section-subsubsec = if !show-num-section-subsubsec-ref then arabic(!num-section-ref) else ` ` in
+      let num-subsection-subsubsec = if !show-num-subsection-subsubsec-ref then arabic(!num-subsection-ref) else ` ` in
+      let num-subsubsection = if !show-num-subsubsection-ref then arabic(!num-subsubsection-ref) else ` ` in
+    let subsubsection-title = !subsubsection-text-1-ref ^ !subsubsection-text-2-ref ^ (num-chapter-subsubsec) ^ !subsubsection-text-3-ref ^ (num-section-subsubsec) ^ !subsubsection-text-4-ref ^ (num-subsection-subsubsec) ^ !subsubsection-text-5-ref ^ (num-subsubsection) ^ !subsubsection-text-6-ref ^ !subsubsection-text-7-ref in
+    let () = register-cross-reference (label ^ `:num`) subsubsection-title in
+    let () = if !toc-depth-ref < 4 then toc-acc-ref <- !toc-acc-ref else toc-acc-ref <- (TocSubSubSection(label, title)) :: !toc-acc-ref in
+    let ib-num =
+      read-inline ctx-title (embed-string (subsubsection-title))
+        ++ hook-page-break (fun pbinfo _ -> register-cross-reference (label ^ `:page`) (arabic pbinfo#page-number))
+    in
+    let ib-title = read-inline ctx-title title in
+    let bb-title =
+      line-break true false (ctx |> set-paragraph-margin !subsubsection-top-space-ref !subsubsection-bottom-space-ref)
+        ((inline-skip !subsubsection-left-space-ref) ++ ib-num ++ (inline-skip !subsubsection-right-space-ref) ++ ib-title ++ (inline-fil))
+    in
+    let bb-inner = read-block ctx inner in
+      bb-title +++ bb-inner
+
+
+%%% +section系を定義
+  let-block ctx +part ?:labelopt title inner =
+    let label =
+      match labelopt with
+      | None -> generate-fresh-label ()
+      | Some(label) -> label
+    in
+      part-scheme ctx label title inner
+
+  let-block ctx +chapter ?:labelopt title inner =
+    let label =
+      match labelopt with
+      | None -> generate-fresh-label ()
+      | Some(label) -> label
+    in
+      chapter-scheme ctx label title inner
+
+  let-block ctx +section ?:labelopt title inner =
+    let label =
+      match labelopt with
+      | None -> generate-fresh-label ()
+      | Some(label) -> label
+    in
+      section-scheme ctx label title inner
+
+  let-block ctx +subsection ?:labelopt title inner =
+    let label =
+      match labelopt with
+      | None -> generate-fresh-label ()
+      | Some(label) -> label
+    in
+      subsection-scheme ctx label title inner
+
+  let-block ctx +subsubsection ?:labelopt title inner =
+    let label =
+      match labelopt with
+      | None -> generate-fresh-label ()
+      | Some(label) -> label
+    in
+      subsubsection-scheme ctx label title inner
+
+% +p関係
+let quad-indent-ja ctx =
+        inline-skip (get-font-size ctx *' font-ratio-cjk)
+
+let quad-indent-en ctx =
+        inline-skip (get-font-size ctx *' font-ratio-latin)
+
+  let-block ctx +p-ja inner =
+    let needs-indentation =
+      if !needs-indentation-ref then true else
+        let () = needs-indentation-ref <- true in
+          false
+    in
+    let ib-inner =
+        let ctx-normal =
+          ctx |> set-font-size !normal-fontsize-ref in
+      read-inline ctx-normal inner in
+    let br-parag =
+        (quad-indent-ja ctx) ++ ib-inner ++ inline-fil
+    in
+      form-paragraph ctx br-parag
+
+  let-block ctx +p-en inner =
+    let needs-indentation =
+      if !needs-indentation-ref then true else
+        let () = needs-indentation-ref <- true in
+          false
+    in
+    let ib-inner =
+        let ctx-normal =
+          ctx |> set-font-size !normal-fontsize-ref in
+      read-inline ctx-normal inner in
+    let br-parag =
+      if needs-indentation then
+        (quad-indent-en ctx) ++ ib-inner ++ inline-fil
+      else
+        ib-inner ++ inline-fil
+    in
+      form-paragraph ctx br-parag
+
+    let-block +p inner = if !language-japanese-ref then '<+p-ja{#inner;}> else '<+p-en{#inner;}>
+
+  let-block ctx +pn inner =
+    let ib-inner =
+        let ctx-normal =
+          ctx |> set-font-size !normal-fontsize-ref in
+      read-inline ctx-normal inner in
+      form-paragraph ctx (ib-inner ++ inline-fil)
+
+let-inline ctx \textrm it =
+    let ctxrm =
+        ctx |> set-latin-font font-latin-roman
+            |> set-cjk-font font-cjk-mincho
+    in
+read-inline ctxrm it
+
+let-inline ctx \textbf it =
+    let ctxbf =
+        ctx |> set-latin-font font-latin-bold
+            |> set-cjk-font font-cjk-gothic
+    in
+read-inline ctxbf it
+
+let-inline ctx \textit it =
+    let ctxit =
+        ctx |> set-latin-font font-latin-italic
+            |> set-cjk-font font-cjk-mincho
+in
+read-inline ctxit it
+
+let-inline ctx \textsf it =
+    let ctxsf =
+        ctx |> set-latin-font font-latin-sans
+            |> set-cjk-font font-cjk-gothic
+    in
+read-inline ctxsf it
+
+let-inline ctx \textmc it =
+    let ctxmc =
+        ctx |> set-latin-font font-latin-roman
+            |> set-cjk-font font-cjk-mincho
+    in
+read-inline ctxmc it
+
+let-inline ctx \textgt it =
+    let ctxgt =
+        ctx |> set-latin-font font-latin-bold
+            |> set-cjk-font font-cjk-gothic
+    in
+read-inline ctxgt it
+
+  let-inline ctx \footnote it = inline-nil
+
+let-inline \pagenum = if !titlepage-ref then embed-string(arabic (!page-number - 1)) else embed-string(arabic !page-number)
+
+end
+
+let document = ExDesign.document
