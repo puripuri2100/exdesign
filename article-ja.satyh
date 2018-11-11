@@ -1,4 +1,9 @@
-@import: exdesign
+%UTF-8
+%(c) Naoki Kaneko 2018
+%https://github.com/puripuri2100/exdesign
+%v0.1
+
+@require : exdesign
 
 module ArticleJa : sig
 

@@ -1,6 +1,7 @@
 %UTF-8
 %(c) Naoki Kaneko and T. Suwa  2018
 %https://github.com/puripuri2100/exdesign
+%v0.1
 
 @require: math
 @require: list
