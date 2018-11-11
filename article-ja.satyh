@@ -3,7 +3,7 @@
 %https://github.com/puripuri2100/exdesign
 %v0.1
 
-@require : exdesign
+@require: exdesign
 
 module ArticleJa : sig
 
