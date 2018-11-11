@@ -1053,11 +1053,31 @@ let document record inner =
                     (fun (x, y) -> [ fill Color.black (Gr.rectangle (x, y) (x +' !hdrwid-ref, y +' !footer-thickness-ref))])) ++ inline-fil)
                     +++ (block-skip 5pt)
                     +++ line-break true true ctx-footer footer-text
-      in
+            in
+
+            let header-origin =
+                if !oneside-ref then
+                    !hdrorg-ref
+                else
+                    if pbinfo#page-number mod 2 == 0 then
+                        !hdrorg-ref
+                    else
+                        !hdrorg-odd-ref
+            in
+            let footer-origin =
+                if !oneside-ref then
+                    !ftrorg-ref
+                else
+                    if pbinfo#page-number mod 2 == 0 then
+                        !ftrorg-ref
+                    else
+                        !ftrorg-odd-ref
+            in
         (|
-          header-origin  = !hdrorg-ref;
+          header-origin  = header-origin;
+
           header-content = header;
-          footer-origin  = !ftrorg-ref;
+          footer-origin  = footer-origin;
           footer-content = footer;
         |)
         in
