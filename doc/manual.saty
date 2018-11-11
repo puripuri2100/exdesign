@@ -1,0 +1,69 @@
+@require: exdesign
+@require: article-ja
+@require: code
+@require: itemize
+
+document (|
+        title = {ExDesignパッケージ};
+        author = {puripuri2100};
+        date = {2018/11/04};
+        show-title = true;
+        show-toc = true;
+        style = ArticleJa.a4paper ;
+        design = ArticleJa.article;
+        header-footer = ArticleJa.normalHF;
+|) '<
+  +section{はじめに}<
+      +p{ExDesignパッケージは、デザインと、クラスファイルとして成立するために必要な設定や提供するコマンドを分離させた\SATySFi;用の新しいクラスファイルです。
+      これによって、基本となる体裁を維持しつつ、デザインを（ある程度の制約はあるものの）自由に変えることが可能になります。}
+      +p{この特性のため、ExDesignパッケージは通常のクラスファイルであるexdesign.satyhに加えて、いくつかの補助パッケージも同時に提供することになります。また、補助パッケージを自作することも可能であり、推奨はされないが一つのドキュメントに全ての指定を書き込むこともできる。}
+  >
+  +section{簡単な使用方法}<
+      +p{補助パッケージを使用する際にはこのように書きます。}
+        +console(`
+@require: exdesign
+@require: article-ja
+
+document (|
+        title = {title;
+        author = {puripuri2100};
+        date = {2018/11/04};
+        show-title = true;
+        show-toc = true;
+        style = ArticleJa.a4paper;
+        design = ArticleJa.article;
+        header-footer = ArticleJa.normalHF;
+|) '<
+    +p{test}
+>`
+);
++pn{このように、\code(`@require : exdesign`);でパッケージを読み込み、補助パッケージであるarticle-ja.satyhを\code(`@require : article-ja`);で読み込みます（勿論、article-ja.satyhの置き場所によってどのコマンドを使用して読み込むかは変わりますが）。}
+
++p{そして、\code(`document`);コマンドの引数であるレコード型に必要な値を入れていきます。}
+
++p{\code(`title`);ではinline-textを入れてください。出力されるタイトル部分になります。\code(`author`);は著者、\code(`date`);は日付です。\code(`show-title`);と\code(`show-toc`);には真偽値を入れてください。前者は「タイトルを出力するか」どうかで、後者は「目次を出力するかどうか」です。これはstdjaクラスと同じです。}
+
++p{\code(`style`);では、版面に関する設定を行いますが、22個ほど指定しなければならない値があるレコード型なので、補助パッケージで既にその値を入力済みとなっている関数を使いましょう。ここでの\code(`ArticleJa.a4paper`);がそれです。同様にして\code(`design`);と\code(`header-footer`);も指定します。これで後は書くだけです。}
+  >
++section{提供するコマンド}<
+    +p{ExDesignパッケージが提供するコマンドです。}
+    +listing{
+        * \code(`` +part?:(`string`){inline-text}<block-text> ``); : 部を提供する。
+        * \code(`` +chapter?:(`string`){inline-text}<block-text> ``); : 章を提供する。
+        * \code(`` +section?:(`string`){inline-text}<block-text> ``); : 節を提供する。
+        * \code(`` +subsection?:(`string`){inline-text}<block-text> ``); : 小節を提供する。
+        * \code(`` +subsubsection?:(`string`){inline-text}<block-text> ``); : 小々節を提供する。
+        * \code(` +p-ja{inline-text} `); : 日本語を入れる段落
+        * \code(` +p-en{inline-text} `); : 英語を入れる段落
+        * \code(` +p{inline-text} `); : 文字を入れる段落（言語選択によって中身が\code(` +p-ja `);もしくは\code(` +p-en `);になる。）
+        * \code(` +p{inline-text} `); : 文字を入れる行頭インデント無しの段落
+        * \code(` \textrm{inline-text} `); : ローマン体にする
+        * \code(` \textbf{inline-text} `); : ボールド体にする
+        * \code(` \textit{inline-text} `); : イタリック体にする
+        * \code(` \textsf{inline-text} `); : サンセリフ体にする
+        * \code(` \textmc{inline-text} `); : 明朝体にする
+        * \code(` \textgt{inline-text} `); : ゴチック体にする
+        * \code(` \footnote{inline-text} `); : フットノートを提供する（ただし、\SATySFi; for Windows Versionでは空）
+    }
+>
+>

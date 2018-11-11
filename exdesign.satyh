@@ -172,7 +172,6 @@ direct \textsf : [inline-text] inline-cmd
 direct \textmc : [inline-text] inline-cmd
 direct \textgt : [inline-text] inline-cmd
 direct \footnote : [inline-text] inline-cmd
-direct \pagenum : [] inline-cmd
 
     val title-ref : inline-text ref
     val author-ref : inline-text ref
@@ -1398,9 +1397,6 @@ read-inline ctxgt it
         line-break false false ctx (read-inline ctx {#it-num; #it;} ++ inline-fil)
     in
       FootnoteScheme.main ctx ibf bbf
-
-
-let-inline \pagenum = if !titlepage-ref then embed-string(arabic (!page-number - 1)) else embed-string(arabic !page-number)
 
 end
 
