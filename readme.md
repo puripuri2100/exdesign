@@ -48,6 +48,10 @@ stdjaを使用するのに対して、`style`と`design`、`header-footer`が追
 
 バグ報告や、プルリクエストは歓迎しています。
 
+# Version歴
+
+- 2018/11/11 v0.1
+
 ---
 
 (c) Naoki Kaneko and T. Suwa 2018
