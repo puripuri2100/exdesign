@@ -6,6 +6,7 @@
 @require: list
 @require: gr
 @require: color
+@require: footnote-scheme
 
 module ExDesign : sig
 
@@ -151,7 +152,7 @@ val document : 'a -> block-text -> document
         |)
     |)
 
-% æä¾›ã‚³ãƒãƒ³ãƒ‰
+% ’ñ‹ŸƒRƒ}ƒ“ƒh
 
 
 direct +part : [string?; inline-text; block-text] block-cmd
@@ -169,6 +170,7 @@ direct \textit : [inline-text] inline-cmd
 direct \textsf : [inline-text] inline-cmd
 direct \textmc : [inline-text] inline-cmd
 direct \textgt : [inline-text] inline-cmd
+direct \footnote : [inline-text] inline-cmd
 direct \pagenum : [] inline-cmd
 
     val title-ref : inline-text ref
@@ -294,7 +296,7 @@ direct \pagenum : [] inline-cmd
     val tocpage-rfoot-ref : inline-text ref
     val tocpage-footer-line-ref : length ref
 
-%% ãã®ä»–
+%% ‚»‚Ì‘¼
     val text-org-ref : (length * length) ref
     val text-width-ref : length ref
     val text-height-ref : length ref
@@ -304,7 +306,7 @@ direct \pagenum : [] inline-cmd
     val ftrwid-ref : length ref
     val header-thickness-ref : length ref
     val footer-thickness-ref : length ref
-%%% titlepageç”¨
+%%% titlepage—p
     val titlepage-text-org-ref : (length * length) ref
     val titlepage-text-width-ref : length ref
     val titlepage-text-height-ref : length ref
@@ -312,7 +314,7 @@ direct \pagenum : [] inline-cmd
     val titlepage-ftrorg-ref : (length * length) ref
     val titlepage-hdrwid-ref : length ref
     val titlepage-ftrwid-ref : length ref
-%%% tocpageç”¨
+%%% tocpage—p
     val tocpage-text-org-ref : (length * length) ref
     val tocpage-text-width-ref : length ref
     val tocpage-text-height-ref : length ref
@@ -329,17 +331,17 @@ direct \pagenum : [] inline-cmd
 end = struct
 
 
-% ãƒ•ã‚©ãƒ³ãƒˆè¨­å®š
+% ƒtƒHƒ“ƒgİ’è
 
-%% æ‹¡å¤§ç‡
+%% Šg‘å—¦
     let font-ratio-latin = 1.
     let font-ratio-cjk = 0.88
 
-%% ãƒ™ãƒ¼ã‚¹ãƒ©ã‚¤ãƒ³è£œæ­£
+%% ƒx[ƒXƒ‰ƒCƒ“•â³
     let font-correction-latin = 0.
     let font-correction-cjk = 0.
 
-%% ãƒ•ã‚©ãƒ³ãƒˆè¨­å®š
+%% ƒtƒHƒ“ƒgİ’è
     let font-latin-roman = (`Junicode` , font-ratio-latin , font-correction-latin)
     let font-latin-bold = (`Junicode-b` , font-ratio-latin , font-correction-latin)
     let font-latin-italic = (`Junicode-it` , font-ratio-latin , font-correction-latin)
@@ -348,16 +350,16 @@ end = struct
     let font-cjk-mincho = (`ipaexm` , font-ratio-cjk, font-correction-cjk)
     let font-cjk-gothic = (`ipaexg` , font-ratio-cjk, font-correction-cjk)
 
-%% ãƒ•ã‚©ãƒ³ãƒˆè¨­å®šç”¨ã®é–¢æ•°
+%% ƒtƒHƒ“ƒgİ’è—p‚ÌŠÖ”
     let set-latin-font font ctx =
         ctx |> set-font Latin font
     let set-cjk-font font ctx =
         ctx |> set-font Kana font
             |> set-font HanIdeographic font
 
-% è‰²ã€…ãªæº–å‚™
+% FX‚È€”õ
 
-%% ãƒ–ãƒ­ãƒƒã‚¯èª­ã¿è¾¼ã¿ã®æº–å‚™
+%% ƒuƒƒbƒN“Ç‚İ‚İ‚Ì€”õ
     let get-standard-context wid =
         get-initial-context wid (command \math)
             |> set-dominant-wide-script Kana
@@ -371,7 +373,7 @@ end = struct
             |> set-math-font `lmodern`
             |> set-hyphen-penalty 100
 
-%% ç›®æ¬¡ã®æº–å‚™
+%% –ÚŸ‚Ì€”õ
     let-mutable toc-acc-ref <- []
     type toc-type =
         | TocPart of string * inline-text
@@ -409,7 +411,7 @@ end = struct
         inline-fil ++ (repeat-inline n ib) ++ inline-fil
 
 
-% documentå†…ã®å€¤ã‚’å…¥ã‚Œã‚‹ãŸã‚ã®å¯å¤‰å‚ç…§ã®è¨­å®š
+% document“à‚Ì’l‚ğ“ü‚ê‚é‚½‚ß‚Ì‰Â•ÏQÆ‚Ìİ’è
     let-mutable title-ref <- {}
     let-mutable author-ref <- {}
     let-mutable date-ref <- {}
@@ -547,7 +549,7 @@ end = struct
     let-mutable tocpage-rfoot-ref <- {}
     let-mutable tocpage-footer-line-ref <- 0pt
 
-%% ãã®ä»–
+%% ‚»‚Ì‘¼
     let-mutable text-org-ref <- (0pt, 0pt)
     let-mutable text-org-odd-ref <- (0pt, 0pt)
     let-mutable text-width-ref <- 0pt
@@ -560,7 +562,7 @@ end = struct
     let-mutable ftrwid-ref <- 0pt
     let-mutable header-thickness-ref <- 0pt
     let-mutable footer-thickness-ref <- 0pt
-%%% titlepageç”¨
+%%% titlepage—p
     let-mutable titlepage-text-org-ref <- (0pt, 0pt)
     let-mutable titlepage-text-width-ref <- 0pt
     let-mutable titlepage-text-height-ref <- 0pt
@@ -568,7 +570,7 @@ end = struct
     let-mutable titlepage-ftrorg-ref <- (0pt, 0pt)
     let-mutable titlepage-hdrwid-ref <- 0pt
     let-mutable titlepage-ftrwid-ref <- 0pt
-%%% tocpageç”¨
+%%% tocpage—p
     let-mutable tocpage-text-org-ref <- (0pt, 0pt)
     let-mutable tocpage-text-width-ref <- 0pt
     let-mutable tocpage-text-height-ref <- 0pt
@@ -585,10 +587,10 @@ end = struct
 
 % -----------------------------------------------------------------------
 
-% documentã®è¨­å®š
+% document‚Ìİ’è
 
 let document record inner =
-%% å¯å¤‰å‚ç…§ã«å€¤ã‚’å…¥ã‚Œã‚‹
+%% ‰Â•ÏQÆ‚É’l‚ğ“ü‚ê‚é
     let () = title-ref <- record#title in
     let () = author-ref <- record#author in
     let () = date-ref <- record#date in
@@ -727,7 +729,7 @@ let document record inner =
     let () = tocpage-rfoot-ref <- record#header-footer#tocpage-rfoot in
     let () = tocpage-footer-line-ref <- record#header-footer#tocpage-footer-line in
 
-%% å€¤è¨ˆç®—
+%% ’lŒvZ
     let () = text-org-ref <- ( !left-space-ref , (!top-space-ref +' !header-height-ref)) in
     let () = text-org-odd-ref <- ( !right-space-ref , (!top-space-ref +' !header-height-ref)) in
     let () = text-width-ref <- ((!page-width-ref -' !left-space-ref) -' !right-space-ref) in
@@ -740,7 +742,7 @@ let document record inner =
     let () = ftrwid-ref <- ((!page-width-ref -' !footer-left-space-ref) -' !footer-right-space-ref) in
     let () = header-thickness-ref <- !header-line-ref in
     let () = footer-thickness-ref <- !footer-line-ref in
-%%% titlepageã§ã®è¨ˆç®—
+%%% titlepage‚Å‚ÌŒvZ
     let () = titlepage-text-org-ref <- ( !titlepage-left-space-ref, (!titlepage-top-space-ref +' !header-height-ref)) in
     let () = titlepage-text-width-ref <- ((!page-width-ref -' !titlepage-left-space-ref) -' !titlepage-right-space-ref) in
     let () = titlepage-text-height-ref <- (!page-height-ref -' !titlepage-top-space-ref -' !header-height-ref -' !footer-height-ref -' !titlepage-bottom-space-ref) in
@@ -749,7 +751,7 @@ let document record inner =
     let () = titlepage-hdrwid-ref <- ((!page-width-ref -' !header-left-space-ref)  -' !header-right-space-ref) in
     let () = titlepage-ftrwid-ref <- ((!page-width-ref -' !footer-left-space-ref) -' !footer-right-space-ref) in
 
-%%% tocpageã§ã®è¨ˆç®—
+%%% tocpage‚Å‚ÌŒvZ
     let () = tocpage-text-org-ref <- ( !tocpage-left-space-ref, (!tocpage-top-space-ref +' !header-height-ref)) in
     let () = tocpage-text-width-ref <- ((!page-width-ref -' !tocpage-left-space-ref) -' !tocpage-right-space-ref) in
     let () = tocpage-text-height-ref <- (!page-height-ref -' !tocpage-top-space-ref -' !header-height-ref -' !footer-height-ref -' !bottom-space-ref) in
@@ -760,7 +762,7 @@ let document record inner =
     let () = tocpage-header-thickness-ref <- !tocpage-header-line-ref in
     let () = tocpage-footer-thickness-ref <- !tocpage-footer-line-ref in
 
-%% æ§‹ç¯‰ã®ãŸã‚ã®æº–å‚™
+%% \’z‚Ì‚½‚ß‚Ì€”õ
     let ctx-doc = get-standard-context !text-width-ref in
     let ctx-header = get-standard-context !hdrwid-ref in
     let ctx-footer = get-standard-context !ftrwid-ref in
@@ -773,10 +775,10 @@ let document record inner =
     let ctx-tocpage-header = get-standard-context !tocpage-hdrwid-ref in
     let ctx-tocpage-footer = get-standard-context !tocpage-ftrwid-ref in
 
-%% ãƒ¡ã‚¤ãƒ³éƒ¨åˆ†èª­ã¿è¾¼ã¿
+%% ƒƒCƒ“•”•ª“Ç‚İ‚İ
     let bb-main = read-block ctx-doc inner in
 
-%% ã‚¿ã‚¤ãƒˆãƒ«
+%% ƒ^ƒCƒgƒ‹
     let bb-title =
     if not !show-title-ref then
         block-nil
@@ -831,7 +833,7 @@ let document record inner =
           bb-title-main +++ bb-author +++ bb-date
     in
 
-%% ç›®æ¬¡
+%% –ÚŸ
     let make-toc-title ctx =
         ctx |> set-font-size !toc-fontsize-ref
             |> set-font Latin font-latin-sans
@@ -843,7 +845,7 @@ let document record inner =
             block-nil
         else
                 let bb-toc-title =
-                line-break true false ctx-doc (read-inline (make-toc-title ctx-doc) {ç›®æ¬¡} ++ inline-fil)
+                line-break true false ctx-doc (read-inline (make-toc-title ctx-doc) {–ÚŸ} ++ inline-fil)
                 in
                 let bb-toc-main =
                 (!toc-acc-ref) |> List.reverse |> List.fold-left (fun bbacc tocelem -> (
@@ -919,7 +921,7 @@ let document record inner =
         else
             bb-toc-title +++ bb-toc-main
     in
-%ãƒšãƒ¼ã‚¸ã«ã¤ã„ã¦ã‚»ãƒƒãƒ†ã‚£ãƒ³ã‚°
+%ƒy[ƒW‚É‚Â‚¢‚ÄƒZƒbƒeƒBƒ“ƒO
 %% page
     let page = UserDefinedPaper(!page-width-ref , !page-height-ref) in
 
@@ -932,16 +934,17 @@ let document record inner =
     in
 
     let pagecontf pbinfo =
-      let hgtfb = height-of-float-boxes pbinfo#page-number in
-      let () = page-number <- pbinfo#page-number in
-      let (txtorgx, txtorgy) =
-        if !oneside-ref then
-            !text-org-ref
-        else
-            if pbinfo#page-number mod 2 == 0 then
+        let () = FootnoteScheme.start-page () in
+        let () = page-number <- pbinfo#page-number in
+        let hgtfb = height-of-float-boxes pbinfo#page-number in
+        let (txtorgx, txtorgy) =
+            if !oneside-ref then
                 !text-org-ref
             else
-                !text-org-odd-ref
+                if pbinfo#page-number mod 2 == 0 then
+                    !text-org-ref
+                else
+                    !text-org-odd-ref
         in
       (|
         text-origin = (txtorgx, txtorgy +' hgtfb);
@@ -1085,11 +1088,11 @@ let document record inner =
 
 % -----------------------------------------------------------------------
 
-% ã‚³ãƒãƒ³ãƒ‰ç­‰ã®å®Ÿè£…
+% ƒRƒ}ƒ“ƒh“™‚ÌÀ‘•
 
-%% +sectionã¨ã‹ã®å®Ÿè£…
+%% +section‚Æ‚©‚ÌÀ‘•
 
-%%% titleéƒ¨åˆ†ã®è¨­å®š
+%%% title•”•ª‚Ìİ’è
     let make-part-title ctx =
     ctx |> set-font-size !part-fontsize-ref
         |> set-latin-font font-latin-sans
@@ -1117,7 +1120,7 @@ let document record inner =
         |> set-latin-font font-latin-sans
         |> set-cjk-font font-cjk-gothic
 
-%%% å¿…è¦ãªå¯å¤‰å‚ç…§è¨­å®š
+%%% •K—v‚È‰Â•ÏQÆİ’è
   let-mutable needs-indentation-ref <- true
   let-mutable num-part-ref <- 0
   let-mutable num-chapter-ref <- 0
@@ -1125,7 +1128,7 @@ let document record inner =
   let-mutable num-subsection-ref <- 0
   let-mutable num-subsubsection-ref <- 0
 
-%%% ãã‚Œãã‚Œã®è¦ç´ ã®è¨­å®š
+%%% ‚»‚ê‚¼‚ê‚Ì—v‘f‚Ìİ’è
   let part-scheme ctx label title inner =
     let ctx-title = make-part-title ctx in
     let () = num-part-ref <- !num-part-ref + 1 in
@@ -1241,7 +1244,7 @@ let document record inner =
       bb-title +++ bb-inner
 
 
-%%% +sectionç³»ã‚’å®šç¾©
+%%% +sectionŒn‚ğ’è‹`
   let-block ctx +part ?:labelopt title inner =
     let label =
       match labelopt with
@@ -1282,7 +1285,7 @@ let document record inner =
     in
       subsubsection-scheme ctx label title inner
 
-% +pé–¢ä¿‚
+% +pŠÖŒW
 let quad-indent-ja ctx =
         inline-skip (get-font-size ctx *' font-ratio-cjk)
 
@@ -1373,6 +1376,27 @@ let-inline ctx \textgt it =
     in
 read-inline ctxgt it
 
+  let-inline ctx \footnote it =
+    let size = get-font-size ctx in
+    let ibf num =
+      let it-num = embed-string (arabic num) in
+      let ctx =
+        ctx |> set-font-size (size *' 0.75)
+            |> set-manual-rising (size *' 0.25)
+      in
+        read-inline ctx {\*#it-num;}
+    in
+    let bbf num =
+      let it-num = embed-string (arabic num) in
+      let ctx =
+        ctx |> set-font-size (size *' 0.9)
+            |> set-leading (size *' 1.2)
+            |> set-paragraph-margin (size *' 0.5) (size *' 0.5)
+          %temporary
+      in
+        line-break false false ctx (read-inline ctx {#it-num; #it;} ++ inline-fil)
+    in
+      FootnoteScheme.main ctx ibf bbf
 
 
 let-inline \pagenum = if !titlepage-ref then embed-string(arabic (!page-number - 1)) else embed-string(arabic !page-number)
