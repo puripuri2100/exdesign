@@ -41,6 +41,8 @@ val document : 'a -> block-text -> document
             language-japanese : bool;
         |);
         design : (|
+            oneside : bool;
+
             titlepage : bool;
             title-fontsize : length;
             author-fontsize : length;
@@ -438,6 +440,8 @@ end = struct
     let-mutable language-japanese-ref <- true
 
 %% design
+    let-mutable oneside-ref <- true
+
     let-mutable titlepage-ref <- true
     let-mutable title-fontsize-ref <- 0pt
     let-mutable author-fontsize-ref <- 0pt
@@ -545,10 +549,13 @@ end = struct
 
 %% その他
     let-mutable text-org-ref <- (0pt, 0pt)
+    let-mutable text-org-odd-ref <- (0pt, 0pt)
     let-mutable text-width-ref <- 0pt
     let-mutable text-height-ref <- 0pt
     let-mutable hdrorg-ref <- (0pt, 0pt)
+    let-mutable hdrorg-odd-ref <- (0pt, 0pt)
     let-mutable ftrorg-ref <- (0pt, 0pt)
+    let-mutable ftrorg-odd-ref <- (0pt, 0pt)
     let-mutable hdrwid-ref <- 0pt
     let-mutable ftrwid-ref <- 0pt
     let-mutable header-thickness-ref <- 0pt
@@ -612,6 +619,8 @@ let document record inner =
     let () = language-japanese-ref <- record#style#language-japanese in
 
 %%% design
+    let () = oneside-ref <- record#design#oneside in
+
     let () = titlepage-ref <- record#design#titlepage in
     let () = title-fontsize-ref <- record#design#title-fontsize in
     let () = author-fontsize-ref <- record#design#author-fontsize in
@@ -720,10 +729,13 @@ let document record inner =
 
 %% 値計算
     let () = text-org-ref <- ( !left-space-ref , (!top-space-ref +' !header-height-ref)) in
+    let () = text-org-odd-ref <- ( !right-space-ref , (!top-space-ref +' !header-height-ref)) in
     let () = text-width-ref <- ((!page-width-ref -' !left-space-ref) -' !right-space-ref) in
     let () = text-height-ref <- (!page-height-ref -' !top-space-ref -' !header-height-ref -' !footer-height-ref -' !bottom-space-ref) in
     let () = hdrorg-ref <- ( !header-left-space-ref  , !top-space-ref) in
+    let () = hdrorg-odd-ref <- ( !header-right-space-ref  , !top-space-ref) in
     let () = ftrorg-ref <- (!footer-left-space-ref , ((!page-height-ref -' !bottom-space-ref) -' !footer-height-ref)) in
+    let () = ftrorg-odd-ref <- (!footer-right-space-ref , ((!page-height-ref -' !bottom-space-ref) -' !footer-height-ref)) in
     let () = hdrwid-ref <- ((!page-width-ref -' !header-left-space-ref)  -' !header-right-space-ref) in
     let () = ftrwid-ref <- ((!page-width-ref -' !footer-left-space-ref) -' !footer-right-space-ref) in
     let () = header-thickness-ref <- !header-line-ref in
@@ -922,7 +934,15 @@ let document record inner =
     let pagecontf pbinfo =
       let hgtfb = height-of-float-boxes pbinfo#page-number in
       let () = page-number <- pbinfo#page-number in
-      let (txtorgx, txtorgy) = !text-org-ref in
+      let (txtorgx, txtorgy) =
+        if !oneside-ref then
+            !text-org-ref
+        else
+            if pbinfo#page-number mod 2 == 0 then
+                !text-org-ref
+            else
+                !text-org-odd-ref
+        in
       (|
         text-origin = (txtorgx, txtorgy +' hgtfb);
         text-height = !text-height-ref -' hgtfb;
@@ -940,7 +960,14 @@ let document record inner =
                 let lhead = !lhead-ref in
                 let chead = !chead-ref in
                 let rhead = !rhead-ref in
-                let header-text = (inline-skip 5pt ++ (read-inline ctx-header {#lhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#rhead;}) ++ inline-skip 5pt)
+                let header-text =
+                    if !oneside-ref then
+                        (inline-skip 5pt ++ (read-inline ctx-header {#lhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#rhead;}) ++ inline-skip 5pt)
+                    else
+                        if pbinfo#page-number mod 2 == 0 then
+                            (inline-skip 5pt ++ (read-inline ctx-header {#lhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#rhead;}) ++ inline-skip 5pt)
+                        else
+                            (inline-skip 5pt ++ (read-inline ctx-header {#rhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#lhead;}) ++ inline-skip 5pt)
                 in
                 line-break true true ctx-header header-text
                             +++ line-break true true (ctx-header |> set-paragraph-margin 0pt 0pt)
@@ -954,7 +981,14 @@ let document record inner =
                     let lhead = !lhead-ref in
                     let chead = !chead-ref in
                     let rhead = !rhead-ref in
-                    let header-text = (inline-skip 5pt ++ (read-inline ctx-header {#lhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#rhead;}) ++ inline-skip 5pt)
+                    let header-text =
+                        if !oneside-ref then
+                            (inline-skip 5pt ++ (read-inline ctx-header {#lhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#rhead;}) ++ inline-skip 5pt)
+                        else
+                            if pbinfo#page-number mod 2 == 0 then
+                                (inline-skip 5pt ++ (read-inline ctx-header {#lhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#rhead;}) ++ inline-skip 5pt)
+                            else
+                                (inline-skip 5pt ++ (read-inline ctx-header {#rhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#lhead;}) ++ inline-skip 5pt)
                     in
                     line-break true true ctx-header header-text
                                 +++ line-break true true (ctx-header |> set-paragraph-margin 0pt 0pt)
@@ -964,7 +998,14 @@ let document record inner =
                 let lhead = !lhead-ref in
                 let chead = !chead-ref in
                 let rhead = !rhead-ref in
-                let header-text = (inline-skip 5pt ++ (read-inline ctx-header {#lhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#rhead;}) ++ inline-skip 5pt)
+                let header-text =
+                    if !oneside-ref then
+                        (inline-skip 5pt ++ (read-inline ctx-header {#lhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#rhead;}) ++ inline-skip 5pt)
+                    else
+                        if pbinfo#page-number mod 2 == 0 then
+                            (inline-skip 5pt ++ (read-inline ctx-header {#lhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#rhead;}) ++ inline-skip 5pt)
+                        else
+                            (inline-skip 5pt ++ (read-inline ctx-header {#rhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#lhead;}) ++ inline-skip 5pt)
                 in
                 line-break true true ctx-header header-text
                             +++ line-break true true (ctx-header |> set-paragraph-margin 0pt 0pt)
@@ -980,7 +1021,14 @@ let document record inner =
                 let lfoot = !lfoot-ref in
                 let cfoot = !cfoot-ref in
                 let rfoot = !rfoot-ref in
-                let footer-text = (inline-skip 5pt ++ (read-inline ctx-footer {#lfoot;}) ++ inline-fil ++ (read-inline ctx-footer {#cfoot;}) ++ inline-fil ++ (read-inline ctx-footer {#rfoot;}) ++ inline-skip 5pt)
+                let footer-text =
+                    if !oneside-ref then
+                        (inline-skip 5pt ++ (read-inline ctx-header {#lfoot;}) ++ inline-fil ++ (read-inline ctx-header {#cfoot;}) ++ inline-fil ++ (read-inline ctx-header {#rfoot;}) ++ inline-skip 5pt)
+                    else
+                        if pbinfo#page-number mod 2 == 0 then
+                            (inline-skip 5pt ++ (read-inline ctx-header {#lfoot;}) ++ inline-fil ++ (read-inline ctx-header {#cfoot;}) ++ inline-fil ++ (read-inline ctx-header {#rfoot;}) ++ inline-skip 5pt)
+                        else
+                            (inline-skip 5pt ++ (read-inline ctx-header {#rfoot;}) ++ inline-fil ++ (read-inline ctx-header {#cfoot;}) ++ inline-fil ++ (read-inline ctx-header {#lfoot;}) ++ inline-skip 5pt)
                 in (block-skip 1pt) +++
                     line-break true true (ctx-footer |> set-paragraph-margin 0pt 0pt)
                     ((inline-graphics !hdrwid-ref !footer-thickness-ref 0pt
@@ -991,7 +1039,14 @@ let document record inner =
             let lfoot = !lfoot-ref in
             let cfoot = !cfoot-ref in
             let rfoot = !rfoot-ref in
-            let footer-text = (inline-skip 5pt ++ (read-inline ctx-footer {#lfoot;}) ++ inline-fil ++ (read-inline ctx-footer {#cfoot;}) ++ inline-fil ++ (read-inline ctx-footer {#rfoot;}) ++ inline-skip 5pt)
+            let footer-text =
+                if !oneside-ref then
+                    (inline-skip 5pt ++ (read-inline ctx-header {#lfoot;}) ++ inline-fil ++ (read-inline ctx-header {#cfoot;}) ++ inline-fil ++ (read-inline ctx-header {#rfoot;}) ++ inline-skip 5pt)
+                else
+                    if pbinfo#page-number mod 2 == 0 then
+                        (inline-skip 5pt ++ (read-inline ctx-header {#lfoot;}) ++ inline-fil ++ (read-inline ctx-header {#cfoot;}) ++ inline-fil ++ (read-inline ctx-header {#rfoot;}) ++ inline-skip 5pt)
+                    else
+                        (inline-skip 5pt ++ (read-inline ctx-header {#rfoot;}) ++ inline-fil ++ (read-inline ctx-header {#cfoot;}) ++ inline-fil ++ (read-inline ctx-header {#lfoot;}) ++ inline-skip 5pt)
             in (block-skip 1pt) +++
                 line-break true true (ctx-footer |> set-paragraph-margin 0pt 0pt)
                 ((inline-graphics !hdrwid-ref !footer-thickness-ref 0pt
@@ -1008,7 +1063,7 @@ let document record inner =
         in
         page-break page pagecontf pagepartsf (bb-title +++ bb-toc +++ bb-main)
 
-% -----------------------------------------------------------------------]
+% -----------------------------------------------------------------------
 
 % コマンド等の実装
 
