@@ -20,7 +20,7 @@ document (|
   >
   +section{簡単な使用方法}<
       +p{補助パッケージを使用する際にはこのように書きます。}
-        +console(`
+        +code(`
 @require: exdesign
 @require: article-ja
 
@@ -65,5 +65,155 @@ document (|
         * \code(` \textgt{inline-text} `); : ゴチック体にする
         * \code(` \footnote{inline-text} `); : フットノートを提供する（ただし、\SATySFi; for Windows Versionでは空）
     }
+>
++section{\code(`document`);コマンドで必要なレコード型について}<
+    +p{レコード型部分の定義}
+    +code(`
+val document : 'a -> block-text -> document
+    constraint 'a :: (|
+        title : inline-text;
+        author : inline-text;
+        date : inline-text;
+        show-title : bool;
+        show-toc : bool;
+        style : (|
+            page-width : length;
+            page-height : length;
+            top-space : length;
+            bottom-space : length;
+            left-space : length;
+            right-space : length;
+            header-left-space : length;
+            header-right-space : length;
+            header-height : length;
+            footer-left-space : length;
+            footer-right-space : length;
+            footer-height : length;
+            titlepage-top-space : length;
+            titlepage-bottom-space : length;
+            titlepage-left-space : length;
+            titlepage-right-space : length;
+            tocpage-top-space : length;
+            tocpage-bottom-space : length;
+            tocpage-left-space : length;
+            tocpage-right-space : length;
+            normal-fontsize : length;
+            language-japanese : bool;
+        |);
+        design : (|
+            oneside : bool;
+
+            titlepage : bool;
+            title-fontsize : length;
+            author-fontsize : length;
+            date-fontsize : length;
+
+            tocpage : bool;
+
+            toc-fontsize : length;
+            toc-line-text-part : inline-text;
+            toc-line-text-chapter : inline-text;
+            toc-line-text-section : inline-text;
+            toc-line-text-subsection : inline-text;
+            toc-line-text-subsubsection : inline-text;
+            toc-line-space-part : length;
+            toc-line-space-chapter : length;
+            toc-line-space-section : length;
+            toc-line-space-subsection : length;
+            toc-line-space-subsubsection : length;
+            toc-depth : int;
+
+            part-fontsize : length;
+            part-text-1 : string;
+            part-text-2 : string;
+            show-num-part : bool;
+            part-text-3 : string;
+            part-text-4 : string;
+            part-top-space : length;
+            part-bottom-space : length;
+            part-left-space : length;
+            part-right-space : length;
+
+            chapter-fontsize : length;
+            chapter-text-1 : string;
+            chapter-text-2 : string;
+            show-num-chapter : bool;
+            chapter-text-3 : string;
+            chapter-text-4 : string;
+            chapter-top-space : length;
+            chapter-bottom-space : length;
+            chapter-left-space : length;
+            chapter-right-space : length;
+
+            section-fontsize : length;
+            section-text-1 : string;
+            section-text-2 : string;
+            show-num-chapter-sec : bool;
+            section-text-3 : string;
+            show-num-section : bool;
+            section-text-4 : string;
+            section-text-5 : string;
+            section-top-space : length;
+            section-bottom-space : length;
+            section-left-space : length;
+            section-right-space : length;
+
+            subsection-fontsize : length;
+            subsection-text-1 : string;
+            subsection-text-2 : string;
+            show-num-chapter-subsec : bool;
+            subsection-text-3 : string;
+            show-num-section-subsec : bool;
+            subsection-text-4 : string;
+            show-num-subsection : bool;
+            subsection-text-5 : string;
+            subsection-text-6 : string;
+            subsection-top-space : length;
+            subsection-bottom-space : length;
+            subsection-left-space : length;
+            subsection-right-space : length;
+
+            subsubsection-fontsize : length;
+            subsubsection-text-1 : string;
+            subsubsection-text-2 : string;
+            show-num-chapter-subsubsec : bool;
+            subsubsection-text-3 : string;
+            show-num-section-subsubsec : bool;
+            subsubsection-text-4 : string;
+            show-num-subsection-subsubsec : bool;
+            subsubsection-text-5 : string;
+            show-num-subsubsection : bool;
+            subsubsection-text-6 : string;
+            subsubsection-text-7 : string;
+            subsubsection-top-space : length;
+            subsubsection-bottom-space : length;
+            subsubsection-left-space : length;
+            subsubsection-right-space : length;
+        |);
+        header-footer : (|
+            lhead : inline-text;
+            chead : inline-text;
+            rhead : inline-text;
+            header-line : length;
+            lfoot : inline-text;
+            cfoot : inline-text;
+            rfoot : inline-text;
+            footer-line : length;
+
+            tocpage-lhead : inline-text;
+            tocpage-chead : inline-text;
+            tocpage-rhead : inline-text;
+            tocpage-header-line : length;
+            tocpage-lfoot : inline-text;
+            tocpage-cfoot : inline-text;
+            tocpage-rfoot : inline-text;
+            tocpage-footer-line : length;
+        |)
+    |)
+    `);
+    +p{とりあえずは上記の定義に合うように値を入れていけば良い。}
+>
++section{今後の開発について}<
+    +p{これからフォント関係やdeco関係で機能を拡張していく予定。多くの人が開発に参加してこのクラスファイルを広めてくれるとすごく嬉しい。}
 >
 >
