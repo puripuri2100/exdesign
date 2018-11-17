@@ -13,6 +13,22 @@ SATySFiに付属するstdjaやstdjabook等のクラスファイルをかなり�
 
 `exdesign.satyh`と補助パッケージをSATySFiの読み込める場所においてください。
 
+Linux系統のOSであるならば、
+
+~~~
+$ ./Installer.sh
+~~~
+
+を実行することで導入することが可能です。
+
+削除したい時は
+
+~~~
+$ ./UnInstaller.sh
+~~~
+
+です。
+
 # 使い方
 
 ~~~
@@ -50,6 +66,7 @@ stdjaを使用するのに対して、`style`・`design`・`header-footer`・`fo
 # Version歴
 
 - 2018/11/11 v0.1
+- 2018/11/18 v0.2
 
 ---
 
