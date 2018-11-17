@@ -857,6 +857,8 @@ let document record inner =
         let bb-title-main =
           let ctx =
             ctx-doc |> set-font-size !title-fontsize-ref
+                        |> set-latin-font !font-latin-sans-ref
+                        |> set-cjk-font !font-cjk-mincho-bx-ref
           in
             line-break false false ctx
               (inline-fil ++ read-inline ctx !title-ref ++ inline-fil)
@@ -864,6 +866,8 @@ let document record inner =
         let bb-author =
           let ctx =
             ctx-doc |> set-font-size !author-fontsize-ref
+                        |> set-latin-font !font-latin-sans-ref
+                        |> set-cjk-font !font-cjk-mincho-bx-ref
           in
             line-break false false ctx
               (inline-fil ++ read-inline ctx !author-ref ++ inline-fil)
@@ -871,6 +875,8 @@ let document record inner =
         let bb-date =
           let ctx =
             ctx-doc |> set-font-size !date-fontsize-ref
+                        |> set-latin-font !font-latin-sans-ref
+                        |> set-cjk-font !font-cjk-mincho-bx-ref
           in
             line-break false false ctx
               (inline-fil ++ read-inline ctx !date-ref ++ inline-fil)
@@ -882,6 +888,8 @@ let document record inner =
         let bb-title-main =
           let ctx =
             ctx-doc |> set-font-size !title-fontsize-ref
+                        |> set-latin-font !font-latin-sans-ref
+                        |> set-cjk-font !font-cjk-mincho-bx-ref
           in
             line-break false false ctx
               (inline-fil ++ read-inline ctx !title-ref ++ inline-fil)
@@ -889,6 +897,8 @@ let document record inner =
         let bb-author =
           let ctx =
             ctx-doc |> set-font-size !author-fontsize-ref
+                        |> set-latin-font !font-latin-sans-ref
+                        |> set-cjk-font !font-cjk-mincho-bx-ref
           in
             line-break false false ctx
               (inline-fil ++ read-inline ctx !author-ref ++ inline-fil)
@@ -896,6 +906,8 @@ let document record inner =
         let bb-date =
           let ctx =
             ctx-doc |> set-font-size !date-fontsize-ref
+                        |> set-latin-font !font-latin-sans-ref
+                        |> set-cjk-font !font-cjk-mincho-bx-ref
           in
             line-break false false ctx
               (inline-fil ++ read-inline ctx !date-ref ++ inline-fil)
