@@ -157,8 +157,13 @@ val document : 'a -> block-text -> document
             latin-italic : string;
             latin-sans : string;
             latin-mono : string;
-            cjk-mincho : string;
-            cjk-gothic : string;
+            cjk-mincho-l : string;
+            cjk-mincho-m : string;
+            cjk-mincho-bx : string;
+            cjk-gothic-m : string;
+            cjk-gothic-bx : string;
+            cjk-gothic-eb : string;
+            math-font : string;
             ratio-latin : float;
             ratio-cjk : float;
             correction-latin : float;
@@ -351,8 +356,12 @@ end = struct
     let-mutable font-latin-italic-ref <-  (` ` , 0. , 0.)
     let-mutable font-latin-sans-ref <-  (` ` , 0. , 0.)
     let-mutable font-latin-mono-ref <-  (` ` , 0. , 0.)
-    let-mutable font-cjk-mincho-ref <-  (` ` , 0. , 0.)
-    let-mutable font-cjk-gothic-ref <-  (` ` , 0. , 0.)
+    let-mutable font-cjk-mincho-l-ref <-  (` ` , 0. , 0.)
+    let-mutable font-cjk-mincho-m-ref <-  (` ` , 0. , 0.)
+    let-mutable font-cjk-mincho-bx-ref <-  (` ` , 0. , 0.)
+    let-mutable font-cjk-gothic-m-ref <-  (` ` , 0. , 0.)
+    let-mutable font-cjk-gothic-bx-ref <-  (` ` , 0. , 0.)
+    let-mutable font-cjk-gothic-eb-ref <-  (` ` , 0. , 0.)
 %% フォント設定用の関数
     let set-latin-font font ctx =
         ctx |> set-font Latin font
@@ -543,8 +552,13 @@ end = struct
     let-mutable latin-italic-ref <- ` `
     let-mutable latin-sans-ref <- ` `
     let-mutable latin-mono-ref <- ` `
-    let-mutable cjk-mincho-ref <- ` `
+    let-mutable cjk-mincho-l-ref <- ` `
+    let-mutable cjk-mincho-m-ref <- ` `
+    let-mutable cjk-mincho-bx-ref <- ` `
     let-mutable cjk-gothic-ref <- ` `
+    let-mutable cjk-gothic-m-ref <- ` `
+    let-mutable cjk-gothic-bx-ref <- ` `
+    let-mutable cjk-gothic-eb-ref <- ` `
     let-mutable ratio-latin-ref <- 0.
     let-mutable ratio-cjk-ref <- 0.88
     let-mutable correction-latin-ref <- 0.
@@ -736,8 +750,12 @@ let document record inner =
     let () = latin-italic-ref <- record#fonts#latin-italic in
     let () = latin-sans-ref <- record#fonts#latin-sans in
     let () = latin-mono-ref <- record#fonts#latin-mono in
-    let () = cjk-mincho-ref <- record#fonts#cjk-mincho in
-    let () = cjk-gothic-ref <- record#fonts#cjk-gothic in
+    let () = cjk-mincho-l-ref <- record#fonts#cjk-mincho-l in
+    let () = cjk-mincho-m-ref <- record#fonts#cjk-mincho-m in
+    let () = cjk-mincho-bx-ref <- record#fonts#cjk-mincho-bx in
+    let () = cjk-gothic-m-ref <- record#fonts#cjk-gothic-m in
+    let () = cjk-gothic-bx-ref <- record#fonts#cjk-gothic-bx in
+    let () = cjk-gothic-eb-ref <- record#fonts#cjk-gothic-eb in
     let () = ratio-latin-ref <- record#fonts#ratio-latin in
     let () = ratio-cjk-ref <- record#fonts#ratio-cjk in
     let () = correction-latin-ref <- record#fonts#correction-latin in
@@ -793,8 +811,12 @@ let document record inner =
     let () = font-latin-italic-ref <- (!latin-italic-ref , font-ratio-latin , font-correction-latin) in
     let () = font-latin-sans-ref <- (!latin-sans-ref , font-ratio-latin , font-correction-latin) in
     let () = font-latin-mono-ref <- (!latin-mono-ref , font-ratio-latin, font-correction-latin) in
-    let () = font-cjk-mincho-ref <- (!cjk-mincho-ref , font-ratio-cjk, font-correction-cjk) in
-    let () = font-cjk-gothic-ref <- (!cjk-gothic-ref , font-ratio-cjk, font-correction-cjk) in
+    let () = font-cjk-mincho-l-ref <- (!cjk-mincho-l-ref , font-ratio-cjk, font-correction-cjk) in
+    let () = font-cjk-mincho-m-ref <- (!cjk-mincho-m-ref , font-ratio-cjk, font-correction-cjk) in
+    let () = font-cjk-mincho-bx-ref <- (!cjk-mincho-bx-ref , font-ratio-cjk, font-correction-cjk) in
+    let () = font-cjk-gothic-m-ref <- (!cjk-gothic-m-ref , font-ratio-cjk, font-correction-cjk) in
+    let () = font-cjk-gothic-bx-ref <- (!cjk-gothic-bx-ref , font-ratio-cjk, font-correction-cjk) in
+    let () = font-cjk-gothic-eb-ref <- (!cjk-gothic-eb-ref , font-ratio-cjk, font-correction-cjk) in
 
 %% ブロック読み込みの準備
     let get-standard-context wid =
@@ -804,10 +826,10 @@ let document record inner =
             |> set-language HanIdeographic Japanese
             |> set-dominant-narrow-script Latin
             |> set-language Latin English
-            |> set-font Kana !font-cjk-mincho-ref
-            |> set-font HanIdeographic !font-cjk-mincho-ref
+            |> set-font Kana !font-cjk-mincho-m-ref
+            |> set-font HanIdeographic !font-cjk-mincho-m-ref
             |> set-font Latin !font-latin-roman-ref
-            |> set-math-font `lmodern`
+            |> set-math-font record#fonts#math-font
             |> set-hyphen-penalty 100
     in
 
@@ -885,7 +907,7 @@ let document record inner =
     let make-toc-title ctx =
         ctx |> set-font-size !toc-fontsize-ref
             |> set-latin-font !font-latin-sans-ref
-            |> set-cjk-font !font-cjk-gothic-ref
+            |> set-cjk-font !font-cjk-gothic-bx-ref
     in
 
     let bb-toc =
@@ -1144,29 +1166,29 @@ let document record inner =
     let make-part-title ctx =
     ctx |> set-font-size !part-fontsize-ref
         |> set-latin-font !font-latin-sans-ref
-        |> set-cjk-font !font-cjk-gothic-ref
+        |> set-cjk-font !font-cjk-gothic-bx-ref
 
   let make-chapter-title ctx =
     ctx |> set-font-size !chapter-fontsize-ref
         |> set-latin-font !font-latin-sans-ref
-        |> set-cjk-font !font-cjk-gothic-ref
+        |> set-cjk-font !font-cjk-gothic-bx-ref
 
   let make-section-title ctx =
     ctx |> set-font-size !section-fontsize-ref
         |> set-latin-font !font-latin-sans-ref
-        |> set-cjk-font !font-cjk-gothic-ref
+        |> set-cjk-font !font-cjk-gothic-bx-ref
 
 
   let make-subsection-title ctx =
     ctx |> set-font-size !subsection-fontsize-ref
         |> set-latin-font !font-latin-sans-ref
-        |> set-cjk-font !font-cjk-gothic-ref
+        |> set-cjk-font !font-cjk-gothic-bx-ref
 
 
   let make-subsubsection-title ctx =
     ctx |> set-font-size !subsubsection-fontsize-ref
         |> set-latin-font !font-latin-sans-ref
-        |> set-cjk-font !font-cjk-gothic-ref
+        |> set-cjk-font !font-cjk-gothic-bx-ref
 
 %%% 必要な可変参照設定
   let-mutable needs-indentation-ref <- true
@@ -1385,42 +1407,42 @@ let quad-indent-en ctx =
 let-inline ctx \textrm it =
     let ctxrm =
         ctx |> set-latin-font !font-latin-roman-ref
-            |> set-cjk-font !font-cjk-mincho-ref
+            |> set-cjk-font !font-cjk-mincho-m-ref
     in
 read-inline ctxrm it
 
 let-inline ctx \textbf it =
     let ctxbf =
         ctx |> set-latin-font !font-latin-bold-ref
-            |> set-cjk-font !font-cjk-gothic-ref
+            |> set-cjk-font !font-cjk-gothic-m-ref
     in
 read-inline ctxbf it
 
 let-inline ctx \textit it =
     let ctxit =
         ctx |> set-latin-font !font-latin-italic-ref
-            |> set-cjk-font !font-cjk-mincho-ref
+            |> set-cjk-font !font-cjk-mincho-l-ref
 in
 read-inline ctxit it
 
 let-inline ctx \textsf it =
     let ctxsf =
         ctx |> set-latin-font !font-latin-sans-ref
-            |> set-cjk-font !font-cjk-gothic-ref
+            |> set-cjk-font !font-cjk-gothic-m-ref
     in
 read-inline ctxsf it
 
 let-inline ctx \textmc it =
     let ctxmc =
         ctx |> set-latin-font !font-latin-roman-ref
-            |> set-cjk-font !font-cjk-mincho-ref
+            |> set-cjk-font !font-cjk-mincho-m-ref
     in
 read-inline ctxmc it
 
 let-inline ctx \textgt it =
     let ctxgt =
         ctx |> set-latin-font !font-latin-bold-ref
-            |> set-cjk-font !font-cjk-gothic-ref
+            |> set-cjk-font !font-cjk-gothic-m-ref
     in
 read-inline ctxgt it
 
