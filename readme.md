@@ -28,6 +28,7 @@ document (|
         style = ArticleJa.a4paper;
         design = ArticleJa.article;
         header-footer = ArticleJa.normalHF;
+        fonts = ArticleJa.fonts;
 |) '<
     +p{test}
 >
@@ -35,7 +36,7 @@ document (|
 
 などのようにすれば使うことができます。
 
-stdjaを使用するのに対して、`style`と`design`、`header-footer`が追加されています（`date`も追加されていますが割愛します）。
+stdjaを使用するのに対して、`style`・`design`・`header-footer`・`fonts`が追加されています（`date`も追加されていますが割愛します）。
 ここには本来ならばレコード型が書かれるはずですが、`@import: article-ja`によって読み込まれている、補助パッケージであるarticle-jaパッケージによって事前に値が定められているため、短い文字で容易に指定することが可能になっています。
 
 この補助パッケージは今後増やしていく予定です。
