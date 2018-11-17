@@ -4,7 +4,7 @@
 @require: itemize
 
 document (|
-        title = {ExDesignパッケージ};
+        title = {ExDesignパッケージ v0.2};
         author = {puripuri2100};
         date = {2018/11/04};
         show-title = true;
@@ -12,6 +12,7 @@ document (|
         style = ArticleJa.a4paper ;
         design = ArticleJa.article;
         header-footer = ArticleJa.normalHF;
+        fonts = ArticleJa.fonts;
 |) '<
   +section{はじめに}<
       +p{ExDesignパッケージは、デザインと、クラスファイルとして成立するために必要な設定や提供するコマンドを分離させた\SATySFi;用の新しいクラスファイルです。
@@ -33,6 +34,7 @@ document (|
         style = ArticleJa.a4paper;
         design = ArticleJa.article;
         header-footer = ArticleJa.normalHF;
+        fonts = ArticleJa.fonts;
 |) '<
     +p{test}
 >`
@@ -208,6 +210,24 @@ val document : 'a -> block-text -> document
             tocpage-cfoot : inline-text;
             tocpage-rfoot : inline-text;
             tocpage-footer-line : length;
+        |);
+        fonts : (|
+            latin-roman : string;
+            latin-bold : string;
+            latin-italic : string;
+            latin-sans : string;
+            latin-mono : string;
+            cjk-mincho-l : string;
+            cjk-mincho-m : string;
+            cjk-mincho-bx : string;
+            cjk-gothic-m : string;
+            cjk-gothic-bx : string;
+            cjk-gothic-eb : string;
+            math-font : string;
+            ratio-latin : float;
+            ratio-cjk : float;
+            correction-latin : float;
+            correction-cjk : float;
         |)
     |)
     `);
