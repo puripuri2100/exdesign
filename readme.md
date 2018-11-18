@@ -16,6 +16,7 @@ SATySFiに付属するstdjaやstdjabook等のクラスファイルをかなり�
 Linux系統のOSであるならば、
 
 ~~~
+$ chmod u+x Installer.sh
 $ ./Installer.sh
 ~~~
 
@@ -24,6 +25,7 @@ $ ./Installer.sh
 削除したい時は
 
 ~~~
+$ chmod u+x UnInstaller.sh
 $ ./UnInstaller.sh
 ~~~
 
