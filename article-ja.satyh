@@ -375,7 +375,7 @@ let report = (|
             toc-depth = 3;
 
             part-fontsize = 30pt;
-            part-page-break-1 = true;
+            part-page-break-1 = false;
             part-text-1 = `第`;
             part-text-2 = ` `;
             show-num-part = true;
@@ -384,9 +384,9 @@ let report = (|
             part-top-space = 40pt;
             part-bottom-space = 25pt;
             part-left-space = 0pt;
-            part-line-break = true;
+            part-line-break = false;
             part-right-space = 30pt;
-            part-page-break-2 = true;
+            part-page-break-2 = false;
 
             chapter-fontsize = 25pt;
             chapter-page-break-1 = false;
@@ -398,7 +398,7 @@ let report = (|
             chapter-top-space = 35pt;
             chapter-bottom-space = 30pt;
             chapter-left-space = 0pt;
-            chapter-line-break = true;
+            chapter-line-break = false;
             chapter-right-space = 25pt;
             chapter-page-break-2 = false;
 
@@ -413,7 +413,7 @@ let report = (|
             section-top-space = 25pt;
             section-bottom-space = 15pt;
             section-left-space = 0pt;
-            section-line-break = true;
+            section-line-break = false;
             section-right-space = 18pt;
 
             subsection-fontsize = 15pt;
@@ -484,7 +484,7 @@ let article = (|
             part-top-space = 50pt;
             part-bottom-space = 35pt;
             part-left-space = 0pt;
-            part-line-break = true;
+            part-line-break = false;
             part-right-space = 30pt;
             part-page-break-2 = false;
 
@@ -498,7 +498,7 @@ let article = (|
             chapter-top-space = 40pt;
             chapter-bottom-space = 30pt;
             chapter-left-space = 0pt;
-            chapter-line-break = true;
+            chapter-line-break = false;
             chapter-right-space = 25pt;
             chapter-page-break-2 = false;
 

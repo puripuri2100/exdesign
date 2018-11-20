@@ -1188,7 +1188,6 @@ let document record inner =
             in
         (|
           header-origin  = header-origin;
-
           header-content = header;
           footer-origin  = footer-origin;
           footer-content = footer;
