@@ -1265,7 +1265,16 @@ let document record inner =
             ((inline-skip !part-left-space-ref) ++ ib-num ++ (inline-skip !part-right-space-ref) ++ ib-title ++ (inline-fil))
     in
     let bb-inner = read-block ctx inner in
-      bb-title +++ bb-inner
+        if !part-page-break-1-ref then
+            if !part-page-break-2-ref then
+                clear-page +++ bb-title +++ clear-page +++ bb-inner
+            else
+                clear-page +++ bb-title +++ bb-inner
+        else
+            if !part-page-break-2-ref then
+                bb-title +++ clear-page +++ bb-inner
+            else
+                bb-title +++ bb-inner
 
 
   let chapter-scheme ctx label title inner =
@@ -1294,7 +1303,16 @@ let document record inner =
             ((inline-skip !chapter-left-space-ref) ++ ib-num ++ (inline-skip !chapter-right-space-ref) ++ ib-title ++ (inline-fil))
     in
     let bb-inner = read-block ctx inner in
-      bb-title +++ bb-inner
+        if !chapter-page-break-1-ref then
+            if !chapter-page-break-2-ref then
+                clear-page +++ bb-title +++ clear-page +++ bb-inner
+            else
+                clear-page +++ bb-title +++ bb-inner
+        else
+            if !chapter-page-break-2-ref then
+                bb-title +++ clear-page +++ bb-inner
+            else
+                bb-title +++ bb-inner
 
 
   let section-scheme ctx label title inner =
