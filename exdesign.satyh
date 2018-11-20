@@ -66,6 +66,7 @@ val document : 'a -> block-text -> document
             toc-depth : int;
 
             part-fontsize : length;
+            part-page-break-1 : bool;
             part-text-1 : string;
             part-text-2 : string;
             show-num-part : bool;
@@ -74,9 +75,12 @@ val document : 'a -> block-text -> document
             part-top-space : length;
             part-bottom-space : length;
             part-left-space : length;
+            part-line-break : bool;
             part-right-space : length;
+            part-page-break-2 : bool;
 
             chapter-fontsize : length;
+            chapter-page-break-1 : bool;
             chapter-text-1 : string;
             chapter-text-2 : string;
             show-num-chapter : bool;
@@ -85,7 +89,9 @@ val document : 'a -> block-text -> document
             chapter-top-space : length;
             chapter-bottom-space : length;
             chapter-left-space : length;
+            chapter-line-break : bool;
             chapter-right-space : length;
+            chapter-page-break-2 : bool;
 
             section-fontsize : length;
             section-text-1 : string;
@@ -98,6 +104,7 @@ val document : 'a -> block-text -> document
             section-top-space : length;
             section-bottom-space : length;
             section-left-space : length;
+            section-line-break : bool;
             section-right-space : length;
 
             subsection-fontsize : length;
@@ -113,6 +120,7 @@ val document : 'a -> block-text -> document
             subsection-top-space : length;
             subsection-bottom-space : length;
             subsection-left-space : length;
+            subsection-line-break : bool;
             subsection-right-space : length;
 
             subsubsection-fontsize : length;
@@ -130,6 +138,7 @@ val document : 'a -> block-text -> document
             subsubsection-top-space : length;
             subsubsection-bottom-space : length;
             subsubsection-left-space : length;
+            subsubsection-line-break : bool;
             subsubsection-right-space : length;
         |);
         header-footer : (|
@@ -362,6 +371,7 @@ end = struct
     let-mutable font-cjk-gothic-m-ref <-  (` ` , 0. , 0.)
     let-mutable font-cjk-gothic-bx-ref <-  (` ` , 0. , 0.)
     let-mutable font-cjk-gothic-eb-ref <-  (` ` , 0. , 0.)
+
 %% フォント設定用の関数
     let set-latin-font font ctx =
         ctx |> set-font Latin font
@@ -462,6 +472,7 @@ end = struct
     let-mutable toc-depth-ref <- 0
 
     let-mutable part-fontsize-ref <- 0pt
+    let-mutable part-page-break-1-ref <- true
     let-mutable part-text-1-ref <- ` `
     let-mutable part-text-2-ref <- ` `
     let-mutable show-num-part-ref <- true
@@ -470,9 +481,12 @@ end = struct
     let-mutable part-top-space-ref <- 0pt
     let-mutable part-bottom-space-ref <- 0pt
     let-mutable part-left-space-ref <- 0pt
+    let-mutable part-line-break-ref <- true
     let-mutable part-right-space-ref <- 0pt
+    let-mutable part-page-break-2-ref <- true
 
     let-mutable chapter-fontsize-ref <- 0pt
+    let-mutable chapter-page-break-1-ref <- true
     let-mutable chapter-text-1-ref <- ` `
     let-mutable chapter-text-2-ref <- ` `
     let-mutable show-num-chapter-ref <- true
@@ -481,7 +495,9 @@ end = struct
     let-mutable chapter-top-space-ref <- 0pt
     let-mutable chapter-bottom-space-ref <- 0pt
     let-mutable chapter-left-space-ref <- 0pt
+    let-mutable chapter-line-break-ref <- true
     let-mutable chapter-right-space-ref <- 0pt
+    let-mutable chapter-page-break-2-ref <- true
 
     let-mutable section-fontsize-ref <- 0pt
     let-mutable section-text-1-ref <- ` `
@@ -494,6 +510,7 @@ end = struct
     let-mutable section-top-space-ref <- 0pt
     let-mutable section-bottom-space-ref <- 0pt
     let-mutable section-left-space-ref <- 0pt
+    let-mutable section-line-break-ref <- true
     let-mutable section-right-space-ref <- 0pt
 
     let-mutable subsection-fontsize-ref <- 0pt
@@ -509,6 +526,7 @@ end = struct
     let-mutable subsection-top-space-ref <- 0pt
     let-mutable subsection-bottom-space-ref <- 0pt
     let-mutable subsection-left-space-ref <- 0pt
+    let-mutable subsection-line-break-ref <- true
     let-mutable subsection-right-space-ref <- 0pt
 
     let-mutable subsubsection-fontsize-ref <- 0pt
@@ -526,6 +544,7 @@ end = struct
     let-mutable subsubsection-top-space-ref <- 0pt
     let-mutable subsubsection-bottom-space-ref <- 0pt
     let-mutable subsubsection-left-space-ref <- 0pt
+    let-mutable subsubsection-line-break-ref <- true
     let-mutable subsubsection-right-space-ref <- 0pt
 
 %% header-footer
@@ -659,6 +678,7 @@ let document record inner =
 
 
     let () = part-fontsize-ref <- record#design#part-fontsize in
+    let () = part-page-break-1-ref <- record#design#part-page-break-1 in
     let () = part-text-1-ref <- record#design#part-text-1 in
     let () = part-text-2-ref <- record#design#part-text-2 in
     let () = show-num-part-ref <- record#design#show-num-part in
@@ -667,9 +687,12 @@ let document record inner =
     let () = part-top-space-ref <- record#design#part-top-space in
     let () = part-bottom-space-ref <- record#design#part-bottom-space in
     let () = part-left-space-ref <- record#design#part-left-space in
+    let () = part-line-break-ref <- record#design#part-line-break in
     let () = part-right-space-ref <- record#design#part-right-space in
+    let () = part-page-break-2-ref <- record#design#part-page-break-2 in
 
     let () = chapter-fontsize-ref <- record#design#chapter-fontsize in
+    let () = chapter-page-break-1-ref <- record#design#chapter-page-break-1 in
     let () = chapter-text-1-ref <- record#design#chapter-text-1 in
     let () = chapter-text-2-ref <- record#design#chapter-text-2 in
     let () = show-num-chapter-ref <- record#design#show-num-chapter in
@@ -678,7 +701,9 @@ let document record inner =
     let () = chapter-top-space-ref <- record#design#chapter-top-space in
     let () = chapter-bottom-space-ref <- record#design#chapter-bottom-space in
     let () = chapter-left-space-ref <- record#design#chapter-left-space in
+    let () = chapter-line-break-ref <- record#design#chapter-line-break in
     let () = chapter-right-space-ref <- record#design#chapter-right-space in
+    let () = chapter-page-break-2-ref <- record#design#chapter-page-break-2 in
 
     let () = section-fontsize-ref <- record#design#section-fontsize in
     let () = section-text-1-ref <- record#design#section-text-1 in
@@ -691,6 +716,7 @@ let document record inner =
     let () = section-top-space-ref <- record#design#section-top-space in
     let () = section-bottom-space-ref <- record#design#section-bottom-space in
     let () = section-left-space-ref <- record#design#section-left-space in
+    let () = section-line-break-ref <- record#design#section-line-break in
     let () = section-right-space-ref <- record#design#section-right-space in
 
     let () = subsection-fontsize-ref <- record#design#subsection-fontsize in
@@ -706,6 +732,7 @@ let document record inner =
     let () = subsection-top-space-ref <- record#design#subsection-top-space in
     let () = subsection-bottom-space-ref <- record#design#subsection-bottom-space in
     let () = subsection-left-space-ref <- record#design#subsection-left-space in
+    let () = subsection-line-break-ref <- record#design#subsection-line-break in
     let () = subsection-right-space-ref <- record#design#subsection-right-space in
 
     let () = subsubsection-fontsize-ref <- record#design#subsubsection-fontsize in
@@ -723,6 +750,7 @@ let document record inner =
     let () = subsubsection-top-space-ref <- record#design#subsubsection-top-space in
     let () = subsubsection-bottom-space-ref <- record#design#subsubsection-bottom-space in
     let () = subsubsection-left-space-ref <- record#design#subsubsection-left-space in
+    let () = subsubsection-line-break-ref <- record#design#subsubsection-line-break in
     let () = subsubsection-right-space-ref <- record#design#subsubsection-right-space in
 
 %%% header-footer
@@ -1226,8 +1254,15 @@ let document record inner =
     in
     let ib-title = read-inline ctx-title title in
     let bb-title =
-      line-break true false (ctx |> set-paragraph-margin !part-top-space-ref !part-bottom-space-ref)
-        ((inline-skip !part-left-space-ref) ++ ib-num ++ (inline-skip !part-right-space-ref) ++ ib-title ++ (inline-fil))
+        if !part-line-break-ref then
+            line-break true false (ctx |> set-paragraph-margin !part-top-space-ref 0pt)
+            ((inline-skip !part-left-space-ref) ++ ib-num )
+            +++
+            line-break false false (ctx |> set-paragraph-margin !part-top-space-ref !part-bottom-space-ref)
+            ((inline-skip !part-right-space-ref) ++ ib-title ++ (inline-fil))
+        else
+            line-break true false (ctx |> set-paragraph-margin 0pt !part-bottom-space-ref)
+            ((inline-skip !part-left-space-ref) ++ ib-num ++ (inline-skip !part-right-space-ref) ++ ib-title ++ (inline-fil))
     in
     let bb-inner = read-block ctx inner in
       bb-title +++ bb-inner
@@ -1248,8 +1283,15 @@ let document record inner =
     in
     let ib-title = read-inline ctx-title title in
     let bb-title =
-      line-break true false (ctx |> set-paragraph-margin !chapter-top-space-ref !chapter-bottom-space-ref)
-        ((inline-skip !chapter-left-space-ref) ++ ib-num ++ (inline-skip !chapter-right-space-ref) ++ ib-title ++ (inline-fil))
+        if !chapter-line-break-ref then
+            line-break true false (ctx |> set-paragraph-margin !chapter-top-space-ref 0pt)
+            ((inline-skip !chapter-left-space-ref) ++ ib-num )
+            +++
+            line-break false false (ctx |> set-paragraph-margin !chapter-top-space-ref !chapter-bottom-space-ref)
+            ((inline-skip !chapter-right-space-ref) ++ ib-title ++ (inline-fil))
+        else
+            line-break true false (ctx |> set-paragraph-margin 0pt !chapter-bottom-space-ref)
+            ((inline-skip !chapter-left-space-ref) ++ ib-num ++ (inline-skip !chapter-right-space-ref) ++ ib-title ++ (inline-fil))
     in
     let bb-inner = read-block ctx inner in
       bb-title +++ bb-inner
@@ -1271,8 +1313,15 @@ let document record inner =
     in
     let ib-title = read-inline ctx-title title in
     let bb-title =
-      line-break true false (ctx |> set-paragraph-margin !section-top-space-ref !section-bottom-space-ref)
-        ((inline-skip !section-left-space-ref) ++ ib-num ++ (inline-skip !section-right-space-ref) ++ ib-title ++ (inline-fil))
+        if !section-line-break-ref then
+            line-break true false (ctx |> set-paragraph-margin !section-top-space-ref 0pt)
+            ((inline-skip !section-left-space-ref) ++ ib-num )
+            +++
+            line-break false false (ctx |> set-paragraph-margin !section-top-space-ref !section-bottom-space-ref)
+            ((inline-skip !section-right-space-ref) ++ ib-title ++ (inline-fil))
+        else
+            line-break true false (ctx |> set-paragraph-margin 0pt !section-bottom-space-ref)
+            ((inline-skip !section-left-space-ref) ++ ib-num ++ (inline-skip !section-right-space-ref) ++ ib-title ++ (inline-fil))
     in
     let bb-inner = read-block ctx inner in
       bb-title +++ bb-inner
@@ -1295,8 +1344,15 @@ let document record inner =
     in
     let ib-title = read-inline ctx-title title in
     let bb-title =
-      line-break true false (ctx |> set-paragraph-margin !subsection-top-space-ref !subsection-bottom-space-ref)
-        ((inline-skip !subsection-left-space-ref) ++ ib-num ++ (inline-skip !subsection-right-space-ref) ++ ib-title ++ (inline-fil))
+        if !subsection-line-break-ref then
+            line-break true false (ctx |> set-paragraph-margin !subsection-top-space-ref 0pt)
+            ((inline-skip !subsection-left-space-ref) ++ ib-num )
+            +++
+            line-break false false (ctx |> set-paragraph-margin !subsection-top-space-ref !subsection-bottom-space-ref)
+            ((inline-skip !subsection-right-space-ref) ++ ib-title ++ (inline-fil))
+        else
+            line-break true false (ctx |> set-paragraph-margin 0pt !subsection-bottom-space-ref)
+            ((inline-skip !subsection-left-space-ref) ++ ib-num ++ (inline-skip !subsection-right-space-ref) ++ ib-title ++ (inline-fil))
     in
     let bb-inner = read-block ctx inner in
       bb-title +++ bb-inner
@@ -1319,8 +1375,15 @@ let document record inner =
     in
     let ib-title = read-inline ctx-title title in
     let bb-title =
-      line-break true false (ctx |> set-paragraph-margin !subsubsection-top-space-ref !subsubsection-bottom-space-ref)
-        ((inline-skip !subsubsection-left-space-ref) ++ ib-num ++ (inline-skip !subsubsection-right-space-ref) ++ ib-title ++ (inline-fil))
+        if !subsubsection-line-break-ref then
+            line-break true false (ctx |> set-paragraph-margin !subsubsection-top-space-ref 0pt)
+            ((inline-skip !subsubsection-left-space-ref) ++ ib-num )
+            +++
+            line-break false false (ctx |> set-paragraph-margin !subsubsection-top-space-ref !subsubsection-bottom-space-ref)
+            ((inline-skip !subsubsection-right-space-ref) ++ ib-title ++ (inline-fil))
+        else
+            line-break true false (ctx |> set-paragraph-margin 0pt !subsubsection-bottom-space-ref)
+            ((inline-skip !subsubsection-left-space-ref) ++ ib-num ++ (inline-skip !subsubsection-right-space-ref) ++ ib-title ++ (inline-fil))
     in
     let bb-inner = read-block ctx inner in
       bb-title +++ bb-inner
