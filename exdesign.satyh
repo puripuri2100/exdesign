@@ -63,6 +63,11 @@ val document : 'a -> block-text -> document
             toc-line-space-section : length;
             toc-line-space-subsection : length;
             toc-line-space-subsubsection : length;
+            toc-name-fontsize-part : length;
+            toc-name-fontsize-chapter : length;
+            toc-name-fontsize-section : length;
+            toc-name-fontsize-subsection : length;
+            toc-name-fontsize-subsubsection : length;
             toc-depth : int;
 
             part-fontsize : length;
@@ -469,6 +474,11 @@ end = struct
     let-mutable toc-line-space-section-ref <- 0pt
     let-mutable toc-line-space-subsection-ref <- 0pt
     let-mutable toc-line-space-subsubsection-ref <- 0pt
+    let-mutable toc-name-fontsize-part-ref <- 0pt
+    let-mutable toc-name-fontsize-chapter-ref <- 0pt
+    let-mutable toc-name-fontsize-section-ref <- 0pt
+    let-mutable toc-name-fontsize-subsection-ref <- 0pt
+    let-mutable toc-name-fontsize-subsubsection-ref <- 0pt
     let-mutable toc-depth-ref <- 0
 
     let-mutable part-fontsize-ref <- 0pt
@@ -674,6 +684,11 @@ let document record inner =
     let () = toc-line-space-section-ref <- record#design#toc-line-space-section in
     let () = toc-line-space-subsection-ref <- record#design#toc-line-space-subsection in
     let () = toc-line-space-subsubsection-ref <- record#design#toc-line-space-subsubsection in
+    let () = toc-name-fontsize-part-ref <- record#design#toc-name-fontsize-part in
+    let () = toc-name-fontsize-chapter-ref <- record#design#toc-name-fontsize-chapter in
+    let () = toc-name-fontsize-section-ref <- record#design#toc-name-fontsize-section in
+    let () = toc-name-fontsize-subsection-ref <- record#design#toc-name-fontsize-subsection in
+    let () = toc-name-fontsize-subsubsection-ref <- record#design#toc-name-fontsize-subsubsection in
     let () = toc-depth-ref <- record#design#toc-depth in
 
 
@@ -885,8 +900,8 @@ let document record inner =
         let bb-title-main =
           let ctx =
             ctx-doc |> set-font-size !title-fontsize-ref
-                        |> set-latin-font !font-latin-sans-ref
-                        |> set-cjk-font !font-cjk-mincho-bx-ref
+                    |> set-latin-font !font-latin-sans-ref
+                    |> set-cjk-font !font-cjk-mincho-bx-ref
           in
             line-break false false ctx
               (inline-fil ++ read-inline ctx !title-ref ++ inline-fil)
@@ -903,8 +918,8 @@ let document record inner =
         let bb-date =
           let ctx =
             ctx-doc |> set-font-size !date-fontsize-ref
-                        |> set-latin-font !font-latin-sans-ref
-                        |> set-cjk-font !font-cjk-mincho-bx-ref
+                    |> set-latin-font !font-latin-sans-ref
+                    |> set-cjk-font !font-cjk-mincho-bx-ref
           in
             line-break false false ctx
               (inline-fil ++ read-inline ctx !date-ref ++ inline-fil)
@@ -916,8 +931,8 @@ let document record inner =
         let bb-title-main =
           let ctx =
             ctx-doc |> set-font-size !title-fontsize-ref
-                        |> set-latin-font !font-latin-sans-ref
-                        |> set-cjk-font !font-cjk-mincho-bx-ref
+                    |> set-latin-font !font-latin-sans-ref
+                    |> set-cjk-font !font-cjk-mincho-bx-ref
           in
             line-break false false ctx
               (inline-fil ++ read-inline ctx !title-ref ++ inline-fil)
@@ -925,8 +940,8 @@ let document record inner =
         let bb-author =
           let ctx =
             ctx-doc |> set-font-size !author-fontsize-ref
-                        |> set-latin-font !font-latin-sans-ref
-                        |> set-cjk-font !font-cjk-mincho-bx-ref
+                    |> set-latin-font !font-latin-sans-ref
+                    |> set-cjk-font !font-cjk-mincho-bx-ref
           in
             line-break false false ctx
               (inline-fil ++ read-inline ctx !author-ref ++ inline-fil)
@@ -934,8 +949,8 @@ let document record inner =
         let bb-date =
           let ctx =
             ctx-doc |> set-font-size !date-fontsize-ref
-                        |> set-latin-font !font-latin-sans-ref
-                        |> set-cjk-font !font-cjk-mincho-bx-ref
+                    |> set-latin-font !font-latin-sans-ref
+                    |> set-cjk-font !font-cjk-mincho-bx-ref
           in
             line-break false false ctx
               (inline-fil ++ read-inline ctx !date-ref ++ inline-fil)
@@ -963,7 +978,13 @@ let document record inner =
                     | TocPart(label, title) ->
                         let it-num = embed-string (get-cross-reference-number label) in
                         let it-page = embed-string (get-cross-reference-page label) in
-                        let ib-title = read-inline ctx-doc {#it-num; #title;} ++ inline-skip 3pt in
+                        let ib-title =
+                            let ctx =
+                                ctx-doc |> set-font-size !toc-name-fontsize-part-ref
+                                        |> set-latin-font !font-latin-sans-ref
+                                        |> set-cjk-font !font-cjk-gothic-bx-ref
+                            in
+                        read-inline ctx {#it-num; #title;} ++ inline-skip 3pt in
                         let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
                         let toc-line-part =
                             let w = (get-text-width ctx-doc) -' !toc-line-space-part-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
@@ -976,7 +997,13 @@ let document record inner =
                     | TocChapter(label, title) ->
                         let it-num = embed-string (get-cross-reference-number label) in
                         let it-page = embed-string (get-cross-reference-page label) in
-                        let ib-title = read-inline ctx-doc {#it-num; #title;} ++ inline-skip 3pt in
+                        let ib-title =
+                            let ctx =
+                                ctx-doc |> set-font-size !toc-name-fontsize-chapter-ref
+                                        |> set-latin-font !font-latin-sans-ref
+                                        |> set-cjk-font !font-cjk-gothic-bx-ref
+                            in
+                        read-inline ctx {#it-num; #title;} ++ inline-skip 3pt in
                         let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
                         let toc-line-chapter =
                             let w = (get-text-width ctx-doc) -' !toc-line-space-chapter-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
@@ -989,7 +1016,13 @@ let document record inner =
                     | TocSection(label, title) ->
                         let it-num = embed-string (get-cross-reference-number label) in
                         let it-page = embed-string (get-cross-reference-page label) in
-                        let ib-title = read-inline ctx-doc {#it-num; #title;} ++ inline-skip 3pt in
+                        let ib-title =
+                            let ctx =
+                                ctx-doc |> set-font-size !toc-name-fontsize-section-ref
+                                        |> set-latin-font !font-latin-roman-ref
+                                        |> set-cjk-font !font-cjk-mincho-bx-ref
+                            in
+                        read-inline ctx {#it-num; #title;} ++ inline-skip 3pt in
                         let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
                         let toc-line-section =
                             let w = (get-text-width ctx-doc) -' !toc-line-space-section-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
@@ -1002,7 +1035,13 @@ let document record inner =
                 | TocSubSection(label, title) ->
                         let it-num = embed-string (get-cross-reference-number label) in
                         let it-page = embed-string (get-cross-reference-page label) in
-                        let ib-title = read-inline ctx-doc {#it-num; #title;} ++ inline-skip 3pt in
+                        let ib-title =
+                            let ctx =
+                                ctx-doc |> set-font-size !toc-name-fontsize-subsection-ref
+                                        |> set-latin-font !font-latin-roman-ref
+                                        |> set-cjk-font !font-cjk-mincho-bx-ref
+                            in
+                        read-inline ctx {#it-num; #title;} ++ inline-skip 3pt in
                         let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
                         let toc-line-subsection =
                             let w = (get-text-width ctx-doc) -' !toc-line-space-subsection-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
@@ -1015,7 +1054,13 @@ let document record inner =
                     | TocSubSubSection(label, title) ->
                         let it-num = embed-string (get-cross-reference-number label) in
                         let it-page = embed-string (get-cross-reference-page label) in
-                        let ib-title = read-inline ctx-doc {#it-num; #title;} ++ inline-skip 3pt in
+                        let ib-title =
+                            let ctx =
+                                ctx-doc |> set-font-size !toc-name-fontsize-subsubsection-ref
+                                        |> set-latin-font !font-latin-roman-ref
+                                        |> set-cjk-font !font-cjk-mincho-bx-ref
+                            in
+                        read-inline ctx {#it-num; #title;} ++ inline-skip 3pt in
                         let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
                         let toc-line-subsubsection =
                             let w = (get-text-width ctx-doc) -' !toc-line-space-subsubsection-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in

@@ -79,6 +79,11 @@ val report : (|
             toc-line-space-section : length;
             toc-line-space-subsection : length;
             toc-line-space-subsubsection : length;
+            toc-name-fontsize-part : length;
+            toc-name-fontsize-chapter : length;
+            toc-name-fontsize-section : length;
+            toc-name-fontsize-subsection : length;
+            toc-name-fontsize-subsubsection : length;
             toc-depth : int;
 
             part-fontsize : length;
@@ -179,6 +184,11 @@ val article : (|
             toc-line-space-section : length;
             toc-line-space-subsection : length;
             toc-line-space-subsubsection : length;
+            toc-name-fontsize-part : length;
+            toc-name-fontsize-chapter : length;
+            toc-name-fontsize-section : length;
+            toc-name-fontsize-subsection : length;
+            toc-name-fontsize-subsubsection : length;
             toc-depth : int;
 
             part-fontsize : length;
@@ -372,6 +382,11 @@ let report = (|
             toc-line-space-section = 35pt;
             toc-line-space-subsection = 45pt;
             toc-line-space-subsubsection = 53pt;
+            toc-name-fontsize-part = 16pt;
+            toc-name-fontsize-chapter = 14pt;
+            toc-name-fontsize-section = 12pt;
+            toc-name-fontsize-subsection = 12pt;
+            toc-name-fontsize-subsubsection = 12pt;
             toc-depth = 3;
 
             part-fontsize = 30pt;
@@ -472,6 +487,11 @@ let article = (|
             toc-line-space-section = 20pt;
             toc-line-space-subsection = 25pt;
             toc-line-space-subsubsection = 33pt;
+            toc-name-fontsize-part = 16pt;
+            toc-name-fontsize-chapter = 14pt;
+            toc-name-fontsize-section = 12pt;
+            toc-name-fontsize-subsection = 12pt;
+            toc-name-fontsize-subsubsection = 12pt;
             toc-depth = 3;
 
             part-fontsize = 30pt;
