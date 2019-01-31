@@ -1318,7 +1318,7 @@ let document record inner =
         | None -> extract-string ib-title
         | Some(outline) -> outline
     in
-    let () = outline-ref <- (1, part-title ^ `.` ^ outline-title , label, true) :: !outline-ref in
+    let () = outline-ref <- (1, part-title ^ #`  `# ^ outline-title , label, true) :: !outline-ref in
     let bb-inner = read-block ctx inner in
         if !part-page-break-1-ref then
             if !part-page-break-2-ref then
@@ -1362,7 +1362,7 @@ let document record inner =
         | None -> extract-string ib-title
         | Some(outline) -> outline
     in
-    let () = outline-ref <- (2, chapter-title ^ `.` ^ outline-title , label, true) :: !outline-ref in
+    let () = outline-ref <- (2, chapter-title ^ #`  `# ^ outline-title , label, true) :: !outline-ref in
     let bb-inner = read-block ctx inner in
         if !chapter-page-break-1-ref then
             if !chapter-page-break-2-ref then
@@ -1407,7 +1407,7 @@ let document record inner =
         | None -> extract-string ib-title
         | Some(outline) -> outline
     in
-    let () = outline-ref <- (3, section-title ^ `.` ^ outline-title , label, true) :: !outline-ref in
+    let () = outline-ref <- (3, section-title ^ #`  `# ^ outline-title , label, true) :: !outline-ref in
     let bb-inner = read-block ctx inner in
       bb-title +++ bb-inner
 
@@ -1444,7 +1444,7 @@ let document record inner =
         | None -> extract-string ib-title
         | Some(outline) -> outline
     in
-    let () = outline-ref <- (4, subsection-title ^ `.` ^ outline-title , label, true) :: !outline-ref in
+    let () = outline-ref <- (4, subsection-title ^ #`  `# ^ outline-title , label, true) :: !outline-ref in
     let bb-inner = read-block ctx inner in
       bb-title +++ bb-inner
 
@@ -1481,7 +1481,7 @@ let document record inner =
         | None -> extract-string ib-title
         | Some(outline) -> outline
     in
-    let () = outline-ref <- (5, subsubsection-title ^ `.` ^ outline-title , label, true) :: !outline-ref in
+    let () = outline-ref <- (5, subsubsection-title ^ #`  `# ^ outline-title , label, true) :: !outline-ref in
     let bb-inner = read-block ctx inner in
       bb-title +++ bb-inner
 
