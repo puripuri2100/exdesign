@@ -188,11 +188,11 @@ val document : 'a -> block-text -> document
 % 提供コマンド
 
 
-direct +part : [string?; inline-text; block-text] block-cmd
-direct +chapter : [string?; inline-text; block-text] block-cmd
-direct +section : [string?; inline-text; block-text] block-cmd
-direct +subsection : [string?; inline-text; block-text] block-cmd
-direct +subsubsection : [string?; inline-text; block-text] block-cmd
+direct +part : [string?; string?; inline-text; block-text] block-cmd
+direct +chapter : [string?; string?; inline-text; block-text] block-cmd
+direct +section : [string?; string?; inline-text; block-text] block-cmd
+direct +subsection : [string?; string?; inline-text; block-text] block-cmd
+direct +subsubsection : [string?; string?; inline-text; block-text] block-cmd
 direct +p-ja : [inline-text] block-cmd
 direct +p-en : [inline-text] block-cmd
 direct +p : [inline-text] block-cmd
@@ -422,6 +422,9 @@ end = struct
         let wid-text = get-natural-width ib in
         let n = round (width /' wid-text) in
         inline-fil ++ (repeat-inline n ib) ++ inline-fil
+
+%% PDF outline
+    let-mutable outline-ref <- []
 
 
 % document内の値を入れるための可変参照の設定
@@ -1238,6 +1241,8 @@ let document record inner =
           footer-content = footer;
         |)
         in
+        let () = register-outline (List.reverse !outline-ref)
+        in
         page-break page pagecontf pagepartsf (bb-title +++ bb-toc +++ bb-main)
 
 % -----------------------------------------------------------------------
@@ -1283,7 +1288,7 @@ let document record inner =
   let-mutable num-subsubsection-ref <- 0
 
 %%% それぞれの要素の設定
-  let part-scheme ctx label title inner =
+  let part-scheme ctx label outlineopt title inner =
     let ctx-title = make-part-title ctx in
     let () = num-part-ref <- !num-part-ref + 1 in
     let () = num-chapter-ref <- 0 in
@@ -1308,6 +1313,12 @@ let document record inner =
             line-break true false (ctx |> set-paragraph-margin 0pt !part-bottom-space-ref)
             ((inline-skip !part-left-space-ref) ++ ib-num ++ (inline-skip !part-right-space-ref) ++ ib-title ++ (inline-fil))
     in
+    let outline-title =
+        match outlineopt with
+        | None -> extract-string ib-title
+        | Some(outline) -> outline
+    in
+    let () = outline-ref <- (1, part-title ^ `.` ^ outline-title , label, true) :: !outline-ref in
     let bb-inner = read-block ctx inner in
         if !part-page-break-1-ref then
             if !part-page-break-2-ref then
@@ -1321,7 +1332,7 @@ let document record inner =
                 bb-title +++ bb-inner
 
 
-  let chapter-scheme ctx label title inner =
+  let chapter-scheme ctx label outlineopt title inner =
     let ctx-title = make-chapter-title ctx in
     let () = num-chapter-ref <- !num-chapter-ref + 1 in
     let () = num-section-ref <- 0 in
@@ -1346,6 +1357,12 @@ let document record inner =
             line-break true false (ctx |> set-paragraph-margin 0pt !chapter-bottom-space-ref)
             ((inline-skip !chapter-left-space-ref) ++ ib-num ++ (inline-skip !chapter-right-space-ref) ++ ib-title ++ (inline-fil))
     in
+    let outline-title =
+        match outlineopt with
+        | None -> extract-string ib-title
+        | Some(outline) -> outline
+    in
+    let () = outline-ref <- (2, chapter-title ^ `.` ^ outline-title , label, true) :: !outline-ref in
     let bb-inner = read-block ctx inner in
         if !chapter-page-break-1-ref then
             if !chapter-page-break-2-ref then
@@ -1359,7 +1376,7 @@ let document record inner =
                 bb-title +++ bb-inner
 
 
-  let section-scheme ctx label title inner =
+  let section-scheme ctx label outlineopt title inner =
     let ctx-title = make-section-title ctx in
     let () = num-section-ref <- !num-section-ref + 1 in
     let () = num-subsection-ref <- 0 in
@@ -1385,11 +1402,17 @@ let document record inner =
             line-break true false (ctx |> set-paragraph-margin 0pt !section-bottom-space-ref)
             ((inline-skip !section-left-space-ref) ++ ib-num ++ (inline-skip !section-right-space-ref) ++ ib-title ++ (inline-fil))
     in
+    let outline-title =
+        match outlineopt with
+        | None -> extract-string ib-title
+        | Some(outline) -> outline
+    in
+    let () = outline-ref <- (3, section-title ^ `.` ^ outline-title , label, true) :: !outline-ref in
     let bb-inner = read-block ctx inner in
       bb-title +++ bb-inner
 
 
-  let subsection-scheme ctx label title inner =
+  let subsection-scheme ctx label outlineopt title inner =
     let ctx-title = make-subsection-title ctx in
     let () = num-subsection-ref <- !num-subsection-ref + 1 in
     let () = num-subsubsection-ref <- 0 in
@@ -1416,11 +1439,17 @@ let document record inner =
             line-break true false (ctx |> set-paragraph-margin 0pt !subsection-bottom-space-ref)
             ((inline-skip !subsection-left-space-ref) ++ ib-num ++ (inline-skip !subsection-right-space-ref) ++ ib-title ++ (inline-fil))
     in
+    let outline-title =
+        match outlineopt with
+        | None -> extract-string ib-title
+        | Some(outline) -> outline
+    in
+    let () = outline-ref <- (4, subsection-title ^ `.` ^ outline-title , label, true) :: !outline-ref in
     let bb-inner = read-block ctx inner in
       bb-title +++ bb-inner
 
 
-  let subsubsection-scheme ctx label title inner =
+  let subsubsection-scheme ctx label outlineopt title inner =
     let ctx-title = make-subsubsection-title ctx in
     let () = num-subsubsection-ref <- !num-subsubsection-ref + 1 in
     let () = needs-indentation-ref <- false in
@@ -1447,50 +1476,56 @@ let document record inner =
             line-break true false (ctx |> set-paragraph-margin 0pt !subsubsection-bottom-space-ref)
             ((inline-skip !subsubsection-left-space-ref) ++ ib-num ++ (inline-skip !subsubsection-right-space-ref) ++ ib-title ++ (inline-fil))
     in
+    let outline-title =
+        match outlineopt with
+        | None -> extract-string ib-title
+        | Some(outline) -> outline
+    in
+    let () = outline-ref <- (5, subsubsection-title ^ `.` ^ outline-title , label, true) :: !outline-ref in
     let bb-inner = read-block ctx inner in
       bb-title +++ bb-inner
 
 
 %%% +section系を定義
-  let-block ctx +part ?:labelopt title inner =
+  let-block ctx +part ?:labelopt ?:outlineopt title inner =
     let label =
       match labelopt with
       | None -> generate-fresh-label ()
       | Some(label) -> label
     in
-      part-scheme ctx label title inner
+      part-scheme ctx label outlineopt title inner
 
-  let-block ctx +chapter ?:labelopt title inner =
+  let-block ctx +chapter ?:labelopt ?:outlineopt title inner =
     let label =
       match labelopt with
       | None -> generate-fresh-label ()
       | Some(label) -> label
     in
-      chapter-scheme ctx label title inner
+      chapter-scheme ctx label outlineopt title inner
 
-  let-block ctx +section ?:labelopt title inner =
+  let-block ctx +section ?:labelopt ?:outlineopt title inner =
     let label =
       match labelopt with
       | None -> generate-fresh-label ()
       | Some(label) -> label
     in
-      section-scheme ctx label title inner
+      section-scheme ctx label outlineopt title inner
 
-  let-block ctx +subsection ?:labelopt title inner =
+  let-block ctx +subsection ?:labelopt ?:outlineopt title inner =
     let label =
       match labelopt with
       | None -> generate-fresh-label ()
       | Some(label) -> label
     in
-      subsection-scheme ctx label title inner
+      subsection-scheme ctx label outlineopt title inner
 
-  let-block ctx +subsubsection ?:labelopt title inner =
+  let-block ctx +subsubsection ?:labelopt ?:outlineopt title inner =
     let label =
       match labelopt with
       | None -> generate-fresh-label ()
       | Some(label) -> label
     in
-      subsubsection-scheme ctx label title inner
+      subsubsection-scheme ctx label outlineopt title inner
 
 % +p関係
 let quad-indent-ja ctx =
