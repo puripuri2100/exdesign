@@ -207,6 +207,7 @@ direct \textgt : [inline-text] inline-cmd
 direct \footnote : [inline-text] inline-cmd
 direct \ref : [string] inline-cmd
 direct \ref-page : [string] inline-cmd
+direct \figure : [string?; inline-text; block-text] inline-cmd
 
     val title-ref : inline-text ref
     val author-ref : inline-text ref
@@ -429,6 +430,38 @@ end = struct
 %% PDF outline
     let-mutable outline-ref <- []
 
+%% 浮動環境
+
+    let-mutable ref-float-boxes <- []
+
+    let height-of-float-boxes pageno =
+        (!ref-float-boxes) |> List.fold-left (fun h (pn, bb) -> (
+        if pn < pageno then h +' (get-natural-length bb) else h
+        )) 0pt
+
+    let no-pads = (0pt, 0pt, 0pt, 0pt)
+
+    let-mutable figure-num-ref <- 0
+
+    let-inline ctx \figure ?:labelopt caption inner =
+        let () = figure-num-ref <- !figure-num-ref + 1 in
+        let figure-num = arabic (!figure-num-ref) in
+        let label =
+            match labelopt with
+            | None -> generate-fresh-label ()
+            | Some (label) -> label
+        in
+        let () =
+            match labelopt with
+            | None -> ()
+            | Some (label) -> register-cross-reference (label ^ `:num`) figure-num
+        in
+        let bb-inner = block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
+            read-block ctx inner
+                +++ line-break true true ctx (inline-fil ++ read-inline ctx {#caption;} ++ inline-fil)))
+        in
+        hook-page-break (fun pbinfo _ -> (
+            ref-float-boxes <- (pbinfo#page-number, bb-inner) :: !ref-float-boxes))
 
 % document内の値を入れるための可変参照の設定
     let-mutable title-ref <- {}
@@ -1087,12 +1120,6 @@ let document record inner =
     let page = UserDefinedPaper(!page-width-ref , !page-height-ref) in
 
 %% pagecontf
-    let-mutable ref-float-boxes <- [] in
-    let height-of-float-boxes pageno =
-        (!ref-float-boxes) |> List.fold-left (fun h (pn, bb) -> (
-        if pn < pageno then h +' (get-natural-length bb) else h
-        )) 0pt
-    in
 
     let pagecontf pbinfo =
         let () = FootnoteScheme.start-page () in
@@ -1133,10 +1160,26 @@ let document record inner =
                         else
                             (inline-skip 5pt ++ (read-inline ctx-header {#rhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#lhead;}) ++ inline-skip 5pt)
                 in
-                line-break true true ctx-header header-text
-                            +++ line-break true true (ctx-header |> set-paragraph-margin 0pt 0pt)
-                    ((inline-graphics !hdrwid-ref !header-thickness-ref 0pt
-                        (fun (x, y) -> [ fill Color.black (Gr.rectangle (x, y) (x +' !hdrwid-ref, y +' !header-thickness-ref))])) ++ inline-fil)
+                let (bb-float-boxes, acc) =
+                    (!ref-float-boxes) |> List.fold-left (fun (bbacc, acc) elem -> (
+                    let (pn, bb) = elem in
+                        if pn < pbinfo#page-number then
+                        let bbs =
+                            line-break true true (ctx-header |> set-paragraph-margin 0pt 12pt)
+                            (inline-fil ++ embed-block-top ctx-header !hdrwid-ref (fun _ -> bb) ++ inline-fil)
+                                % 'ctx' is a dummy context
+                        in
+                            (bbacc +++ bbs, acc)
+                        else
+                        (bbacc, elem :: acc)
+                    )) (block-nil, [])
+                in
+                let () = ref-float-boxes <- acc in
+                        line-break true true ctx-header header-text
+                                    +++ line-break true true (ctx-header |> set-paragraph-margin 0pt 0pt)
+                            ((inline-graphics !hdrwid-ref !header-thickness-ref 0pt
+                                (fun (x, y) -> [ fill Color.black (Gr.rectangle (x, y) (x +' !hdrwid-ref, y +' !header-thickness-ref))])) ++ inline-fil)
+                                +++ bb-float-boxes
         else
             if !show-title-ref then
                 if pbinfo#page-number == 1 then
@@ -1154,10 +1197,26 @@ let document record inner =
                             else
                                 (inline-skip 5pt ++ (read-inline ctx-header {#rhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#lhead;}) ++ inline-skip 5pt)
                     in
+                let (bb-float-boxes, acc) =
+                    (!ref-float-boxes) |> List.fold-left (fun (bbacc, acc) elem -> (
+                    let (pn, bb) = elem in
+                        if pn < pbinfo#page-number then
+                        let bbs =
+                            line-break true true (ctx-header |> set-paragraph-margin 0pt 12pt)
+                            (inline-fil ++ embed-block-top ctx-header !hdrwid-ref (fun _ -> bb) ++ inline-fil)
+                                % 'ctx' is a dummy context
+                        in
+                            (bbacc +++ bbs, acc)
+                        else
+                        (bbacc, elem :: acc)
+                    )) (block-nil, [])
+                in
+                let () = ref-float-boxes <- acc in
                     line-break true true ctx-header header-text
                                 +++ line-break true true (ctx-header |> set-paragraph-margin 0pt 0pt)
                         ((inline-graphics !hdrwid-ref !header-thickness-ref 0pt
                             (fun (x, y) -> [ fill Color.black (Gr.rectangle (x, y) (x +' !hdrwid-ref, y +' !header-thickness-ref))])) ++ inline-fil)
+                            +++ bb-float-boxes
             else
                 let lhead = !lhead-ref in
                 let chead = !chead-ref in
@@ -1171,10 +1230,26 @@ let document record inner =
                         else
                             (inline-skip 5pt ++ (read-inline ctx-header {#rhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#lhead;}) ++ inline-skip 5pt)
                 in
+                let (bb-float-boxes, acc) =
+                    (!ref-float-boxes) |> List.fold-left (fun (bbacc, acc) elem -> (
+                    let (pn, bb) = elem in
+                        if pn < pbinfo#page-number then
+                        let bbs =
+                            line-break true true (ctx-header |> set-paragraph-margin 0pt 12pt)
+                            (inline-fil ++ embed-block-top ctx-header !hdrwid-ref (fun _ -> bb) ++ inline-fil)
+                                % 'ctx' is a dummy context
+                        in
+                            (bbacc +++ bbs, acc)
+                        else
+                        (bbacc, elem :: acc)
+                    )) (block-nil, [])
+                in
+                let () = ref-float-boxes <- acc in
                 line-break true true ctx-header header-text
                             +++ line-break true true (ctx-header |> set-paragraph-margin 0pt 0pt)
                     ((inline-graphics !hdrwid-ref !header-thickness-ref 0pt
                         (fun (x, y) -> [ fill Color.black (Gr.rectangle (x, y) (x +' !hdrwid-ref, y +' !header-thickness-ref))])) ++ inline-fil)
+                        +++ bb-float-boxes
       in
 %%% footer
       let footer =
@@ -1289,8 +1364,6 @@ let document record inner =
   let-mutable num-section-ref <- 0
   let-mutable num-subsection-ref <- 0
   let-mutable num-subsubsection-ref <- 0
-
-    let no-pads = (0pt, 0pt, 0pt, 0pt)
 
 %%% それぞれの要素の設定
   let part-scheme ctx label outlineopt title inner =
