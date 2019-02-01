@@ -445,6 +445,7 @@ end = struct
     let-mutable figure-num-ref <- 0
 
     let-inline ctx \figure ?:labelopt caption inner =
+        let pads = (2pt, 2pt, 2pt, 12pt) in
         let () = figure-num-ref <- !figure-num-ref + 1 in
         let figure-num = arabic (!figure-num-ref) in
         let label =
@@ -457,7 +458,7 @@ end = struct
             | None -> ()
             | Some (label) -> register-cross-reference (label ^ `:num`) figure-num
         in
-        let bb-inner = block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
+        let bb-inner = block-frame-breakable ctx pads (Annot.register-location-frame label) (fun ctx -> (
             read-block ctx inner
                 +++ line-break true true ctx (inline-fil ++ read-inline ctx {#caption;} ++ inline-fil)))
         in
@@ -467,6 +468,7 @@ end = struct
     let-mutable table-num-ref <- 0
 
     let-inline ctx \table ?:labelopt caption inner =
+        let pads = (2pt, 2pt, 2pt, 12pt) in
         let () = table-num-ref <- !table-num-ref + 1 in
         let table-num = arabic (!table-num-ref) in
         let label =
@@ -479,7 +481,7 @@ end = struct
             | None -> ()
             | Some (label) -> register-cross-reference (label ^ `:num`) table-num
         in
-        let bb-inner = block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
+        let bb-inner = block-frame-breakable ctx pads (Annot.register-location-frame label) (fun ctx -> (
             read-block ctx inner
                 +++ line-break true true ctx (inline-fil ++ read-inline ctx {#caption;} ++ inline-fil)))
         in
