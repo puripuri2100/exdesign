@@ -8,6 +8,7 @@
 @require: gr
 @require: color
 @require: footnote-scheme
+@require: annot
 
 module ExDesign : sig
 
@@ -204,6 +205,8 @@ direct \textsf : [inline-text] inline-cmd
 direct \textmc : [inline-text] inline-cmd
 direct \textgt : [inline-text] inline-cmd
 direct \footnote : [inline-text] inline-cmd
+direct \ref : [string] inline-cmd
+direct \ref-page : [string] inline-cmd
 
     val title-ref : inline-text ref
     val author-ref : inline-text ref
@@ -1287,6 +1290,8 @@ let document record inner =
   let-mutable num-subsection-ref <- 0
   let-mutable num-subsubsection-ref <- 0
 
+    let no-pads = (0pt, 0pt, 0pt, 0pt)
+
 %%% それぞれの要素の設定
   let part-scheme ctx label outlineopt title inner =
     let ctx-title = make-part-title ctx in
@@ -1304,14 +1309,16 @@ let document record inner =
     let ib-title = read-inline ctx-title title in
     let bb-title =
         if !part-line-break-ref then
+            block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
             line-break true false (ctx |> set-paragraph-margin !part-top-space-ref 0pt)
             ((inline-skip !part-left-space-ref) ++ ib-num )
             +++
             line-break false false (ctx |> set-paragraph-margin !part-top-space-ref !part-bottom-space-ref)
-            ((inline-skip !part-right-space-ref) ++ ib-title ++ (inline-fil))
+            ((inline-skip !part-right-space-ref) ++ ib-title ++ (inline-fil))))
         else
+            block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
             line-break true false (ctx |> set-paragraph-margin 0pt !part-bottom-space-ref)
-            ((inline-skip !part-left-space-ref) ++ ib-num ++ (inline-skip !part-right-space-ref) ++ ib-title ++ (inline-fil))
+            ((inline-skip !part-left-space-ref) ++ ib-num ++ (inline-skip !part-right-space-ref) ++ ib-title ++ (inline-fil))))
     in
     let outline-title =
         match outlineopt with
@@ -1348,14 +1355,16 @@ let document record inner =
     let ib-title = read-inline ctx-title title in
     let bb-title =
         if !chapter-line-break-ref then
+            block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
             line-break true false (ctx |> set-paragraph-margin !chapter-top-space-ref 0pt)
             ((inline-skip !chapter-left-space-ref) ++ ib-num )
             +++
             line-break false false (ctx |> set-paragraph-margin !chapter-top-space-ref !chapter-bottom-space-ref)
-            ((inline-skip !chapter-right-space-ref) ++ ib-title ++ (inline-fil))
+            ((inline-skip !chapter-right-space-ref) ++ ib-title ++ (inline-fil))))
         else
+            block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
             line-break true false (ctx |> set-paragraph-margin 0pt !chapter-bottom-space-ref)
-            ((inline-skip !chapter-left-space-ref) ++ ib-num ++ (inline-skip !chapter-right-space-ref) ++ ib-title ++ (inline-fil))
+            ((inline-skip !chapter-left-space-ref) ++ ib-num ++ (inline-skip !chapter-right-space-ref) ++ ib-title ++ (inline-fil))))
     in
     let outline-title =
         match outlineopt with
@@ -1393,14 +1402,15 @@ let document record inner =
     let ib-title = read-inline ctx-title title in
     let bb-title =
         if !section-line-break-ref then
+            block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
             line-break true false (ctx |> set-paragraph-margin !section-top-space-ref 0pt)
             ((inline-skip !section-left-space-ref) ++ ib-num )
             +++
             line-break false false (ctx |> set-paragraph-margin !section-top-space-ref !section-bottom-space-ref)
-            ((inline-skip !section-right-space-ref) ++ ib-title ++ (inline-fil))
+            ((inline-skip !section-right-space-ref) ++ ib-title ++ (inline-fil))))
         else
-            line-break true false (ctx |> set-paragraph-margin 0pt !section-bottom-space-ref)
-            ((inline-skip !section-left-space-ref) ++ ib-num ++ (inline-skip !section-right-space-ref) ++ ib-title ++ (inline-fil))
+             block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (line-break true false (ctx |> set-paragraph-margin 0pt !section-bottom-space-ref)
+            ((inline-skip !section-left-space-ref) ++ ib-num ++ (inline-skip !section-right-space-ref) ++ ib-title ++ (inline-fil))))
     in
     let outline-title =
         match outlineopt with
@@ -1430,14 +1440,16 @@ let document record inner =
     let ib-title = read-inline ctx-title title in
     let bb-title =
         if !subsection-line-break-ref then
+            block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
             line-break true false (ctx |> set-paragraph-margin !subsection-top-space-ref 0pt)
             ((inline-skip !subsection-left-space-ref) ++ ib-num )
             +++
             line-break false false (ctx |> set-paragraph-margin !subsection-top-space-ref !subsection-bottom-space-ref)
-            ((inline-skip !subsection-right-space-ref) ++ ib-title ++ (inline-fil))
+            ((inline-skip !subsection-right-space-ref) ++ ib-title ++ (inline-fil))))
         else
+            block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
             line-break true false (ctx |> set-paragraph-margin 0pt !subsection-bottom-space-ref)
-            ((inline-skip !subsection-left-space-ref) ++ ib-num ++ (inline-skip !subsection-right-space-ref) ++ ib-title ++ (inline-fil))
+            ((inline-skip !subsection-left-space-ref) ++ ib-num ++ (inline-skip !subsection-right-space-ref) ++ ib-title ++ (inline-fil))))
     in
     let outline-title =
         match outlineopt with
@@ -1467,14 +1479,16 @@ let document record inner =
     let ib-title = read-inline ctx-title title in
     let bb-title =
         if !subsubsection-line-break-ref then
+            block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
             line-break true false (ctx |> set-paragraph-margin !subsubsection-top-space-ref 0pt)
             ((inline-skip !subsubsection-left-space-ref) ++ ib-num )
             +++
             line-break false false (ctx |> set-paragraph-margin !subsubsection-top-space-ref !subsubsection-bottom-space-ref)
-            ((inline-skip !subsubsection-right-space-ref) ++ ib-title ++ (inline-fil))
+            ((inline-skip !subsubsection-right-space-ref) ++ ib-title ++ (inline-fil))))
         else
+            block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
             line-break true false (ctx |> set-paragraph-margin 0pt !subsubsection-bottom-space-ref)
-            ((inline-skip !subsubsection-left-space-ref) ++ ib-num ++ (inline-skip !subsubsection-right-space-ref) ++ ib-title ++ (inline-fil))
+            ((inline-skip !subsubsection-left-space-ref) ++ ib-num ++ (inline-skip !subsubsection-right-space-ref) ++ ib-title ++ (inline-fil))))
     in
     let outline-title =
         match outlineopt with
@@ -1639,6 +1653,25 @@ read-inline ctxgt it
         line-break false false ctx (read-inline ctx {#it-num; #it;} ++ inline-fil)
     in
       FootnoteScheme.main ctx ibf bbf
+
+
+let-inline ctx \ref key =
+    let opt = get-cross-reference (key ^ `:num`) in
+    let it =
+        match opt with
+        | None    -> {?}
+        | Some(s) -> embed-string s
+    in
+        inline-frame-breakable no-pads (Annot.link-to-location-frame key None) (read-inline ctx it)
+
+let-inline ctx \ref-page key =
+    let opt = get-cross-reference (key ^ `:page`) in
+    let it =
+        match opt with
+        | None    -> {?}
+        | Some(s) -> embed-string s
+    in
+        inline-frame-breakable no-pads (Annot.link-to-location-frame key None) (read-inline ctx it)
 
 end
 
