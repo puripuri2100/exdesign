@@ -59,9 +59,9 @@ val a4paper : (|
         |)
 
 val report : (|
-           oneside : bool;
+            oneside : bool;
 
-           titlepage : bool;
+            titlepage : bool;
             title-fontsize : length;
             author-fontsize : length;
             date-fontsize : length;
@@ -79,9 +79,15 @@ val report : (|
             toc-line-space-section : length;
             toc-line-space-subsection : length;
             toc-line-space-subsubsection : length;
+            toc-name-fontsize-part : length;
+            toc-name-fontsize-chapter : length;
+            toc-name-fontsize-section : length;
+            toc-name-fontsize-subsection : length;
+            toc-name-fontsize-subsubsection : length;
             toc-depth : int;
 
             part-fontsize : length;
+            part-page-break-1 : bool;
             part-text-1 : string;
             part-text-2 : string;
             show-num-part : bool;
@@ -90,9 +96,12 @@ val report : (|
             part-top-space : length;
             part-bottom-space : length;
             part-left-space : length;
+            part-line-break : bool;
             part-right-space : length;
+            part-page-break-2 : bool;
 
             chapter-fontsize : length;
+            chapter-page-break-1 : bool;
             chapter-text-1 : string;
             chapter-text-2 : string;
             show-num-chapter : bool;
@@ -101,7 +110,9 @@ val report : (|
             chapter-top-space : length;
             chapter-bottom-space : length;
             chapter-left-space : length;
+            chapter-line-break : bool;
             chapter-right-space : length;
+            chapter-page-break-2 : bool;
 
             section-fontsize : length;
             section-text-1 : string;
@@ -114,6 +125,7 @@ val report : (|
             section-top-space : length;
             section-bottom-space : length;
             section-left-space : length;
+            section-line-break : bool;
             section-right-space : length;
 
             subsection-fontsize : length;
@@ -129,6 +141,7 @@ val report : (|
             subsection-top-space : length;
             subsection-bottom-space : length;
             subsection-left-space : length;
+            subsection-line-break : bool;
             subsection-right-space : length;
 
             subsubsection-fontsize : length;
@@ -146,13 +159,24 @@ val report : (|
             subsubsection-top-space : length;
             subsubsection-bottom-space : length;
             subsubsection-left-space : length;
+            subsubsection-line-break : bool;
             subsubsection-right-space : length;
+
+            figure-caption-fontsize : length;
+            figure-caption-right-title : inline-text;
+            figure-caption-left-title : inline-text;
+            show-figure-caption-num : bool;
+
+            table-caption-fontsize : length;
+            table-caption-right-title : inline-text;
+            table-caption-left-title : inline-text;
+            show-table-caption-num : bool;
         |)
 
 val article : (|
-           oneside : bool;
+            oneside : bool;
 
-           titlepage : bool;
+            titlepage : bool;
             title-fontsize : length;
             author-fontsize : length;
             date-fontsize : length;
@@ -170,9 +194,15 @@ val article : (|
             toc-line-space-section : length;
             toc-line-space-subsection : length;
             toc-line-space-subsubsection : length;
+            toc-name-fontsize-part : length;
+            toc-name-fontsize-chapter : length;
+            toc-name-fontsize-section : length;
+            toc-name-fontsize-subsection : length;
+            toc-name-fontsize-subsubsection : length;
             toc-depth : int;
 
             part-fontsize : length;
+            part-page-break-1 : bool;
             part-text-1 : string;
             part-text-2 : string;
             show-num-part : bool;
@@ -181,9 +211,12 @@ val article : (|
             part-top-space : length;
             part-bottom-space : length;
             part-left-space : length;
+            part-line-break : bool;
             part-right-space : length;
+            part-page-break-2 : bool;
 
             chapter-fontsize : length;
+            chapter-page-break-1 : bool;
             chapter-text-1 : string;
             chapter-text-2 : string;
             show-num-chapter : bool;
@@ -192,7 +225,9 @@ val article : (|
             chapter-top-space : length;
             chapter-bottom-space : length;
             chapter-left-space : length;
+            chapter-line-break : bool;
             chapter-right-space : length;
+            chapter-page-break-2 : bool;
 
             section-fontsize : length;
             section-text-1 : string;
@@ -205,6 +240,7 @@ val article : (|
             section-top-space : length;
             section-bottom-space : length;
             section-left-space : length;
+            section-line-break : bool;
             section-right-space : length;
 
             subsection-fontsize : length;
@@ -220,6 +256,7 @@ val article : (|
             subsection-top-space : length;
             subsection-bottom-space : length;
             subsection-left-space : length;
+            subsection-line-break : bool;
             subsection-right-space : length;
 
             subsubsection-fontsize : length;
@@ -237,7 +274,18 @@ val article : (|
             subsubsection-top-space : length;
             subsubsection-bottom-space : length;
             subsubsection-left-space : length;
+            subsubsection-line-break : bool;
             subsubsection-right-space : length;
+
+            figure-caption-fontsize : length;
+            figure-caption-right-title : inline-text;
+            figure-caption-left-title : inline-text;
+            show-figure-caption-num : bool;
+
+            table-caption-fontsize : length;
+            table-caption-right-title : inline-text;
+            table-caption-left-title : inline-text;
+            show-table-caption-num : bool;
         |)
 
 val fonts : (|
@@ -354,9 +402,15 @@ let report = (|
             toc-line-space-section = 35pt;
             toc-line-space-subsection = 45pt;
             toc-line-space-subsubsection = 53pt;
+            toc-name-fontsize-part = 16pt;
+            toc-name-fontsize-chapter = 14pt;
+            toc-name-fontsize-section = 12pt;
+            toc-name-fontsize-subsection = 12pt;
+            toc-name-fontsize-subsubsection = 12pt;
             toc-depth = 3;
 
             part-fontsize = 30pt;
+            part-page-break-1 = false;
             part-text-1 = `第`;
             part-text-2 = ` `;
             show-num-part = true;
@@ -365,9 +419,12 @@ let report = (|
             part-top-space = 40pt;
             part-bottom-space = 25pt;
             part-left-space = 0pt;
+            part-line-break = false;
             part-right-space = 30pt;
+            part-page-break-2 = false;
 
             chapter-fontsize = 25pt;
+            chapter-page-break-1 = false;
             chapter-text-1 = `第`;
             chapter-text-2 = ` `;
             show-num-chapter = true;
@@ -376,7 +433,9 @@ let report = (|
             chapter-top-space = 35pt;
             chapter-bottom-space = 30pt;
             chapter-left-space = 0pt;
+            chapter-line-break = false;
             chapter-right-space = 25pt;
+            chapter-page-break-2 = false;
 
             section-fontsize = 18pt;
             section-text-1 = ` `;
@@ -389,6 +448,7 @@ let report = (|
             section-top-space = 25pt;
             section-bottom-space = 15pt;
             section-left-space = 0pt;
+            section-line-break = false;
             section-right-space = 18pt;
 
             subsection-fontsize = 15pt;
@@ -404,6 +464,7 @@ let report = (|
             subsection-top-space = 20pt;
             subsection-bottom-space = 15pt;
             subsection-left-space = 0pt;
+            subsection-line-break = false;
             subsection-right-space = 15pt;
 
             subsubsection-fontsize = 13pt;
@@ -421,7 +482,18 @@ let report = (|
             subsubsection-top-space = 15pt;
             subsubsection-bottom-space = 10pt;
             subsubsection-left-space = 0pt;
+            subsubsection-line-break = false;
             subsubsection-right-space = 13pt;
+
+            figure-caption-fontsize = 12pt;
+            figure-caption-right-title = {図};
+            figure-caption-left-title = {:};
+            show-figure-caption-num = true;
+
+            table-caption-fontsize = 12pt;
+            table-caption-right-title = {表};
+            table-caption-left-title = {:};
+            show-table-caption-num = true;
         |)
 
 let article = (|
@@ -445,9 +517,15 @@ let article = (|
             toc-line-space-section = 20pt;
             toc-line-space-subsection = 25pt;
             toc-line-space-subsubsection = 33pt;
+            toc-name-fontsize-part = 16pt;
+            toc-name-fontsize-chapter = 14pt;
+            toc-name-fontsize-section = 12pt;
+            toc-name-fontsize-subsection = 12pt;
+            toc-name-fontsize-subsubsection = 12pt;
             toc-depth = 3;
 
             part-fontsize = 30pt;
+            part-page-break-1 = false;
             part-text-1 = `第`;
             part-text-2 = ` `;
             show-num-part = true;
@@ -456,9 +534,12 @@ let article = (|
             part-top-space = 50pt;
             part-bottom-space = 35pt;
             part-left-space = 0pt;
+            part-line-break = false;
             part-right-space = 30pt;
+            part-page-break-2 = false;
 
             chapter-fontsize = 25pt;
+            chapter-page-break-1 = false;
             chapter-text-1 = `第`;
             chapter-text-2 = ` `;
             show-num-chapter = true;
@@ -467,7 +548,9 @@ let article = (|
             chapter-top-space = 40pt;
             chapter-bottom-space = 30pt;
             chapter-left-space = 0pt;
+            chapter-line-break = false;
             chapter-right-space = 25pt;
+            chapter-page-break-2 = false;
 
             section-fontsize = 18pt;
             section-text-1 = ` `;
@@ -480,6 +563,7 @@ let article = (|
             section-top-space = 25pt;
             section-bottom-space = 15pt;
             section-left-space = 0pt;
+            section-line-break = false;
             section-right-space = 18pt;
 
             subsection-fontsize = 15pt;
@@ -495,6 +579,7 @@ let article = (|
             subsection-top-space = 20pt;
             subsection-bottom-space = 15pt;
             subsection-left-space = 0pt;
+            subsection-line-break = false;
             subsection-right-space = 15pt;
 
             subsubsection-fontsize = 13pt;
@@ -512,7 +597,18 @@ let article = (|
             subsubsection-top-space = 15pt;
             subsubsection-bottom-space = 10pt;
             subsubsection-left-space = 0pt;
+            subsubsection-line-break = false;
             subsubsection-right-space = 13pt;
+
+            figure-caption-fontsize = 12pt;
+            figure-caption-right-title = {図};
+            figure-caption-left-title = {:};
+            show-figure-caption-num = true;
+
+            table-caption-fontsize = 12pt;
+            table-caption-right-title = {表};
+            table-caption-left-title = {:};
+            show-table-caption-num = true;
         |)
 
 let fonts = (|

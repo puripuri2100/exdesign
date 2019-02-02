@@ -8,6 +8,7 @@
 @require: gr
 @require: color
 @require: footnote-scheme
+@require: annot
 
 module ExDesign : sig
 
@@ -63,9 +64,15 @@ val document : 'a -> block-text -> document
             toc-line-space-section : length;
             toc-line-space-subsection : length;
             toc-line-space-subsubsection : length;
+            toc-name-fontsize-part : length;
+            toc-name-fontsize-chapter : length;
+            toc-name-fontsize-section : length;
+            toc-name-fontsize-subsection : length;
+            toc-name-fontsize-subsubsection : length;
             toc-depth : int;
 
             part-fontsize : length;
+            part-page-break-1 : bool;
             part-text-1 : string;
             part-text-2 : string;
             show-num-part : bool;
@@ -74,9 +81,12 @@ val document : 'a -> block-text -> document
             part-top-space : length;
             part-bottom-space : length;
             part-left-space : length;
+            part-line-break : bool;
             part-right-space : length;
+            part-page-break-2 : bool;
 
             chapter-fontsize : length;
+            chapter-page-break-1 : bool;
             chapter-text-1 : string;
             chapter-text-2 : string;
             show-num-chapter : bool;
@@ -85,7 +95,9 @@ val document : 'a -> block-text -> document
             chapter-top-space : length;
             chapter-bottom-space : length;
             chapter-left-space : length;
+            chapter-line-break : bool;
             chapter-right-space : length;
+            chapter-page-break-2 : bool;
 
             section-fontsize : length;
             section-text-1 : string;
@@ -98,6 +110,7 @@ val document : 'a -> block-text -> document
             section-top-space : length;
             section-bottom-space : length;
             section-left-space : length;
+            section-line-break : bool;
             section-right-space : length;
 
             subsection-fontsize : length;
@@ -113,6 +126,7 @@ val document : 'a -> block-text -> document
             subsection-top-space : length;
             subsection-bottom-space : length;
             subsection-left-space : length;
+            subsection-line-break : bool;
             subsection-right-space : length;
 
             subsubsection-fontsize : length;
@@ -130,7 +144,18 @@ val document : 'a -> block-text -> document
             subsubsection-top-space : length;
             subsubsection-bottom-space : length;
             subsubsection-left-space : length;
+            subsubsection-line-break : bool;
             subsubsection-right-space : length;
+
+            figure-caption-fontsize : length;
+            figure-caption-right-title : inline-text;
+            figure-caption-left-title : inline-text;
+            show-figure-caption-num : bool;
+
+            table-caption-fontsize : length;
+            table-caption-right-title : inline-text;
+            table-caption-left-title : inline-text;
+            show-table-caption-num : bool;
         |);
         header-footer : (|
             lhead : inline-text;
@@ -174,11 +199,11 @@ val document : 'a -> block-text -> document
 % 提供コマンド
 
 
-direct +part : [string?; inline-text; block-text] block-cmd
-direct +chapter : [string?; inline-text; block-text] block-cmd
-direct +section : [string?; inline-text; block-text] block-cmd
-direct +subsection : [string?; inline-text; block-text] block-cmd
-direct +subsubsection : [string?; inline-text; block-text] block-cmd
+direct +part : [string?; string?; inline-text; block-text] block-cmd
+direct +chapter : [string?; string?; inline-text; block-text] block-cmd
+direct +section : [string?; string?; inline-text; block-text] block-cmd
+direct +subsection : [string?; string?; inline-text; block-text] block-cmd
+direct +subsubsection : [string?; string?; inline-text; block-text] block-cmd
 direct +p-ja : [inline-text] block-cmd
 direct +p-en : [inline-text] block-cmd
 direct +p : [inline-text] block-cmd
@@ -190,6 +215,13 @@ direct \textsf : [inline-text] inline-cmd
 direct \textmc : [inline-text] inline-cmd
 direct \textgt : [inline-text] inline-cmd
 direct \footnote : [inline-text] inline-cmd
+direct \ref : [string] inline-cmd
+direct \ref-page : [string] inline-cmd
+direct \figure : [string?; inline-text; block-text] inline-cmd
+direct +figure : [string?; inline-text; block-text] block-cmd
+direct \table : [string?; inline-text; block-text] inline-cmd
+direct +table : [string?; inline-text; block-text] block-cmd
+
 
     val title-ref : inline-text ref
     val author-ref : inline-text ref
@@ -362,6 +394,7 @@ end = struct
     let-mutable font-cjk-gothic-m-ref <-  (` ` , 0. , 0.)
     let-mutable font-cjk-gothic-bx-ref <-  (` ` , 0. , 0.)
     let-mutable font-cjk-gothic-eb-ref <-  (` ` , 0. , 0.)
+
 %% フォント設定用の関数
     let set-latin-font font ctx =
         ctx |> set-font Latin font
@@ -408,6 +441,19 @@ end = struct
         let n = round (width /' wid-text) in
         inline-fil ++ (repeat-inline n ib) ++ inline-fil
 
+%% PDF outline
+    let-mutable outline-ref <- []
+
+%% 浮動環境
+
+    let-mutable ref-float-boxes <- []
+
+    let height-of-float-boxes pageno =
+        (!ref-float-boxes) |> List.fold-left (fun h (pn, bb) -> (
+        if pn < pageno then h +' (get-natural-length bb) else h
+        )) 0pt
+
+    let no-pads = (0pt, 0pt, 0pt, 0pt)
 
 % document内の値を入れるための可変参照の設定
     let-mutable title-ref <- {}
@@ -459,9 +505,15 @@ end = struct
     let-mutable toc-line-space-section-ref <- 0pt
     let-mutable toc-line-space-subsection-ref <- 0pt
     let-mutable toc-line-space-subsubsection-ref <- 0pt
+    let-mutable toc-name-fontsize-part-ref <- 0pt
+    let-mutable toc-name-fontsize-chapter-ref <- 0pt
+    let-mutable toc-name-fontsize-section-ref <- 0pt
+    let-mutable toc-name-fontsize-subsection-ref <- 0pt
+    let-mutable toc-name-fontsize-subsubsection-ref <- 0pt
     let-mutable toc-depth-ref <- 0
 
     let-mutable part-fontsize-ref <- 0pt
+    let-mutable part-page-break-1-ref <- true
     let-mutable part-text-1-ref <- ` `
     let-mutable part-text-2-ref <- ` `
     let-mutable show-num-part-ref <- true
@@ -470,9 +522,12 @@ end = struct
     let-mutable part-top-space-ref <- 0pt
     let-mutable part-bottom-space-ref <- 0pt
     let-mutable part-left-space-ref <- 0pt
+    let-mutable part-line-break-ref <- true
     let-mutable part-right-space-ref <- 0pt
+    let-mutable part-page-break-2-ref <- true
 
     let-mutable chapter-fontsize-ref <- 0pt
+    let-mutable chapter-page-break-1-ref <- true
     let-mutable chapter-text-1-ref <- ` `
     let-mutable chapter-text-2-ref <- ` `
     let-mutable show-num-chapter-ref <- true
@@ -481,7 +536,9 @@ end = struct
     let-mutable chapter-top-space-ref <- 0pt
     let-mutable chapter-bottom-space-ref <- 0pt
     let-mutable chapter-left-space-ref <- 0pt
+    let-mutable chapter-line-break-ref <- true
     let-mutable chapter-right-space-ref <- 0pt
+    let-mutable chapter-page-break-2-ref <- true
 
     let-mutable section-fontsize-ref <- 0pt
     let-mutable section-text-1-ref <- ` `
@@ -494,6 +551,7 @@ end = struct
     let-mutable section-top-space-ref <- 0pt
     let-mutable section-bottom-space-ref <- 0pt
     let-mutable section-left-space-ref <- 0pt
+    let-mutable section-line-break-ref <- true
     let-mutable section-right-space-ref <- 0pt
 
     let-mutable subsection-fontsize-ref <- 0pt
@@ -509,6 +567,7 @@ end = struct
     let-mutable subsection-top-space-ref <- 0pt
     let-mutable subsection-bottom-space-ref <- 0pt
     let-mutable subsection-left-space-ref <- 0pt
+    let-mutable subsection-line-break-ref <- true
     let-mutable subsection-right-space-ref <- 0pt
 
     let-mutable subsubsection-fontsize-ref <- 0pt
@@ -526,7 +585,18 @@ end = struct
     let-mutable subsubsection-top-space-ref <- 0pt
     let-mutable subsubsection-bottom-space-ref <- 0pt
     let-mutable subsubsection-left-space-ref <- 0pt
+    let-mutable subsubsection-line-break-ref <- true
     let-mutable subsubsection-right-space-ref <- 0pt
+
+    let-mutable figure-caption-fontsize-ref <- 0pt
+    let-mutable figure-caption-right-title-ref <- {}
+    let-mutable figure-caption-left-title-ref <- {}
+    let-mutable show-figure-caption-num-ref <- true
+
+    let-mutable table-caption-fontsize-ref <- 0pt
+    let-mutable table-caption-right-title-ref <- {}
+    let-mutable table-caption-left-title-ref <- {}
+    let-mutable show-table-caption-num-ref <- true
 
 %% header-footer
     let-mutable lhead-ref <- {}
@@ -655,10 +725,16 @@ let document record inner =
     let () = toc-line-space-section-ref <- record#design#toc-line-space-section in
     let () = toc-line-space-subsection-ref <- record#design#toc-line-space-subsection in
     let () = toc-line-space-subsubsection-ref <- record#design#toc-line-space-subsubsection in
+    let () = toc-name-fontsize-part-ref <- record#design#toc-name-fontsize-part in
+    let () = toc-name-fontsize-chapter-ref <- record#design#toc-name-fontsize-chapter in
+    let () = toc-name-fontsize-section-ref <- record#design#toc-name-fontsize-section in
+    let () = toc-name-fontsize-subsection-ref <- record#design#toc-name-fontsize-subsection in
+    let () = toc-name-fontsize-subsubsection-ref <- record#design#toc-name-fontsize-subsubsection in
     let () = toc-depth-ref <- record#design#toc-depth in
 
 
     let () = part-fontsize-ref <- record#design#part-fontsize in
+    let () = part-page-break-1-ref <- record#design#part-page-break-1 in
     let () = part-text-1-ref <- record#design#part-text-1 in
     let () = part-text-2-ref <- record#design#part-text-2 in
     let () = show-num-part-ref <- record#design#show-num-part in
@@ -667,9 +743,12 @@ let document record inner =
     let () = part-top-space-ref <- record#design#part-top-space in
     let () = part-bottom-space-ref <- record#design#part-bottom-space in
     let () = part-left-space-ref <- record#design#part-left-space in
+    let () = part-line-break-ref <- record#design#part-line-break in
     let () = part-right-space-ref <- record#design#part-right-space in
+    let () = part-page-break-2-ref <- record#design#part-page-break-2 in
 
     let () = chapter-fontsize-ref <- record#design#chapter-fontsize in
+    let () = chapter-page-break-1-ref <- record#design#chapter-page-break-1 in
     let () = chapter-text-1-ref <- record#design#chapter-text-1 in
     let () = chapter-text-2-ref <- record#design#chapter-text-2 in
     let () = show-num-chapter-ref <- record#design#show-num-chapter in
@@ -678,7 +757,9 @@ let document record inner =
     let () = chapter-top-space-ref <- record#design#chapter-top-space in
     let () = chapter-bottom-space-ref <- record#design#chapter-bottom-space in
     let () = chapter-left-space-ref <- record#design#chapter-left-space in
+    let () = chapter-line-break-ref <- record#design#chapter-line-break in
     let () = chapter-right-space-ref <- record#design#chapter-right-space in
+    let () = chapter-page-break-2-ref <- record#design#chapter-page-break-2 in
 
     let () = section-fontsize-ref <- record#design#section-fontsize in
     let () = section-text-1-ref <- record#design#section-text-1 in
@@ -691,6 +772,7 @@ let document record inner =
     let () = section-top-space-ref <- record#design#section-top-space in
     let () = section-bottom-space-ref <- record#design#section-bottom-space in
     let () = section-left-space-ref <- record#design#section-left-space in
+    let () = section-line-break-ref <- record#design#section-line-break in
     let () = section-right-space-ref <- record#design#section-right-space in
 
     let () = subsection-fontsize-ref <- record#design#subsection-fontsize in
@@ -706,6 +788,7 @@ let document record inner =
     let () = subsection-top-space-ref <- record#design#subsection-top-space in
     let () = subsection-bottom-space-ref <- record#design#subsection-bottom-space in
     let () = subsection-left-space-ref <- record#design#subsection-left-space in
+    let () = subsection-line-break-ref <- record#design#subsection-line-break in
     let () = subsection-right-space-ref <- record#design#subsection-right-space in
 
     let () = subsubsection-fontsize-ref <- record#design#subsubsection-fontsize in
@@ -723,7 +806,18 @@ let document record inner =
     let () = subsubsection-top-space-ref <- record#design#subsubsection-top-space in
     let () = subsubsection-bottom-space-ref <- record#design#subsubsection-bottom-space in
     let () = subsubsection-left-space-ref <- record#design#subsubsection-left-space in
+    let () = subsubsection-line-break-ref <- record#design#subsubsection-line-break in
     let () = subsubsection-right-space-ref <- record#design#subsubsection-right-space in
+
+    let () = figure-caption-fontsize-ref <- record#design#figure-caption-fontsize in
+    let () = figure-caption-right-title-ref <- record#design#figure-caption-right-title in
+    let () = figure-caption-left-title-ref <- record#design#figure-caption-left-title in
+    let () = show-figure-caption-num-ref <- record#design#show-figure-caption-num in
+
+    let () = table-caption-fontsize-ref <- record#design#table-caption-fontsize in
+    let () = table-caption-right-title-ref <- record#design#table-caption-right-title in
+    let () = table-caption-left-title-ref <- record#design#table-caption-left-title in
+    let () = show-table-caption-num-ref <- record#design#show-table-caption-num in
 
 %%% header-footer
     let () = lhead-ref <- record#header-footer#lhead in
@@ -857,8 +951,8 @@ let document record inner =
         let bb-title-main =
           let ctx =
             ctx-doc |> set-font-size !title-fontsize-ref
-                        |> set-latin-font !font-latin-sans-ref
-                        |> set-cjk-font !font-cjk-mincho-bx-ref
+                    |> set-latin-font !font-latin-sans-ref
+                    |> set-cjk-font !font-cjk-mincho-bx-ref
           in
             line-break false false ctx
               (inline-fil ++ read-inline ctx !title-ref ++ inline-fil)
@@ -875,8 +969,8 @@ let document record inner =
         let bb-date =
           let ctx =
             ctx-doc |> set-font-size !date-fontsize-ref
-                        |> set-latin-font !font-latin-sans-ref
-                        |> set-cjk-font !font-cjk-mincho-bx-ref
+                    |> set-latin-font !font-latin-sans-ref
+                    |> set-cjk-font !font-cjk-mincho-bx-ref
           in
             line-break false false ctx
               (inline-fil ++ read-inline ctx !date-ref ++ inline-fil)
@@ -888,8 +982,8 @@ let document record inner =
         let bb-title-main =
           let ctx =
             ctx-doc |> set-font-size !title-fontsize-ref
-                        |> set-latin-font !font-latin-sans-ref
-                        |> set-cjk-font !font-cjk-mincho-bx-ref
+                    |> set-latin-font !font-latin-sans-ref
+                    |> set-cjk-font !font-cjk-mincho-bx-ref
           in
             line-break false false ctx
               (inline-fil ++ read-inline ctx !title-ref ++ inline-fil)
@@ -897,8 +991,8 @@ let document record inner =
         let bb-author =
           let ctx =
             ctx-doc |> set-font-size !author-fontsize-ref
-                        |> set-latin-font !font-latin-sans-ref
-                        |> set-cjk-font !font-cjk-mincho-bx-ref
+                    |> set-latin-font !font-latin-sans-ref
+                    |> set-cjk-font !font-cjk-mincho-bx-ref
           in
             line-break false false ctx
               (inline-fil ++ read-inline ctx !author-ref ++ inline-fil)
@@ -906,8 +1000,8 @@ let document record inner =
         let bb-date =
           let ctx =
             ctx-doc |> set-font-size !date-fontsize-ref
-                        |> set-latin-font !font-latin-sans-ref
-                        |> set-cjk-font !font-cjk-mincho-bx-ref
+                    |> set-latin-font !font-latin-sans-ref
+                    |> set-cjk-font !font-cjk-mincho-bx-ref
           in
             line-break false false ctx
               (inline-fil ++ read-inline ctx !date-ref ++ inline-fil)
@@ -935,7 +1029,13 @@ let document record inner =
                     | TocPart(label, title) ->
                         let it-num = embed-string (get-cross-reference-number label) in
                         let it-page = embed-string (get-cross-reference-page label) in
-                        let ib-title = read-inline ctx-doc {#it-num; #title;} ++ inline-skip 3pt in
+                        let ib-title =
+                            let ctx =
+                                ctx-doc |> set-font-size !toc-name-fontsize-part-ref
+                                        |> set-latin-font !font-latin-sans-ref
+                                        |> set-cjk-font !font-cjk-gothic-bx-ref
+                            in
+                        read-inline ctx {#it-num; #title;} ++ inline-skip 3pt in
                         let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
                         let toc-line-part =
                             let w = (get-text-width ctx-doc) -' !toc-line-space-part-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
@@ -948,7 +1048,13 @@ let document record inner =
                     | TocChapter(label, title) ->
                         let it-num = embed-string (get-cross-reference-number label) in
                         let it-page = embed-string (get-cross-reference-page label) in
-                        let ib-title = read-inline ctx-doc {#it-num; #title;} ++ inline-skip 3pt in
+                        let ib-title =
+                            let ctx =
+                                ctx-doc |> set-font-size !toc-name-fontsize-chapter-ref
+                                        |> set-latin-font !font-latin-sans-ref
+                                        |> set-cjk-font !font-cjk-gothic-bx-ref
+                            in
+                        read-inline ctx {#it-num; #title;} ++ inline-skip 3pt in
                         let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
                         let toc-line-chapter =
                             let w = (get-text-width ctx-doc) -' !toc-line-space-chapter-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
@@ -961,7 +1067,13 @@ let document record inner =
                     | TocSection(label, title) ->
                         let it-num = embed-string (get-cross-reference-number label) in
                         let it-page = embed-string (get-cross-reference-page label) in
-                        let ib-title = read-inline ctx-doc {#it-num; #title;} ++ inline-skip 3pt in
+                        let ib-title =
+                            let ctx =
+                                ctx-doc |> set-font-size !toc-name-fontsize-section-ref
+                                        |> set-latin-font !font-latin-roman-ref
+                                        |> set-cjk-font !font-cjk-mincho-bx-ref
+                            in
+                        read-inline ctx {#it-num; #title;} ++ inline-skip 3pt in
                         let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
                         let toc-line-section =
                             let w = (get-text-width ctx-doc) -' !toc-line-space-section-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
@@ -974,7 +1086,13 @@ let document record inner =
                 | TocSubSection(label, title) ->
                         let it-num = embed-string (get-cross-reference-number label) in
                         let it-page = embed-string (get-cross-reference-page label) in
-                        let ib-title = read-inline ctx-doc {#it-num; #title;} ++ inline-skip 3pt in
+                        let ib-title =
+                            let ctx =
+                                ctx-doc |> set-font-size !toc-name-fontsize-subsection-ref
+                                        |> set-latin-font !font-latin-roman-ref
+                                        |> set-cjk-font !font-cjk-mincho-bx-ref
+                            in
+                        read-inline ctx {#it-num; #title;} ++ inline-skip 3pt in
                         let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
                         let toc-line-subsection =
                             let w = (get-text-width ctx-doc) -' !toc-line-space-subsection-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
@@ -987,7 +1105,13 @@ let document record inner =
                     | TocSubSubSection(label, title) ->
                         let it-num = embed-string (get-cross-reference-number label) in
                         let it-page = embed-string (get-cross-reference-page label) in
-                        let ib-title = read-inline ctx-doc {#it-num; #title;} ++ inline-skip 3pt in
+                        let ib-title =
+                            let ctx =
+                                ctx-doc |> set-font-size !toc-name-fontsize-subsubsection-ref
+                                        |> set-latin-font !font-latin-roman-ref
+                                        |> set-cjk-font !font-cjk-mincho-bx-ref
+                            in
+                        read-inline ctx {#it-num; #title;} ++ inline-skip 3pt in
                         let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
                         let toc-line-subsubsection =
                             let w = (get-text-width ctx-doc) -' !toc-line-space-subsubsection-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
@@ -1008,12 +1132,6 @@ let document record inner =
     let page = UserDefinedPaper(!page-width-ref , !page-height-ref) in
 
 %% pagecontf
-    let-mutable ref-float-boxes <- [] in
-    let height-of-float-boxes pageno =
-        (!ref-float-boxes) |> List.fold-left (fun h (pn, bb) -> (
-        if pn < pageno then h +' (get-natural-length bb) else h
-        )) 0pt
-    in
 
     let pagecontf pbinfo =
         let () = FootnoteScheme.start-page () in
@@ -1054,10 +1172,26 @@ let document record inner =
                         else
                             (inline-skip 5pt ++ (read-inline ctx-header {#rhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#lhead;}) ++ inline-skip 5pt)
                 in
-                line-break true true ctx-header header-text
-                            +++ line-break true true (ctx-header |> set-paragraph-margin 0pt 0pt)
-                    ((inline-graphics !hdrwid-ref !header-thickness-ref 0pt
-                        (fun (x, y) -> [ fill Color.black (Gr.rectangle (x, y) (x +' !hdrwid-ref, y +' !header-thickness-ref))])) ++ inline-fil)
+                let (bb-float-boxes, acc) =
+                    (!ref-float-boxes) |> List.fold-left (fun (bbacc, acc) elem -> (
+                    let (pn, bb) = elem in
+                        if pn < pbinfo#page-number then
+                        let bbs =
+                            line-break true true (ctx-header |> set-paragraph-margin 0pt 12pt)
+                            (inline-fil ++ embed-block-top ctx-header !hdrwid-ref (fun _ -> bb) ++ inline-fil)
+                                % 'ctx' is a dummy context
+                        in
+                            (bbacc +++ bbs, acc)
+                        else
+                        (bbacc, elem :: acc)
+                    )) (block-nil, [])
+                in
+                let () = ref-float-boxes <- acc in
+                        line-break true true ctx-header header-text
+                                    +++ line-break true true (ctx-header |> set-paragraph-margin 0pt 0pt)
+                            ((inline-graphics !hdrwid-ref !header-thickness-ref 0pt
+                                (fun (x, y) -> [ fill Color.black (Gr.rectangle (x, y) (x +' !hdrwid-ref, y +' !header-thickness-ref))])) ++ inline-fil)
+                                +++ bb-float-boxes
         else
             if !show-title-ref then
                 if pbinfo#page-number == 1 then
@@ -1075,10 +1209,26 @@ let document record inner =
                             else
                                 (inline-skip 5pt ++ (read-inline ctx-header {#rhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#lhead;}) ++ inline-skip 5pt)
                     in
+                let (bb-float-boxes, acc) =
+                    (!ref-float-boxes) |> List.fold-left (fun (bbacc, acc) elem -> (
+                    let (pn, bb) = elem in
+                        if pn < pbinfo#page-number then
+                        let bbs =
+                            line-break true true (ctx-header |> set-paragraph-margin 0pt 12pt)
+                            (inline-fil ++ embed-block-top ctx-header !hdrwid-ref (fun _ -> bb) ++ inline-fil)
+                                % 'ctx' is a dummy context
+                        in
+                            (bbacc +++ bbs, acc)
+                        else
+                        (bbacc, elem :: acc)
+                    )) (block-nil, [])
+                in
+                let () = ref-float-boxes <- acc in
                     line-break true true ctx-header header-text
                                 +++ line-break true true (ctx-header |> set-paragraph-margin 0pt 0pt)
                         ((inline-graphics !hdrwid-ref !header-thickness-ref 0pt
                             (fun (x, y) -> [ fill Color.black (Gr.rectangle (x, y) (x +' !hdrwid-ref, y +' !header-thickness-ref))])) ++ inline-fil)
+                            +++ bb-float-boxes
             else
                 let lhead = !lhead-ref in
                 let chead = !chead-ref in
@@ -1092,10 +1242,26 @@ let document record inner =
                         else
                             (inline-skip 5pt ++ (read-inline ctx-header {#rhead;}) ++ inline-fil ++ (read-inline ctx-header {#chead;}) ++ inline-fil ++ (read-inline ctx-header {#lhead;}) ++ inline-skip 5pt)
                 in
+                let (bb-float-boxes, acc) =
+                    (!ref-float-boxes) |> List.fold-left (fun (bbacc, acc) elem -> (
+                    let (pn, bb) = elem in
+                        if pn < pbinfo#page-number then
+                        let bbs =
+                            line-break true true (ctx-header |> set-paragraph-margin 0pt 12pt)
+                            (inline-fil ++ embed-block-top ctx-header !hdrwid-ref (fun _ -> bb) ++ inline-fil)
+                                % 'ctx' is a dummy context
+                        in
+                            (bbacc +++ bbs, acc)
+                        else
+                        (bbacc, elem :: acc)
+                    )) (block-nil, [])
+                in
+                let () = ref-float-boxes <- acc in
                 line-break true true ctx-header header-text
                             +++ line-break true true (ctx-header |> set-paragraph-margin 0pt 0pt)
                     ((inline-graphics !hdrwid-ref !header-thickness-ref 0pt
                         (fun (x, y) -> [ fill Color.black (Gr.rectangle (x, y) (x +' !hdrwid-ref, y +' !header-thickness-ref))])) ++ inline-fil)
+                        +++ bb-float-boxes
       in
 %%% footer
       let footer =
@@ -1160,11 +1326,12 @@ let document record inner =
             in
         (|
           header-origin  = header-origin;
-
           header-content = header;
           footer-origin  = footer-origin;
           footer-content = footer;
         |)
+        in
+        let () = register-outline (List.reverse !outline-ref)
         in
         page-break page pagecontf pagepartsf (bb-title +++ bb-toc +++ bb-main)
 
@@ -1211,7 +1378,7 @@ let document record inner =
   let-mutable num-subsubsection-ref <- 0
 
 %%% それぞれの要素の設定
-  let part-scheme ctx label title inner =
+  let part-scheme ctx label outlineopt title inner =
     let ctx-title = make-part-title ctx in
     let () = num-part-ref <- !num-part-ref + 1 in
     let () = num-chapter-ref <- 0 in
@@ -1226,14 +1393,38 @@ let document record inner =
     in
     let ib-title = read-inline ctx-title title in
     let bb-title =
-      line-break true false (ctx |> set-paragraph-margin !part-top-space-ref !part-bottom-space-ref)
-        ((inline-skip !part-left-space-ref) ++ ib-num ++ (inline-skip !part-right-space-ref) ++ ib-title ++ (inline-fil))
+        if !part-line-break-ref then
+            block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
+            line-break true false (ctx |> set-paragraph-margin !part-top-space-ref 0pt)
+            ((inline-skip !part-left-space-ref) ++ ib-num )
+            +++
+            line-break false false (ctx |> set-paragraph-margin !part-top-space-ref !part-bottom-space-ref)
+            ((inline-skip !part-right-space-ref) ++ ib-title ++ (inline-fil))))
+        else
+            block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
+            line-break true false (ctx |> set-paragraph-margin 0pt !part-bottom-space-ref)
+            ((inline-skip !part-left-space-ref) ++ ib-num ++ (inline-skip !part-right-space-ref) ++ ib-title ++ (inline-fil))))
     in
+    let outline-title =
+        match outlineopt with
+        | None -> extract-string ib-title
+        | Some(outline) -> outline
+    in
+    let () = outline-ref <- (1, part-title ^ #`  `# ^ outline-title , label, true) :: !outline-ref in
     let bb-inner = read-block ctx inner in
-      bb-title +++ bb-inner
+        if !part-page-break-1-ref then
+            if !part-page-break-2-ref then
+                clear-page +++ bb-title +++ clear-page +++ bb-inner
+            else
+                clear-page +++ bb-title +++ bb-inner
+        else
+            if !part-page-break-2-ref then
+                bb-title +++ clear-page +++ bb-inner
+            else
+                bb-title +++ bb-inner
 
 
-  let chapter-scheme ctx label title inner =
+  let chapter-scheme ctx label outlineopt title inner =
     let ctx-title = make-chapter-title ctx in
     let () = num-chapter-ref <- !num-chapter-ref + 1 in
     let () = num-section-ref <- 0 in
@@ -1248,14 +1439,38 @@ let document record inner =
     in
     let ib-title = read-inline ctx-title title in
     let bb-title =
-      line-break true false (ctx |> set-paragraph-margin !chapter-top-space-ref !chapter-bottom-space-ref)
-        ((inline-skip !chapter-left-space-ref) ++ ib-num ++ (inline-skip !chapter-right-space-ref) ++ ib-title ++ (inline-fil))
+        if !chapter-line-break-ref then
+            block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
+            line-break true false (ctx |> set-paragraph-margin !chapter-top-space-ref 0pt)
+            ((inline-skip !chapter-left-space-ref) ++ ib-num )
+            +++
+            line-break false false (ctx |> set-paragraph-margin !chapter-top-space-ref !chapter-bottom-space-ref)
+            ((inline-skip !chapter-right-space-ref) ++ ib-title ++ (inline-fil))))
+        else
+            block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
+            line-break true false (ctx |> set-paragraph-margin 0pt !chapter-bottom-space-ref)
+            ((inline-skip !chapter-left-space-ref) ++ ib-num ++ (inline-skip !chapter-right-space-ref) ++ ib-title ++ (inline-fil))))
     in
+    let outline-title =
+        match outlineopt with
+        | None -> extract-string ib-title
+        | Some(outline) -> outline
+    in
+    let () = outline-ref <- (2, chapter-title ^ #`  `# ^ outline-title , label, true) :: !outline-ref in
     let bb-inner = read-block ctx inner in
-      bb-title +++ bb-inner
+        if !chapter-page-break-1-ref then
+            if !chapter-page-break-2-ref then
+                clear-page +++ bb-title +++ clear-page +++ bb-inner
+            else
+                clear-page +++ bb-title +++ bb-inner
+        else
+            if !chapter-page-break-2-ref then
+                bb-title +++ clear-page +++ bb-inner
+            else
+                bb-title +++ bb-inner
 
 
-  let section-scheme ctx label title inner =
+  let section-scheme ctx label outlineopt title inner =
     let ctx-title = make-section-title ctx in
     let () = num-section-ref <- !num-section-ref + 1 in
     let () = num-subsection-ref <- 0 in
@@ -1271,14 +1486,28 @@ let document record inner =
     in
     let ib-title = read-inline ctx-title title in
     let bb-title =
-      line-break true false (ctx |> set-paragraph-margin !section-top-space-ref !section-bottom-space-ref)
-        ((inline-skip !section-left-space-ref) ++ ib-num ++ (inline-skip !section-right-space-ref) ++ ib-title ++ (inline-fil))
+        if !section-line-break-ref then
+            block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
+            line-break true false (ctx |> set-paragraph-margin !section-top-space-ref 0pt)
+            ((inline-skip !section-left-space-ref) ++ ib-num )
+            +++
+            line-break false false (ctx |> set-paragraph-margin !section-top-space-ref !section-bottom-space-ref)
+            ((inline-skip !section-right-space-ref) ++ ib-title ++ (inline-fil))))
+        else
+             block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (line-break true false (ctx |> set-paragraph-margin 0pt !section-bottom-space-ref)
+            ((inline-skip !section-left-space-ref) ++ ib-num ++ (inline-skip !section-right-space-ref) ++ ib-title ++ (inline-fil))))
     in
+    let outline-title =
+        match outlineopt with
+        | None -> extract-string ib-title
+        | Some(outline) -> outline
+    in
+    let () = outline-ref <- (3, section-title ^ #`  `# ^ outline-title , label, true) :: !outline-ref in
     let bb-inner = read-block ctx inner in
       bb-title +++ bb-inner
 
 
-  let subsection-scheme ctx label title inner =
+  let subsection-scheme ctx label outlineopt title inner =
     let ctx-title = make-subsection-title ctx in
     let () = num-subsection-ref <- !num-subsection-ref + 1 in
     let () = num-subsubsection-ref <- 0 in
@@ -1295,14 +1524,29 @@ let document record inner =
     in
     let ib-title = read-inline ctx-title title in
     let bb-title =
-      line-break true false (ctx |> set-paragraph-margin !subsection-top-space-ref !subsection-bottom-space-ref)
-        ((inline-skip !subsection-left-space-ref) ++ ib-num ++ (inline-skip !subsection-right-space-ref) ++ ib-title ++ (inline-fil))
+        if !subsection-line-break-ref then
+            block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
+            line-break true false (ctx |> set-paragraph-margin !subsection-top-space-ref 0pt)
+            ((inline-skip !subsection-left-space-ref) ++ ib-num )
+            +++
+            line-break false false (ctx |> set-paragraph-margin !subsection-top-space-ref !subsection-bottom-space-ref)
+            ((inline-skip !subsection-right-space-ref) ++ ib-title ++ (inline-fil))))
+        else
+            block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
+            line-break true false (ctx |> set-paragraph-margin 0pt !subsection-bottom-space-ref)
+            ((inline-skip !subsection-left-space-ref) ++ ib-num ++ (inline-skip !subsection-right-space-ref) ++ ib-title ++ (inline-fil))))
     in
+    let outline-title =
+        match outlineopt with
+        | None -> extract-string ib-title
+        | Some(outline) -> outline
+    in
+    let () = outline-ref <- (4, subsection-title ^ #`  `# ^ outline-title , label, true) :: !outline-ref in
     let bb-inner = read-block ctx inner in
       bb-title +++ bb-inner
 
 
-  let subsubsection-scheme ctx label title inner =
+  let subsubsection-scheme ctx label outlineopt title inner =
     let ctx-title = make-subsubsection-title ctx in
     let () = num-subsubsection-ref <- !num-subsubsection-ref + 1 in
     let () = needs-indentation-ref <- false in
@@ -1319,53 +1563,68 @@ let document record inner =
     in
     let ib-title = read-inline ctx-title title in
     let bb-title =
-      line-break true false (ctx |> set-paragraph-margin !subsubsection-top-space-ref !subsubsection-bottom-space-ref)
-        ((inline-skip !subsubsection-left-space-ref) ++ ib-num ++ (inline-skip !subsubsection-right-space-ref) ++ ib-title ++ (inline-fil))
+        if !subsubsection-line-break-ref then
+            block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
+            line-break true false (ctx |> set-paragraph-margin !subsubsection-top-space-ref 0pt)
+            ((inline-skip !subsubsection-left-space-ref) ++ ib-num )
+            +++
+            line-break false false (ctx |> set-paragraph-margin !subsubsection-top-space-ref !subsubsection-bottom-space-ref)
+            ((inline-skip !subsubsection-right-space-ref) ++ ib-title ++ (inline-fil))))
+        else
+            block-frame-breakable ctx no-pads (Annot.register-location-frame label) (fun ctx -> (
+            line-break true false (ctx |> set-paragraph-margin 0pt !subsubsection-bottom-space-ref)
+            ((inline-skip !subsubsection-left-space-ref) ++ ib-num ++ (inline-skip !subsubsection-right-space-ref) ++ ib-title ++ (inline-fil))))
     in
+    let outline-title =
+        match outlineopt with
+        | None -> extract-string ib-title
+        | Some(outline) -> outline
+    in
+    let () = outline-ref <- (5, subsubsection-title ^ #`  `# ^ outline-title , label, true) :: !outline-ref in
     let bb-inner = read-block ctx inner in
       bb-title +++ bb-inner
 
 
 %%% +section系を定義
-  let-block ctx +part ?:labelopt title inner =
+  let-block ctx +part ?:labelopt ?:outlineopt title inner =
     let label =
       match labelopt with
       | None -> generate-fresh-label ()
       | Some(label) -> label
     in
-      part-scheme ctx label title inner
+      part-scheme ctx label outlineopt title inner
 
-  let-block ctx +chapter ?:labelopt title inner =
+  let-block ctx +chapter ?:labelopt ?:outlineopt title inner =
     let label =
       match labelopt with
       | None -> generate-fresh-label ()
       | Some(label) -> label
     in
-      chapter-scheme ctx label title inner
+      chapter-scheme ctx label outlineopt title inner
 
-  let-block ctx +section ?:labelopt title inner =
+  let-block ctx +section ?:labelopt ?:outlineopt title inner =
     let label =
       match labelopt with
       | None -> generate-fresh-label ()
       | Some(label) -> label
     in
-      section-scheme ctx label title inner
+      section-scheme ctx label outlineopt title inner
 
-  let-block ctx +subsection ?:labelopt title inner =
+  let-block ctx +subsection ?:labelopt ?:outlineopt title inner =
     let label =
       match labelopt with
       | None -> generate-fresh-label ()
       | Some(label) -> label
     in
-      subsection-scheme ctx label title inner
+      subsection-scheme ctx label outlineopt title inner
 
-  let-block ctx +subsubsection ?:labelopt title inner =
+  let-block ctx +subsubsection ?:labelopt ?:outlineopt title inner =
     let label =
       match labelopt with
       | None -> generate-fresh-label ()
       | Some(label) -> label
     in
-      subsubsection-scheme ctx label title inner
+      subsubsection-scheme ctx label outlineopt title inner
 
 % +p関係
 let quad-indent-ja ctx =
@@ -1479,6 +1738,136 @@ read-inline ctxgt it
         line-break false false ctx (read-inline ctx {#it-num; #it;} ++ inline-fil)
     in
       FootnoteScheme.main ctx ibf bbf
+
+
+let-inline ctx \ref key =
+    let opt = get-cross-reference (key ^ `:num`) in
+    let it =
+        match opt with
+        | None    -> {?}
+        | Some(s) -> embed-string s
+    in
+        inline-frame-breakable no-pads (Annot.link-to-location-frame key None) (read-inline ctx it)
+
+let-inline ctx \ref-page key =
+    let opt = get-cross-reference (key ^ `:page`) in
+    let it =
+        match opt with
+        | None    -> {?}
+        | Some(s) -> embed-string s
+    in
+        inline-frame-breakable no-pads (Annot.link-to-location-frame key None) (read-inline ctx it)
+
+%% 浮動環境
+    let-mutable figure-num-ref <- 0
+
+    let-inline ctx \figure ?:labelopt caption inner =
+        let pads = (2pt, 2pt, 2pt, 12pt) in
+        let () = figure-num-ref <- !figure-num-ref + 1 in
+        let figure-num = arabic (!figure-num-ref) in
+        let label =
+            match labelopt with
+            | None -> generate-fresh-label ()
+            | Some (label) -> label
+        in
+        let () =
+            match labelopt with
+            | None -> ()
+            | Some (label) -> register-cross-reference (label ^ `:num`) figure-num
+        in
+        let ctx-figure = ctx |> set-font-size !figure-caption-fontsize-ref
+        in
+        let figure-caption-right-title = !figure-caption-right-title-ref in
+        let figure-caption-num = if !show-figure-caption-num-ref then embed-string figure-num else embed-string ` ` in
+        let figure-caption-left-title = !figure-caption-left-title-ref in
+        let bb-inner = block-frame-breakable ctx-figure pads (Annot.register-location-frame label) (fun ctx-figure -> (
+            read-block ctx inner
+                +++ line-break true true ctx (inline-fil ++
+                    read-inline ctx-figure {#figure-caption-right-title;#figure-caption-num;
+                    #figure-caption-left-title;#caption;} ++ inline-fil)))
+        in
+        hook-page-break (fun pbinfo _ -> (
+            ref-float-boxes <- (pbinfo#page-number, bb-inner) :: !ref-float-boxes))
+
+
+    let-block ctx +figure ?:labelopt caption inner =
+        let pads = (2pt, 2pt, 2pt, 12pt) in
+        let () = figure-num-ref <- !figure-num-ref + 1 in
+        let figure-num = arabic (!figure-num-ref) in
+        let label =
+            match labelopt with
+            | None -> generate-fresh-label ()
+            | Some (label) -> label
+        in
+        let () =
+            match labelopt with
+            | None -> ()
+            | Some (label) -> register-cross-reference (label ^ `:num`) figure-num
+        in
+        let ctx-figure = ctx |> set-font-size !figure-caption-fontsize-ref
+        in
+        let figure-caption-right-title = !figure-caption-right-title-ref in
+        let figure-caption-num = if !show-figure-caption-num-ref then embed-string figure-num else embed-string ` ` in
+        let figure-caption-left-title = !figure-caption-left-title-ref in
+        block-frame-breakable ctx-figure pads (Annot.register-location-frame label) (fun ctx-figure -> (
+            read-block ctx inner
+                +++ line-break true true ctx-figure (inline-fil ++ read-inline ctx {#figure-caption-right-title;#figure-caption-num;
+                #figure-caption-left-title;#caption;} ++ inline-fil)))
+
+
+    let-mutable table-num-ref <- 0
+
+    let-inline ctx \table ?:labelopt caption inner =
+        let pads = (2pt, 2pt, 2pt, 12pt) in
+        let () = table-num-ref <- !table-num-ref + 1 in
+        let table-num = arabic (!table-num-ref) in
+        let label =
+            match labelopt with
+            | None -> generate-fresh-label ()
+            | Some (label) -> label
+        in
+        let () =
+            match labelopt with
+            | None -> ()
+            | Some (label) -> register-cross-reference (label ^ `:num`) table-num
+        in
+        let ctx-table = ctx |> set-font-size !table-caption-fontsize-ref
+        in
+        let table-caption-right-title = !table-caption-right-title-ref in
+        let table-caption-num = if !show-table-caption-num-ref then embed-string table-num else embed-string ` ` in
+        let table-caption-left-title = !table-caption-left-title-ref in
+        let bb-inner = block-frame-breakable ctx pads (Annot.register-location-frame label) (fun ctx-table -> (
+            line-break true true ctx-table (inline-fil ++ read-inline ctx-table {#table-caption-right-title;#table-caption-num;
+                #table-caption-left-title;#caption;} ++ inline-fil)))
+                    +++ read-block ctx inner
+        in
+        hook-page-break (fun pbinfo _ -> (
+            ref-float-boxes <- (pbinfo#page-number, bb-inner) :: !ref-float-boxes))
+
+
+    let-block ctx +table ?:labelopt caption inner =
+        let pads = (2pt, 2pt, 2pt, 12pt) in
+        let () = table-num-ref <- !table-num-ref + 1 in
+        let table-num = arabic (!table-num-ref) in
+        let label =
+            match labelopt with
+            | None -> generate-fresh-label ()
+            | Some (label) -> label
+        in
+        let () =
+            match labelopt with
+            | None -> ()
+            | Some (label) -> register-cross-reference (label ^ `:num`) table-num
+        in
+        let ctx-table = ctx |> set-font-size !table-caption-fontsize-ref
+        in
+        let table-caption-right-title = !table-caption-right-title-ref in
+        let table-caption-num = if !show-table-caption-num-ref then embed-string table-num else embed-string ` ` in
+        let table-caption-left-title = !table-caption-left-title-ref in
+        block-frame-breakable ctx pads (Annot.register-location-frame label) (fun ctx -> (
+            line-break true true ctx (inline-fil ++ read-inline ctx {#table-caption-right-title;#table-caption-num;
+                #table-caption-left-title;#caption;} ++ inline-fil)))
+                    +++ read-block ctx inner
 
 end
 
