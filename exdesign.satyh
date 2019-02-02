@@ -442,52 +442,6 @@ end = struct
 
     let no-pads = (0pt, 0pt, 0pt, 0pt)
 
-    let-mutable figure-num-ref <- 0
-
-    let-inline ctx \figure ?:labelopt caption inner =
-        let pads = (2pt, 2pt, 2pt, 12pt) in
-        let () = figure-num-ref <- !figure-num-ref + 1 in
-        let figure-num = arabic (!figure-num-ref) in
-        let label =
-            match labelopt with
-            | None -> generate-fresh-label ()
-            | Some (label) -> label
-        in
-        let () =
-            match labelopt with
-            | None -> ()
-            | Some (label) -> register-cross-reference (label ^ `:num`) figure-num
-        in
-        let bb-inner = block-frame-breakable ctx pads (Annot.register-location-frame label) (fun ctx -> (
-            read-block ctx inner
-                +++ line-break true true ctx (inline-fil ++ read-inline ctx {#caption;} ++ inline-fil)))
-        in
-        hook-page-break (fun pbinfo _ -> (
-            ref-float-boxes <- (pbinfo#page-number, bb-inner) :: !ref-float-boxes))
-
-    let-mutable table-num-ref <- 0
-
-    let-inline ctx \table ?:labelopt caption inner =
-        let pads = (2pt, 2pt, 2pt, 12pt) in
-        let () = table-num-ref <- !table-num-ref + 1 in
-        let table-num = arabic (!table-num-ref) in
-        let label =
-            match labelopt with
-            | None -> generate-fresh-label ()
-            | Some (label) -> label
-        in
-        let () =
-            match labelopt with
-            | None -> ()
-            | Some (label) -> register-cross-reference (label ^ `:num`) table-num
-        in
-        let bb-inner = block-frame-breakable ctx pads (Annot.register-location-frame label) (fun ctx -> (
-            read-block ctx inner
-                +++ line-break true true ctx (inline-fil ++ read-inline ctx {#caption;} ++ inline-fil)))
-        in
-        hook-page-break (fun pbinfo _ -> (
-            ref-float-boxes <- (pbinfo#page-number, bb-inner) :: !ref-float-boxes))
-
 % document内の値を入れるための可変参照の設定
     let-mutable title-ref <- {}
     let-mutable author-ref <- {}
@@ -1770,6 +1724,53 @@ let-inline ctx \ref-page key =
         | Some(s) -> embed-string s
     in
         inline-frame-breakable no-pads (Annot.link-to-location-frame key None) (read-inline ctx it)
+
+%% 浮動環境
+    let-mutable figure-num-ref <- 0
+
+    let-inline ctx \figure ?:labelopt caption inner =
+        let pads = (2pt, 2pt, 2pt, 12pt) in
+        let () = figure-num-ref <- !figure-num-ref + 1 in
+        let figure-num = arabic (!figure-num-ref) in
+        let label =
+            match labelopt with
+            | None -> generate-fresh-label ()
+            | Some (label) -> label
+        in
+        let () =
+            match labelopt with
+            | None -> ()
+            | Some (label) -> register-cross-reference (label ^ `:num`) figure-num
+        in
+        let bb-inner = block-frame-breakable ctx pads (Annot.register-location-frame label) (fun ctx -> (
+            read-block ctx inner
+                +++ line-break true true ctx (inline-fil ++ read-inline ctx {#caption;} ++ inline-fil)))
+        in
+        hook-page-break (fun pbinfo _ -> (
+            ref-float-boxes <- (pbinfo#page-number, bb-inner) :: !ref-float-boxes))
+
+    let-mutable table-num-ref <- 0
+
+    let-inline ctx \table ?:labelopt caption inner =
+        let pads = (2pt, 2pt, 2pt, 12pt) in
+        let () = table-num-ref <- !table-num-ref + 1 in
+        let table-num = arabic (!table-num-ref) in
+        let label =
+            match labelopt with
+            | None -> generate-fresh-label ()
+            | Some (label) -> label
+        in
+        let () =
+            match labelopt with
+            | None -> ()
+            | Some (label) -> register-cross-reference (label ^ `:num`) table-num
+        in
+        let bb-inner = block-frame-breakable ctx pads (Annot.register-location-frame label) (fun ctx -> (
+            read-block ctx inner
+                +++ line-break true true ctx (inline-fil ++ read-inline ctx {#caption;} ++ inline-fil)))
+        in
+        hook-page-break (fun pbinfo _ -> (
+            ref-float-boxes <- (pbinfo#page-number, bb-inner) :: !ref-float-boxes))
 
 end
 
