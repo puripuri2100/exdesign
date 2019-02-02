@@ -1775,9 +1775,16 @@ let-inline ctx \ref-page key =
             | None -> ()
             | Some (label) -> register-cross-reference (label ^ `:num`) figure-num
         in
-        let bb-inner = block-frame-breakable ctx pads (Annot.register-location-frame label) (fun ctx -> (
+        let ctx-figure = ctx |> set-font-size !figure-caption-fontsize-ref
+        in
+        let figure-caption-right-title = !figure-caption-right-title-ref in
+        let figure-caption-num = if !show-figure-caption-num-ref then embed-string figure-num else embed-string ` ` in
+        let figure-caption-left-title = !figure-caption-left-title-ref in
+        let bb-inner = block-frame-breakable ctx-figure pads (Annot.register-location-frame label) (fun ctx-figure -> (
             read-block ctx inner
-                +++ line-break true true ctx (inline-fil ++ read-inline ctx {#caption;} ++ inline-fil)))
+                +++ line-break true true ctx (inline-fil ++
+                    read-inline ctx-figure {#figure-caption-right-title;#figure-caption-num;
+                    #figure-caption-left-title;#caption;} ++ inline-fil)))
         in
         hook-page-break (fun pbinfo _ -> (
             ref-float-boxes <- (pbinfo#page-number, bb-inner) :: !ref-float-boxes))
@@ -1797,9 +1804,15 @@ let-inline ctx \ref-page key =
             | None -> ()
             | Some (label) -> register-cross-reference (label ^ `:num`) figure-num
         in
-        block-frame-breakable ctx pads (Annot.register-location-frame label) (fun ctx -> (
+        let ctx-figure = ctx |> set-font-size !figure-caption-fontsize-ref
+        in
+        let figure-caption-right-title = !figure-caption-right-title-ref in
+        let figure-caption-num = if !show-figure-caption-num-ref then embed-string figure-num else embed-string ` ` in
+        let figure-caption-left-title = !figure-caption-left-title-ref in
+        block-frame-breakable ctx-figure pads (Annot.register-location-frame label) (fun ctx-figure -> (
             read-block ctx inner
-                +++ line-break true true ctx (inline-fil ++ read-inline ctx {#caption;} ++ inline-fil)))
+                +++ line-break true true ctx-figure (inline-fil ++ read-inline ctx {#figure-caption-right-title;#figure-caption-num;
+                #figure-caption-left-title;#caption;} ++ inline-fil)))
 
 
     let-mutable table-num-ref <- 0
@@ -1818,9 +1831,15 @@ let-inline ctx \ref-page key =
             | None -> ()
             | Some (label) -> register-cross-reference (label ^ `:num`) table-num
         in
-        let bb-inner = block-frame-breakable ctx pads (Annot.register-location-frame label) (fun ctx -> (
-            read-block ctx inner
-                +++ line-break true true ctx (inline-fil ++ read-inline ctx {#caption;} ++ inline-fil)))
+        let ctx-table = ctx |> set-font-size !table-caption-fontsize-ref
+        in
+        let table-caption-right-title = !table-caption-right-title-ref in
+        let table-caption-num = if !show-table-caption-num-ref then embed-string table-num else embed-string ` ` in
+        let table-caption-left-title = !table-caption-left-title-ref in
+        let bb-inner = block-frame-breakable ctx pads (Annot.register-location-frame label) (fun ctx-table -> (
+            read-block ctx-table inner
+                +++ line-break true true ctx-table (inline-fil ++ read-inline ctx-table {#table-caption-right-title;#table-caption-num;
+                    #table-caption-left-title;#caption;} ++ inline-fil)))
         in
         hook-page-break (fun pbinfo _ -> (
             ref-float-boxes <- (pbinfo#page-number, bb-inner) :: !ref-float-boxes))
@@ -1829,7 +1848,7 @@ let-inline ctx \ref-page key =
     let-block ctx +table ?:labelopt caption inner =
         let pads = (2pt, 2pt, 2pt, 12pt) in
         let () = table-num-ref <- !table-num-ref + 1 in
-        let figure-num = arabic (!table-num-ref) in
+        let table-num = arabic (!table-num-ref) in
         let label =
             match labelopt with
             | None -> generate-fresh-label ()
@@ -1838,11 +1857,17 @@ let-inline ctx \ref-page key =
         let () =
             match labelopt with
             | None -> ()
-            | Some (label) -> register-cross-reference (label ^ `:num`) figure-num
+            | Some (label) -> register-cross-reference (label ^ `:num`) table-num
         in
+        let ctx-table = ctx |> set-font-size !table-caption-fontsize-ref
+        in
+        let table-caption-right-title = !table-caption-right-title-ref in
+        let table-caption-num = if !show-table-caption-num-ref then embed-string table-num else embed-string ` ` in
+        let table-caption-left-title = !table-caption-left-title-ref in
         block-frame-breakable ctx pads (Annot.register-location-frame label) (fun ctx -> (
             read-block ctx inner
-                +++ line-break true true ctx (inline-fil ++ read-inline ctx {#caption;} ++ inline-fil)))
+                +++ line-break true true ctx (inline-fil ++ read-inline ctx {#table-caption-right-title;#table-caption-num;
+                    #table-caption-left-title;#caption;} ++ inline-fil)))
 
 end
 
