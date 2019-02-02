@@ -588,6 +588,16 @@ end = struct
     let-mutable subsubsection-line-break-ref <- true
     let-mutable subsubsection-right-space-ref <- 0pt
 
+    let-mutable figure-caption-fontsize-ref <- 0pt
+    let-mutable figure-caption-right-title-ref <- {}
+    let-mutable figure-caption-left-title-ref <- {}
+    let-mutable show-figure-caption-num-ref <- true
+
+    let-mutable table-caption-fontsize-ref <- 0pt
+    let-mutable table-caption-right-title-ref <- {}
+    let-mutable table-caption-left-title-ref <- {}
+    let-mutable show-table-caption-num-ref <- true
+
 %% header-footer
     let-mutable lhead-ref <- {}
     let-mutable chead-ref <- {}
@@ -798,6 +808,16 @@ let document record inner =
     let () = subsubsection-left-space-ref <- record#design#subsubsection-left-space in
     let () = subsubsection-line-break-ref <- record#design#subsubsection-line-break in
     let () = subsubsection-right-space-ref <- record#design#subsubsection-right-space in
+
+    let () = figure-caption-fontsize-ref <- record#design#figure-caption-fontsize in
+    let () = figure-caption-right-title-ref <- record#design#figure-caption-right-title in
+    let () = figure-caption-left-title-ref <- record#design#figure-caption-left-title in
+    let () = show-figure-caption-num-ref <- record#design#show-figure-caption-num in
+
+    let () = table-caption-fontsize-ref <- record#design#table-caption-fontsize in
+    let () = table-caption-right-title-ref <- record#design#table-caption-right-title in
+    let () = table-caption-left-title-ref <- record#design#table-caption-left-title in
+    let () = show-table-caption-num-ref <- record#design#show-table-caption-num in
 
 %%% header-footer
     let () = lhead-ref <- record#header-footer#lhead in
