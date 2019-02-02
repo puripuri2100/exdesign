@@ -208,7 +208,10 @@ direct \footnote : [inline-text] inline-cmd
 direct \ref : [string] inline-cmd
 direct \ref-page : [string] inline-cmd
 direct \figure : [string?; inline-text; block-text] inline-cmd
+direct +figure : [string?; inline-text; block-text] block-cmd
 direct \table : [string?; inline-text; block-text] inline-cmd
+direct +table : [string?; inline-text; block-text] block-cmd
+
 
     val title-ref : inline-text ref
     val author-ref : inline-text ref
@@ -1749,6 +1752,26 @@ let-inline ctx \ref-page key =
         hook-page-break (fun pbinfo _ -> (
             ref-float-boxes <- (pbinfo#page-number, bb-inner) :: !ref-float-boxes))
 
+
+    let-block ctx +figure ?:labelopt caption inner =
+        let pads = (2pt, 2pt, 2pt, 12pt) in
+        let () = figure-num-ref <- !figure-num-ref + 1 in
+        let figure-num = arabic (!figure-num-ref) in
+        let label =
+            match labelopt with
+            | None -> generate-fresh-label ()
+            | Some (label) -> label
+        in
+        let () =
+            match labelopt with
+            | None -> ()
+            | Some (label) -> register-cross-reference (label ^ `:num`) figure-num
+        in
+        block-frame-breakable ctx pads (Annot.register-location-frame label) (fun ctx -> (
+            read-block ctx inner
+                +++ line-break true true ctx (inline-fil ++ read-inline ctx {#caption;} ++ inline-fil)))
+
+
     let-mutable table-num-ref <- 0
 
     let-inline ctx \table ?:labelopt caption inner =
@@ -1771,6 +1794,25 @@ let-inline ctx \ref-page key =
         in
         hook-page-break (fun pbinfo _ -> (
             ref-float-boxes <- (pbinfo#page-number, bb-inner) :: !ref-float-boxes))
+
+
+    let-block ctx +table ?:labelopt caption inner =
+        let pads = (2pt, 2pt, 2pt, 12pt) in
+        let () = table-num-ref <- !table-num-ref + 1 in
+        let figure-num = arabic (!table-num-ref) in
+        let label =
+            match labelopt with
+            | None -> generate-fresh-label ()
+            | Some (label) -> label
+        in
+        let () =
+            match labelopt with
+            | None -> ()
+            | Some (label) -> register-cross-reference (label ^ `:num`) figure-num
+        in
+        block-frame-breakable ctx pads (Annot.register-location-frame label) (fun ctx -> (
+            read-block ctx inner
+                +++ line-break true true ctx (inline-fil ++ read-inline ctx {#caption;} ++ inline-fil)))
 
 end
 
