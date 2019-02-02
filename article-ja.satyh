@@ -487,12 +487,12 @@ let report = (|
 
             figure-caption-fontsize = 12pt;
             figure-caption-right-title = {図};
-            figure-caption-left-title = {：};
+            figure-caption-left-title = {:};
             show-figure-caption-num = true;
 
             table-caption-fontsize = 12pt;
             table-caption-right-title = {表};
-            table-caption-left-title = {：};
+            table-caption-left-title = {:};
             show-table-caption-num = true;
         |)
 
@@ -602,12 +602,12 @@ let article = (|
 
             figure-caption-fontsize = 12pt;
             figure-caption-right-title = {図};
-            figure-caption-left-title = {：};
+            figure-caption-left-title = {:};
             show-figure-caption-num = true;
 
             table-caption-fontsize = 12pt;
             table-caption-right-title = {表};
-            table-caption-left-title = {：};
+            table-caption-left-title = {:};
             show-table-caption-num = true;
         |)
 
