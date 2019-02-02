@@ -496,6 +496,9 @@ end = struct
     let-mutable date-fontsize-ref <- 0pt
 
     let-mutable tocpage-ref <- true
+    let-mutable figure-toc-ref <- true
+    let-mutable table-toc-ref <- true
+
     let-mutable toc-fontsize-ref <- 0pt
     let-mutable toc-line-text-part-ref <- {}
     let-mutable toc-line-text-chapter-ref <- {}
@@ -716,6 +719,9 @@ let document record inner =
     let () = date-fontsize-ref <- record#design#date-fontsize in
 
     let () = tocpage-ref <- record#design#tocpage in
+    let () = figure-toc-ref <- record#design#figure-toc in
+    let () = table-toc-ref <- record#design#table-toc in
+
     let () = toc-fontsize-ref <- record#design#toc-fontsize in
     let () = toc-line-text-part-ref <- record#design#toc-line-text-part in
     let () = toc-line-text-chapter-ref <- record#design#toc-line-text-chapter in
