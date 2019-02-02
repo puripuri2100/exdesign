@@ -161,6 +161,16 @@ val report : (|
             subsubsection-left-space : length;
             subsubsection-line-break : bool;
             subsubsection-right-space : length;
+
+            figure-caption-fontsize : length;
+            figure-caption-right-title : inline-text;
+            figure-caption-left-title : inline-text;
+            show-figure-caption-num : bool;
+
+            table-caption-fontsize : length;
+            table-caption-right-title : inline-text;
+            table-caption-left-title : inline-text;
+            show-table-caption-num : bool;
         |)
 
 val article : (|
@@ -266,6 +276,16 @@ val article : (|
             subsubsection-left-space : length;
             subsubsection-line-break : bool;
             subsubsection-right-space : length;
+
+            figure-caption-fontsize : length;
+            figure-caption-right-title : inline-text;
+            figure-caption-left-title : inline-text;
+            show-figure-caption-num : bool;
+
+            table-caption-fontsize : length;
+            table-caption-right-title : inline-text;
+            table-caption-left-title : inline-text;
+            show-table-caption-num : bool;
         |)
 
 val fonts : (|
@@ -464,6 +484,16 @@ let report = (|
             subsubsection-left-space = 0pt;
             subsubsection-line-break = false;
             subsubsection-right-space = 13pt;
+
+            figure-caption-fontsize = 12pt;
+            figure-caption-right-title = {図};
+            figure-caption-left-title = {：};
+            show-figure-caption-num = true;
+
+            table-caption-fontsize = 12pt;
+            table-caption-right-title = {表};
+            table-caption-left-title = {：};
+            show-table-caption-num = true;
         |)
 
 let article = (|
@@ -569,6 +599,16 @@ let article = (|
             subsubsection-left-space = 0pt;
             subsubsection-line-break = false;
             subsubsection-right-space = 13pt;
+
+            figure-caption-fontsize = 12pt;
+            figure-caption-right-title = {図};
+            figure-caption-left-title = {：};
+            show-figure-caption-num = true;
+
+            table-caption-fontsize = 12pt;
+            table-caption-right-title = {表};
+            table-caption-left-title = {：};
+            show-table-caption-num = true;
         |)
 
 let fonts = (|

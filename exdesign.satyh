@@ -146,6 +146,16 @@ val document : 'a -> block-text -> document
             subsubsection-left-space : length;
             subsubsection-line-break : bool;
             subsubsection-right-space : length;
+
+            figure-caption-fontsize : length;
+            figure-caption-right-title : inline-text;
+            figure-caption-left-title : inline-text;
+            show-figure-caption-num : bool;
+
+            table-caption-fontsize : length;
+            table-caption-right-title : inline-text;
+            table-caption-left-title : inline-text;
+            show-table-caption-num : bool;
         |);
         header-footer : (|
             lhead : inline-text;
