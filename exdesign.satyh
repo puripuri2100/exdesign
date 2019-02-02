@@ -52,6 +52,8 @@ val document : 'a -> block-text -> document
             date-fontsize : length;
 
             tocpage : bool;
+            figure-toc : bool;
+            table-toc : bool;
 
             toc-fontsize : length;
             toc-line-text-part : inline-text;

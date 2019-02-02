@@ -67,6 +67,8 @@ val report : (|
             date-fontsize : length;
 
             tocpage : bool;
+            figure-toc : bool;
+            table-toc : bool;
 
             toc-fontsize : length;
             toc-line-text-part : inline-text;
@@ -182,6 +184,8 @@ val article : (|
             date-fontsize : length;
 
             tocpage : bool;
+            figure-toc : bool;
+            table-toc : bool;
 
             toc-fontsize : length;
             toc-line-text-part : inline-text;
@@ -390,6 +394,8 @@ let report = (|
             date-fontsize = 20pt;
 
             tocpage = false;
+            figure-toc = true;
+            table-toc = true;
 
             toc-fontsize = 20pt;
             toc-line-text-part = {};
@@ -505,6 +511,8 @@ let article = (|
             date-fontsize = 20pt;
 
             tocpage = false;
+            figure-toc = false;
+            table-toc = false;
 
             toc-fontsize = 20pt;
             toc-line-text-part = {};
