@@ -443,6 +443,9 @@ end = struct
         let n = round (width /' wid-text) in
         inline-fil ++ (repeat-inline n ib) ++ inline-fil
 
+    let-mutable figure-toc-acc-ref <- []
+    let-mutable table-toc-acc-ref <- []
+
 %% PDF outline
     let-mutable outline-ref <- []
 
@@ -1028,113 +1031,146 @@ let document record inner =
         if not !show-toc-ref then
             block-nil
         else
-                let bb-toc-title =
-                line-break true false ctx-doc (read-inline (make-toc-title ctx-doc) {目次} ++ inline-fil)
-                in
-                let bb-toc-main =
-                (!toc-acc-ref) |> List.reverse |> List.fold-left (fun bbacc tocelem -> (
-                    match tocelem with
-                    | TocPart(label, title) ->
-                        let it-num = embed-string (get-cross-reference-number label) in
-                        let it-page = embed-string (get-cross-reference-page label) in
-                        let ib-title =
-                            let ctx =
-                                ctx-doc |> set-font-size !toc-name-fontsize-part-ref
-                                        |> set-latin-font !font-latin-sans-ref
-                                        |> set-cjk-font !font-cjk-gothic-bx-ref
-                            in
-                        read-inline ctx {#it-num; #title;} ++ inline-skip 3pt in
-                        let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
-                        let toc-line-part =
-                            let w = (get-text-width ctx-doc) -' !toc-line-space-part-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
-                            if w <' 0pt then inline-fil else
-                            make-toc-line ctx-doc w !toc-line-text-part-ref
+            let bb-toc-title =
+            line-break true false ctx-doc (read-inline (make-toc-title ctx-doc) {目次} ++ inline-fil)
+            in
+            let bb-toc-main =
+            (!toc-acc-ref) |> List.reverse |> List.fold-left (fun bbacc tocelem -> (
+                match tocelem with
+                | TocPart(label, title) ->
+                    let it-num = embed-string (get-cross-reference-number label) in
+                    let it-page = embed-string (get-cross-reference-page label) in
+                    let ib-title =
+                        let ctx =
+                            ctx-doc |> set-font-size !toc-name-fontsize-part-ref
+                                    |> set-latin-font !font-latin-sans-ref
+                                    |> set-cjk-font !font-cjk-gothic-bx-ref
                         in
-                        bbacc +++ line-break true true ctx-doc
-                            (inline-skip !toc-line-space-part-ref ++ ib-title ++ inline-fil ++ toc-line-part ++ inline-fil ++ ib-page)
+                    read-inline ctx {#it-num; #title;} ++ inline-skip 3pt in
+                    let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
+                    let toc-line-part =
+                        let w = (get-text-width ctx-doc) -' !toc-line-space-part-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
+                        if w <' 0pt then inline-fil else
+                        make-toc-line ctx-doc w !toc-line-text-part-ref
+                    in
+                    bbacc +++ line-break true true ctx-doc
+                        (inline-skip !toc-line-space-part-ref ++ ib-title ++ inline-fil ++ toc-line-part ++ inline-fil ++ ib-page)
 
-                    | TocChapter(label, title) ->
-                        let it-num = embed-string (get-cross-reference-number label) in
-                        let it-page = embed-string (get-cross-reference-page label) in
-                        let ib-title =
-                            let ctx =
-                                ctx-doc |> set-font-size !toc-name-fontsize-chapter-ref
-                                        |> set-latin-font !font-latin-sans-ref
-                                        |> set-cjk-font !font-cjk-gothic-bx-ref
-                            in
-                        read-inline ctx {#it-num; #title;} ++ inline-skip 3pt in
-                        let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
-                        let toc-line-chapter =
-                            let w = (get-text-width ctx-doc) -' !toc-line-space-chapter-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
-                            if w <' 0pt then inline-fil else
-                            make-toc-line ctx-doc w !toc-line-text-chapter-ref
+                | TocChapter(label, title) ->
+                    let it-num = embed-string (get-cross-reference-number label) in
+                    let it-page = embed-string (get-cross-reference-page label) in
+                    let ib-title =
+                        let ctx =
+                            ctx-doc |> set-font-size !toc-name-fontsize-chapter-ref
+                                    |> set-latin-font !font-latin-sans-ref
+                                    |> set-cjk-font !font-cjk-gothic-bx-ref
                         in
-                        bbacc +++ line-break true true ctx-doc
-                            (inline-skip !toc-line-space-chapter-ref ++ ib-title ++ inline-fil ++ toc-line-chapter ++ inline-fil ++ ib-page)
+                    read-inline ctx {#it-num; #title;} ++ inline-skip 3pt in
+                    let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
+                    let toc-line-chapter =
+                        let w = (get-text-width ctx-doc) -' !toc-line-space-chapter-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
+                        if w <' 0pt then inline-fil else
+                        make-toc-line ctx-doc w !toc-line-text-chapter-ref
+                    in
+                    bbacc +++ line-break true true ctx-doc
+                        (inline-skip !toc-line-space-chapter-ref ++ ib-title ++ inline-fil ++ toc-line-chapter ++ inline-fil ++ ib-page)
 
-                    | TocSection(label, title) ->
-                        let it-num = embed-string (get-cross-reference-number label) in
-                        let it-page = embed-string (get-cross-reference-page label) in
-                        let ib-title =
-                            let ctx =
-                                ctx-doc |> set-font-size !toc-name-fontsize-section-ref
-                                        |> set-latin-font !font-latin-roman-ref
-                                        |> set-cjk-font !font-cjk-mincho-bx-ref
-                            in
-                        read-inline ctx {#it-num; #title;} ++ inline-skip 3pt in
-                        let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
-                        let toc-line-section =
-                            let w = (get-text-width ctx-doc) -' !toc-line-space-section-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
-                            if w <' 0pt then inline-fil else
-                            make-toc-line ctx-doc w !toc-line-text-section-ref
+                | TocSection(label, title) ->
+                    let it-num = embed-string (get-cross-reference-number label) in
+                    let it-page = embed-string (get-cross-reference-page label) in
+                    let ib-title =
+                        let ctx =
+                            ctx-doc |> set-font-size !toc-name-fontsize-section-ref
+                                    |> set-latin-font !font-latin-roman-ref
+                                    |> set-cjk-font !font-cjk-mincho-bx-ref
                         in
-                        bbacc +++ line-break true true ctx-doc
-                            (inline-skip !toc-line-space-section-ref ++ ib-title ++ inline-fil ++ toc-line-section ++ inline-fil ++ ib-page)
+                    read-inline ctx {#it-num; #title;} ++ inline-skip 3pt in
+                    let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
+                    let toc-line-section =
+                        let w = (get-text-width ctx-doc) -' !toc-line-space-section-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
+                        if w <' 0pt then inline-fil else
+                        make-toc-line ctx-doc w !toc-line-text-section-ref
+                    in
+                    bbacc +++ line-break true true ctx-doc
+                        (inline-skip !toc-line-space-section-ref ++ ib-title ++ inline-fil ++ toc-line-section ++ inline-fil ++ ib-page)
 
-                | TocSubSection(label, title) ->
-                        let it-num = embed-string (get-cross-reference-number label) in
-                        let it-page = embed-string (get-cross-reference-page label) in
-                        let ib-title =
-                            let ctx =
-                                ctx-doc |> set-font-size !toc-name-fontsize-subsection-ref
-                                        |> set-latin-font !font-latin-roman-ref
-                                        |> set-cjk-font !font-cjk-mincho-bx-ref
-                            in
-                        read-inline ctx {#it-num; #title;} ++ inline-skip 3pt in
-                        let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
-                        let toc-line-subsection =
-                            let w = (get-text-width ctx-doc) -' !toc-line-space-subsection-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
-                            if w <' 0pt then inline-fil else
-                            make-toc-line ctx-doc w !toc-line-text-subsection-ref
+            | TocSubSection(label, title) ->
+                    let it-num = embed-string (get-cross-reference-number label) in
+                    let it-page = embed-string (get-cross-reference-page label) in
+                    let ib-title =
+                        let ctx =
+                            ctx-doc |> set-font-size !toc-name-fontsize-subsection-ref
+                                    |> set-latin-font !font-latin-roman-ref
+                                    |> set-cjk-font !font-cjk-mincho-bx-ref
                         in
-                        bbacc +++ line-break true true ctx-doc
-                            (inline-skip !toc-line-space-subsection-ref ++ ib-title ++ inline-fil ++ toc-line-subsection ++ inline-fil ++ ib-page)
+                    read-inline ctx {#it-num; #title;} ++ inline-skip 3pt in
+                    let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
+                    let toc-line-subsection =
+                        let w = (get-text-width ctx-doc) -' !toc-line-space-subsection-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
+                        if w <' 0pt then inline-fil else
+                        make-toc-line ctx-doc w !toc-line-text-subsection-ref
+                    in
+                    bbacc +++ line-break true true ctx-doc
+                        (inline-skip !toc-line-space-subsection-ref ++ ib-title ++ inline-fil ++ toc-line-subsection ++ inline-fil ++ ib-page)
 
-                    | TocSubSubSection(label, title) ->
-                        let it-num = embed-string (get-cross-reference-number label) in
-                        let it-page = embed-string (get-cross-reference-page label) in
-                        let ib-title =
-                            let ctx =
-                                ctx-doc |> set-font-size !toc-name-fontsize-subsubsection-ref
-                                        |> set-latin-font !font-latin-roman-ref
-                                        |> set-cjk-font !font-cjk-mincho-bx-ref
-                            in
-                        read-inline ctx {#it-num; #title;} ++ inline-skip 3pt in
-                        let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
-                        let toc-line-subsubsection =
-                            let w = (get-text-width ctx-doc) -' !toc-line-space-subsubsection-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
-                            if w <' 0pt then inline-fil else
-                            make-toc-line ctx-doc w !toc-line-text-subsubsection-ref
+                | TocSubSubSection(label, title) ->
+                    let it-num = embed-string (get-cross-reference-number label) in
+                    let it-page = embed-string (get-cross-reference-page label) in
+                    let ib-title =
+                        let ctx =
+                            ctx-doc |> set-font-size !toc-name-fontsize-subsubsection-ref
+                                    |> set-latin-font !font-latin-roman-ref
+                                    |> set-cjk-font !font-cjk-mincho-bx-ref
                         in
-                        bbacc +++ line-break true true ctx-doc
-                            (inline-skip !toc-line-space-subsubsection-ref ++ ib-title ++ inline-fil ++ toc-line-subsubsection ++ inline-fil ++ ib-page)
-                )) block-nil
-                in
+                    read-inline ctx {#it-num; #title;} ++ inline-skip 3pt in
+                    let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
+                    let toc-line-subsubsection =
+                        let w = (get-text-width ctx-doc) -' !toc-line-space-subsubsection-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
+                        if w <' 0pt then inline-fil else
+                        make-toc-line ctx-doc w !toc-line-text-subsubsection-ref
+                    in
+                    bbacc +++ line-break true true ctx-doc
+                        (inline-skip !toc-line-space-subsubsection-ref ++ ib-title ++ inline-fil ++ toc-line-subsubsection ++ inline-fil ++ ib-page)
+            )) block-nil
+            in
         if !tocpage-ref then
             bb-toc-title +++ bb-toc-main +++ clear-page
         else
             bb-toc-title +++ bb-toc-main
     in
+
+    let bb-figure-toc =
+        if not !figure-toc-ref then
+            block-nil
+        else
+            let bb-figure-toc-title =
+                line-break true false ctx-doc (read-inline (make-toc-title ctx-doc) {図目次} ++ inline-fil)
+            in
+            let fig-toc (label, caption) = line-break false true ctx-doc (read-inline ctx-doc caption)
+            in
+            let bb-figure-toc-main =
+                        (List.fold-left (+++) block-nil (
+                            List.map fig-toc (List.reverse !figure-toc-acc-ref)))
+            in
+        bb-figure-toc-title +++ bb-figure-toc-main
+    in
+
+    let bb-table-toc =
+        if not !figure-toc-ref then
+            block-nil
+        else
+            let bb-table-toc-title =
+                line-break true false ctx-doc (read-inline (make-toc-title ctx-doc) {表目次} ++ inline-fil)
+            in
+            let table-toc (label, caption) = line-break false true ctx-doc (read-inline ctx-doc caption)
+            in
+            let bb-table-toc-main =
+                        (List.fold-left (+++) block-nil (
+                            List.map table-toc (List.reverse !table-toc-acc-ref)))
+            in
+        bb-table-toc-title +++ bb-table-toc-main
+    in
+
 %ページについてセッティング
 %% page
     let page = UserDefinedPaper(!page-width-ref , !page-height-ref) in
@@ -1341,7 +1377,7 @@ let document record inner =
         in
         let () = register-outline (List.reverse !outline-ref)
         in
-        page-break page pagecontf pagepartsf (bb-title +++ bb-toc +++ bb-main)
+        page-break page pagecontf pagepartsf (bb-title +++ bb-toc +++ bb-figure-toc +++ bb-table-toc +++ bb-main)
 
 % -----------------------------------------------------------------------
 
@@ -1766,6 +1802,7 @@ let-inline ctx \ref-page key =
     in
         inline-frame-breakable no-pads (Annot.link-to-location-frame key None) (read-inline ctx it)
 
+
 %% 浮動環境
     let-mutable figure-num-ref <- 0
 
@@ -1783,6 +1820,7 @@ let-inline ctx \ref-page key =
             | None -> ()
             | Some (label) -> register-cross-reference (label ^ `:num`) figure-num
         in
+        let () = figure-toc-acc-ref <- (label, caption) :: !figure-toc-acc-ref in
         let ctx-figure = ctx |> set-font-size !figure-caption-fontsize-ref
         in
         let figure-caption-right-title = !figure-caption-right-title-ref in
@@ -1812,6 +1850,7 @@ let-inline ctx \ref-page key =
             | None -> ()
             | Some (label) -> register-cross-reference (label ^ `:num`) figure-num
         in
+        let () = figure-toc-acc-ref <- (label, caption) :: !figure-toc-acc-ref in
         let ctx-figure = ctx |> set-font-size !figure-caption-fontsize-ref
         in
         let figure-caption-right-title = !figure-caption-right-title-ref in
@@ -1839,6 +1878,7 @@ let-inline ctx \ref-page key =
             | None -> ()
             | Some (label) -> register-cross-reference (label ^ `:num`) table-num
         in
+        let () = table-toc-acc-ref <- (label, caption) :: !table-toc-acc-ref in
         let ctx-table = ctx |> set-font-size !table-caption-fontsize-ref
         in
         let table-caption-right-title = !table-caption-right-title-ref in
@@ -1867,6 +1907,7 @@ let-inline ctx \ref-page key =
             | None -> ()
             | Some (label) -> register-cross-reference (label ^ `:num`) table-num
         in
+        let () = table-toc-acc-ref <- (label, caption) :: !table-toc-acc-ref in
         let ctx-table = ctx |> set-font-size !table-caption-fontsize-ref
         in
         let table-caption-right-title = !table-caption-right-title-ref in
