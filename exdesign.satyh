@@ -1837,9 +1837,9 @@ let-inline ctx \ref-page key =
         let table-caption-num = if !show-table-caption-num-ref then embed-string table-num else embed-string ` ` in
         let table-caption-left-title = !table-caption-left-title-ref in
         let bb-inner = block-frame-breakable ctx pads (Annot.register-location-frame label) (fun ctx-table -> (
-            read-block ctx-table inner
-                +++ line-break true true ctx-table (inline-fil ++ read-inline ctx-table {#table-caption-right-title;#table-caption-num;
-                    #table-caption-left-title;#caption;} ++ inline-fil)))
+            line-break true true ctx-table (inline-fil ++ read-inline ctx-table {#table-caption-right-title;#table-caption-num;
+                #table-caption-left-title;#caption;} ++ inline-fil)))
+                    +++ read-block ctx inner
         in
         hook-page-break (fun pbinfo _ -> (
             ref-float-boxes <- (pbinfo#page-number, bb-inner) :: !ref-float-boxes))
@@ -1865,9 +1865,9 @@ let-inline ctx \ref-page key =
         let table-caption-num = if !show-table-caption-num-ref then embed-string table-num else embed-string ` ` in
         let table-caption-left-title = !table-caption-left-title-ref in
         block-frame-breakable ctx pads (Annot.register-location-frame label) (fun ctx -> (
-            read-block ctx inner
-                +++ line-break true true ctx (inline-fil ++ read-inline ctx {#table-caption-right-title;#table-caption-num;
-                    #table-caption-left-title;#caption;} ++ inline-fil)))
+            line-break true true ctx (inline-fil ++ read-inline ctx {#table-caption-right-title;#table-caption-num;
+                #table-caption-left-title;#caption;} ++ inline-fil)))
+                    +++ read-block ctx inner
 
 end
 
