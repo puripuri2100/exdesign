@@ -88,6 +88,14 @@ val report : (|
             toc-name-fontsize-subsubsection : length;
             toc-depth : int;
 
+            figure-toc-line-text : inline-text;
+            figure-toc-line-space : length;
+            figure-toc-name-fontsize : length;
+
+            table-toc-line-text : inline-text;
+            table-toc-line-space : length;
+            table-toc-name-fontsize : length;
+
             part-fontsize : length;
             part-page-break-1 : bool;
             part-text-1 : string;
@@ -204,6 +212,14 @@ val article : (|
             toc-name-fontsize-subsection : length;
             toc-name-fontsize-subsubsection : length;
             toc-depth : int;
+
+            figure-toc-line-text : inline-text;
+            figure-toc-line-space : length;
+            figure-toc-name-fontsize : length;
+
+            table-toc-line-text : inline-text;
+            table-toc-line-space : length;
+            table-toc-name-fontsize : length;
 
             part-fontsize : length;
             part-page-break-1 : bool;
@@ -415,6 +431,14 @@ let report = (|
             toc-name-fontsize-subsubsection = 12pt;
             toc-depth = 3;
 
+            figure-toc-line-text = {.};
+            figure-toc-line-space = 35pt;
+            figure-toc-name-fontsize = 12pt;
+
+            table-toc-line-text = {.};
+            table-toc-line-space = 35pt;
+            table-toc-name-fontsize = 12pt;
+
             part-fontsize = 30pt;
             part-page-break-1 = false;
             part-text-1 = `第`;
@@ -531,6 +555,14 @@ let article = (|
             toc-name-fontsize-subsection = 12pt;
             toc-name-fontsize-subsubsection = 12pt;
             toc-depth = 3;
+
+            figure-toc-line-text = {.};
+            figure-toc-line-space = 20pt;
+            figure-toc-name-fontsize = 12pt;
+
+            table-toc-line-text = {.};
+            table-toc-line-space = 20pt;
+            table-toc-name-fontsize = 12pt;
 
             part-fontsize = 30pt;
             part-page-break-1 = false;

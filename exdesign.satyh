@@ -73,6 +73,14 @@ val document : 'a -> block-text -> document
             toc-name-fontsize-subsubsection : length;
             toc-depth : int;
 
+            figure-toc-line-text : inline-text;
+            figure-toc-line-space : length;
+            figure-toc-name-fontsize : length;
+
+            table-toc-line-text : inline-text;
+            table-toc-line-space : length;
+            table-toc-name-fontsize : length;
+
             part-fontsize : length;
             part-page-break-1 : bool;
             part-text-1 : string;
@@ -520,6 +528,14 @@ end = struct
     let-mutable toc-name-fontsize-subsubsection-ref <- 0pt
     let-mutable toc-depth-ref <- 0
 
+    let-mutable figure-toc-line-text-ref <- {}
+    let-mutable figure-toc-line-space-ref <- 0pt
+    let-mutable figure-toc-name-fontsize-ref <- 0pt
+
+    let-mutable table-toc-line-text-ref <- {}
+    let-mutable table-toc-line-space-ref <- 0pt
+    let-mutable table-toc-name-fontsize-ref <- 0pt
+
     let-mutable part-fontsize-ref <- 0pt
     let-mutable part-page-break-1-ref <- true
     let-mutable part-text-1-ref <- ` `
@@ -743,6 +759,13 @@ let document record inner =
     let () = toc-name-fontsize-subsubsection-ref <- record#design#toc-name-fontsize-subsubsection in
     let () = toc-depth-ref <- record#design#toc-depth in
 
+    let () = figure-toc-line-text-ref <- record#design#figure-toc-line-text in
+    let () = figure-toc-line-space-ref <- record#design#figure-toc-line-space in
+    let () = figure-toc-name-fontsize-ref <- record#design#figure-toc-name-fontsize in
+
+    let () = table-toc-line-text-ref <- record#design#table-toc-line-text in
+    let () = table-toc-line-space-ref <- record#design#table-toc-line-space in
+    let () = table-toc-name-fontsize-ref <- record#design#table-toc-name-fontsize in
 
     let () = part-fontsize-ref <- record#design#part-fontsize in
     let () = part-page-break-1-ref <- record#design#part-page-break-1 in
@@ -1139,6 +1162,7 @@ let document record inner =
             bb-toc-title +++ bb-toc-main
     in
 
+
     let bb-figure-toc =
         if not !figure-toc-ref then
             block-nil
@@ -1146,29 +1170,54 @@ let document record inner =
             let bb-figure-toc-title =
                 line-break true false ctx-doc (read-inline (make-toc-title ctx-doc) {図目次} ++ inline-fil)
             in
-            let fig-toc (label, caption) = line-break false true ctx-doc (read-inline ctx-doc caption)
+            let fig-toc (label, caption) =
+                let it-num = embed-string (get-cross-reference-number label) in
+                let it-page = embed-string (get-cross-reference-page label) in
+                let ib-title = read-inline ctx-doc it-num ++ inline-skip 5pt ++
+                    read-inline ctx-doc caption ++ inline-skip 3pt in
+                let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
+                let toc-line-figure =
+                    let w = (get-text-width ctx-doc) -' !figure-toc-line-space-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
+                    if w <' 0pt then inline-fil else
+                    make-toc-line ctx-doc w !figure-toc-line-text-ref
+                in
+            line-break false true ctx-doc (inline-frame-breakable no-pads (Annot.link-to-location-frame label None)
+                    (inline-skip !figure-toc-line-space-ref ++ ib-title ++ toc-line-figure ++ ib-page))
             in
             let bb-figure-toc-main =
-                        (List.fold-left (+++) block-nil (
-                            List.map fig-toc (List.reverse !figure-toc-acc-ref)))
+                        (List.fold-left (+++) block-nil
+                            (List.map fig-toc (List.reverse !figure-toc-acc-ref)))
             in
-        bb-figure-toc-title +++ bb-figure-toc-main
+                bb-figure-toc-title +++ bb-figure-toc-main
     in
 
+
     let bb-table-toc =
-        if not !figure-toc-ref then
+        if not !table-toc-ref then
             block-nil
         else
             let bb-table-toc-title =
                 line-break true false ctx-doc (read-inline (make-toc-title ctx-doc) {表目次} ++ inline-fil)
             in
-            let table-toc (label, caption) = line-break false true ctx-doc (read-inline ctx-doc caption)
+            let fig-toc (label, caption) =
+                let it-num = embed-string (get-cross-reference-number label) in
+                let it-page = embed-string (get-cross-reference-page label) in
+                let ib-title = read-inline ctx-doc it-num ++ inline-skip 5pt ++
+                    read-inline ctx-doc caption ++ inline-skip 3pt in
+                let ib-page = inline-skip 3pt ++ read-inline ctx-doc it-page in
+                let toc-line-table =
+                    let w = (get-text-width ctx-doc) -' !table-toc-line-space-ref -' (get-natural-width ib-title) -' (get-natural-width ib-page) in
+                    if w <' 0pt then inline-fil else
+                    make-toc-line ctx-doc w !table-toc-line-text-ref
+                in
+            line-break false true ctx-doc (inline-frame-breakable no-pads (Annot.link-to-location-frame label None)
+                    (inline-skip !table-toc-line-space-ref ++ ib-title ++ toc-line-table ++ ib-page))
             in
             let bb-table-toc-main =
-                        (List.fold-left (+++) block-nil (
-                            List.map table-toc (List.reverse !table-toc-acc-ref)))
+                        (List.fold-left (+++) block-nil
+                            (List.map fig-toc (List.reverse !table-toc-acc-ref)))
             in
-        bb-table-toc-title +++ bb-table-toc-main
+                bb-table-toc-title +++ bb-table-toc-main
     in
 
 %ページについてセッティング
@@ -1826,11 +1875,12 @@ let-inline ctx \ref-page key =
         let figure-caption-right-title = !figure-caption-right-title-ref in
         let figure-caption-num = if !show-figure-caption-num-ref then embed-string figure-num else embed-string ` ` in
         let figure-caption-left-title = !figure-caption-left-title-ref in
+        let hook-page = hook-page-break (fun pbinfo _ -> register-cross-reference (label ^ `:page`) (arabic pbinfo#page-number)) in
         let bb-inner = block-frame-breakable ctx-figure pads (Annot.register-location-frame label) (fun ctx-figure -> (
             read-block ctx inner
                 +++ line-break true true ctx (inline-fil ++
                     read-inline ctx-figure {#figure-caption-right-title;#figure-caption-num;
-                    #figure-caption-left-title;#caption;} ++ inline-fil)))
+                    #figure-caption-left-title;#caption;} ++ inline-fil ++ hook-page)))
         in
         hook-page-break (fun pbinfo _ -> (
             ref-float-boxes <- (pbinfo#page-number, bb-inner) :: !ref-float-boxes))
@@ -1856,10 +1906,11 @@ let-inline ctx \ref-page key =
         let figure-caption-right-title = !figure-caption-right-title-ref in
         let figure-caption-num = if !show-figure-caption-num-ref then embed-string figure-num else embed-string ` ` in
         let figure-caption-left-title = !figure-caption-left-title-ref in
+        let hook-page = hook-page-break (fun pbinfo _ -> register-cross-reference (label ^ `:page`) (arabic pbinfo#page-number)) in
         block-frame-breakable ctx-figure pads (Annot.register-location-frame label) (fun ctx-figure -> (
             read-block ctx inner
                 +++ line-break true true ctx-figure (inline-fil ++ read-inline ctx {#figure-caption-right-title;#figure-caption-num;
-                #figure-caption-left-title;#caption;} ++ inline-fil)))
+                #figure-caption-left-title;#caption;} ++ inline-fil ++ hook-page)))
 
 
     let-mutable table-num-ref <- 0
@@ -1884,9 +1935,10 @@ let-inline ctx \ref-page key =
         let table-caption-right-title = !table-caption-right-title-ref in
         let table-caption-num = if !show-table-caption-num-ref then embed-string table-num else embed-string ` ` in
         let table-caption-left-title = !table-caption-left-title-ref in
+        let hook-page = hook-page-break (fun pbinfo _ -> register-cross-reference (label ^ `:page`) (arabic pbinfo#page-number)) in
         let bb-inner = block-frame-breakable ctx pads (Annot.register-location-frame label) (fun ctx-table -> (
             line-break true true ctx-table (inline-fil ++ read-inline ctx-table {#table-caption-right-title;#table-caption-num;
-                #table-caption-left-title;#caption;} ++ inline-fil)))
+                #table-caption-left-title;#caption;} ++ inline-fil ++ hook-page)))
                     +++ read-block ctx inner
         in
         hook-page-break (fun pbinfo _ -> (
@@ -1913,9 +1965,10 @@ let-inline ctx \ref-page key =
         let table-caption-right-title = !table-caption-right-title-ref in
         let table-caption-num = if !show-table-caption-num-ref then embed-string table-num else embed-string ` ` in
         let table-caption-left-title = !table-caption-left-title-ref in
+        let hook-page = hook-page-break (fun pbinfo _ -> register-cross-reference (label ^ `:page`) (arabic pbinfo#page-number)) in
         block-frame-breakable ctx pads (Annot.register-location-frame label) (fun ctx -> (
             line-break true true ctx (inline-fil ++ read-inline ctx {#table-caption-right-title;#table-caption-num;
-                #table-caption-left-title;#caption;} ++ inline-fil)))
+                #table-caption-left-title;#caption;} ++ inline-fil ++ hook-page)))
                     +++ read-block ctx inner
 
 end
