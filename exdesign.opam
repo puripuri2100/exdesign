@@ -17,5 +17,5 @@ depends: [
 ]
 build: [
   ["install" "-d" "%share%/satysfi/exdesign/packages"]
-  ["install" "-m" "644" "exdesign.satyh, article-ja.satyh" "%share%/satysfi/exdesign/packages"]
+  ["install" "-m" "644" "exdesign.satyh" "%share%/satysfi/exdesign/packages"]
 ]
