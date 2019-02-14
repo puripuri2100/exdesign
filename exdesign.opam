@@ -1,0 +1,21 @@
+opam-version: "2.0"
+name: "exdesign"
+version: "2.0+satysfi0.0.3+satyrograhos0.0.1"
+synopsis: "A class file easy to customize with SATySFi."
+description: "A class file easy to customize with SATySFi."
+
+maintainer: "SAKAMOTO Noriaki <mrty.ityt.pt@gmail.com>"
+authors: "SAKAMOTO Noriaki <mrty.ityt.pt@gmail.com>"
+license: "LGPLv3"
+homepage: "https://github.com/puripuri2100/exdesign"
+bug-reports: "https://github.com/puripuri2100/exdesign/issues"
+dev-repo: "git+https://github.com/puripuri2100/exdesign.git"
+
+depends: [
+  "satysfi" {>= "0.0.3" & < "0.0.4"}
+  "satyrographos" {>= "0.0.1" & < "0.0.2"}
+]
+build: [
+  ["install" "-d" "%share%/satysfi/stjarticle/packages"]
+  ["install" "-m" "644" "stjarticle.satyh" "%share%/satysfi/stjarticle/packages"]
+]
