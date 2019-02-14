@@ -16,6 +16,6 @@ depends: [
   "satyrographos" {>= "0.0.1" & < "0.0.2"}
 ]
 build: [
-  ["install" "-d" "%share%/satysfi/stjarticle/packages"]
-  ["install" "-m" "644" "stjarticle.satyh" "%share%/satysfi/stjarticle/packages"]
+  ["install" "-d" "%share%/satysfi/exdesign/packages"]
+  ["install" "-m" "644" "exdesign.satyh, article-ja.satyh" "%share%/satysfi/exdesign/packages"]
 ]
