@@ -1,6 +1,6 @@
 opam-version: "2.0"
 name: "exdesign"
-version: "2.0+satysfi0.0.3+satyrograhos0.0.1"
+version: "0.2+satysfi0.0.3+satyrograhos0.1.5"
 synopsis: "A class file easy to customize with SATySFi."
 description: "A class file easy to customize with SATySFi."
 
