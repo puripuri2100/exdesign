@@ -2,7 +2,7 @@ opam-version: "2.0"
 name: "exdesign"
 version: "0.2+satysfi0.0.3+satyrograhos0.1.5"
 synopsis: "A class file easy to customize with SATySFi."
-description: "A class file easy to customize with SATySFi."
+description: """A class file easy to customize with SATySFi."""
 
 maintainer: "Naoki Kaneko <puripuri2100@gmail.com>"
 authors: "Naoki Kaneko <puripuri2100@gmail.com>"
@@ -19,3 +19,6 @@ build: [
   ["install" "-d" "%share%/satysfi/exdesign/packages"]
   ["install" "-m" "644" "exdesign.satyh" "article-ja.satyh" "%share%/satysfi/exdesign/packages"]
 ]
+
+install: [ ]
+remove: [ ]
