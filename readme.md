@@ -16,8 +16,7 @@ SATySFiに付属するstdjaやstdjabook等のクラスファイルをかなり�
 Linux系統のOSであるならば、
 
 ~~~
-$ chmod u+x Installer.sh
-$ ./Installer.sh
+$ sudo ./Installer.sh
 ~~~
 
 を実行することで導入することが可能です。
@@ -25,8 +24,7 @@ $ ./Installer.sh
 削除したい時は
 
 ~~~
-$ chmod u+x UnInstaller.sh
-$ ./UnInstaller.sh
+$ sudo ./UnInstaller.sh
 ~~~
 
 です。
@@ -38,7 +36,7 @@ $ ./UnInstaller.sh
 @import: article-ja
 
 document (|
-        title = {title;
+        title = {title};
         author = {puripuri2100};
         date = {2018/11/04};
         show-title = true;
