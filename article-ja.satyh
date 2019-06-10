@@ -327,6 +327,26 @@ val normalHF : (|
             tocpage-footer-line : length;
         |)
 
+val empty : (|
+            lhead : inline-text;
+            chead : inline-text;
+            rhead : inline-text;
+            header-line : length;
+            lfoot : inline-text;
+            cfoot : inline-text;
+            rfoot : inline-text;
+            footer-line : length;
+
+            tocpage-lhead : inline-text;
+            tocpage-chead : inline-text;
+            tocpage-rhead : inline-text;
+            tocpage-header-line : length;
+            tocpage-lfoot : inline-text;
+            tocpage-cfoot : inline-text;
+            tocpage-rfoot : inline-text;
+            tocpage-footer-line : length;
+        |)
+
 end = struct
 
 let-inline \pagenum = if !ExDesign.titlepage-ref then embed-string(arabic (!ExDesign.page-number - 1)) else embed-string(arabic !ExDesign.page-number)
@@ -637,6 +657,26 @@ let normalHF = (|
             header-line = (0pt);
             lfoot =  {};
             cfoot = {\pagenum;};
+            rfoot = {};
+            footer-line = (0pt);
+
+            tocpage-lhead = {};
+            tocpage-chead = {};
+            tocpage-rhead = {};
+            tocpage-header-line = (0pt);
+            tocpage-lfoot = {};
+            tocpage-cfoot = {};
+            tocpage-rfoot = {};
+            tocpage-footer-line = (0pt);
+      |)
+
+let empty = (|
+            lhead = {};
+            chead = {};
+            rhead = {};
+            header-line = (0pt);
+            lfoot =  {};
+            cfoot = {};
             rfoot = {};
             footer-line = (0pt);
 
