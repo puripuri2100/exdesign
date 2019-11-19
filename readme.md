@@ -32,8 +32,8 @@ $ sudo ./UnInstaller.sh
 # 使い方
 
 ~~~
-@require: exdesign
-@import: article-ja
+@require: class-exdesign/exdesign
+@import: class-exdesign/article-ja
 
 document (|
         title = {title};

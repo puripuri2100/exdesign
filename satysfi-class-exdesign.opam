@@ -1,7 +1,7 @@
 opam-version: "2.0"
-name: "exdesign"
-version: "0.2+satysfi0.0.3+satyrograhos0.1.5"
-synopsis: "A class file easy to customize with SATySFi."
+name: "satysfi-class-exdesign"
+version: "0.2"
+synopsis: "A class file easy to customize with SATySFi"
 description: """A class file easy to customize with SATySFi."""
 
 maintainer: "Naoki Kaneko <puripuri2100@gmail.com>"
@@ -13,12 +13,12 @@ dev-repo: "git+https://github.com/puripuri2100/exdesign.git"
 
 depends: [
   "satysfi" {>= "0.0.3" & < "0.0.4"}
-  "satyrographos" {>= "0.0.1" & < "0.0.2"}
+  "satyrographos" {>= "0.0.2" & < "0.0.3"}
 ]
-build: [
-  ["install" "-d" "%share%/satysfi/exdesign/packages"]
-  ["install" "-m" "644" "exdesign.satyh" "article-ja.satyh" "%share%/satysfi/exdesign/packages"]
+build: [ ]
+install: [
+  ["satyrographos" "opam" "install"
+   "-name" "class-exdesign"
+   "-prefix" "%{prefix}%"
+   "-script" "%{build}%/Satyristes"]
 ]
-
-install: [ ]
-remove: [ ]

@@ -1,5 +1,5 @@
-@require: exdesign
-@require: article-ja
+@require: class-exdesign/exdesign
+@require: class-exdesign/article-ja
 @require: code
 @require: itemize
 
@@ -22,8 +22,8 @@ document (|
   +section{簡単な使用方法}<
       +p{補助パッケージを使用する際にはこのように書きます。}
         +code(`
-@require: exdesign
-@require: article-ja
+@require: class-exdesign/exdesign
+@require: class-exdesign/article-ja
 
 document (|
         title = {title;
@@ -39,7 +39,7 @@ document (|
     +p{test}
 >`
 );
-+pn{このように、\code(`@require : exdesign`);でパッケージを読み込み、補助パッケージであるarticle-ja.satyhを\code(`@require : article-ja`);で読み込みます（勿論、article-ja.satyhの置き場所によってどのコマンドを使用して読み込むかは変わりますが）。}
++pn{このように、\code(`@require : class-exdesign/exdesign`);でパッケージを読み込み、補助パッケージであるarticle-ja.satyhを\code(`@require : class-exdesign/article-ja`);で読み込みます（勿論、article-ja.satyhの置き場所によってどのコマンドを使用して読み込むかは変わりますが）。}
 
 +p{そして、\code(`document`);コマンドの引数であるレコード型に必要な値を入れていきます。}
 
