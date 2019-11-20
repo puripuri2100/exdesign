@@ -8,7 +8,8 @@
     ((package "article-ja.satyh" "article-ja.satyh")
      (package "exdesign.satyh" "exdesign.satyh")))
   (opam "satysfi-class-exdesign.opam")
-  (dependencies ()))
+  (dependencies ())
+  (compatibility ((satyrographos "0.0.1"))))
 
 (libraryDoc
   (name "class-exdesign-doc")
