@@ -15,7 +15,7 @@ opamとsatyrographosをインストールした状態で
 
 ```
 opam update
-opam install satysfi-class-mdbook-satysfi
+opam install satysfi-class-exdesign
 satyrographos install
 ```
 
