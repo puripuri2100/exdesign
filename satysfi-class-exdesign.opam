@@ -12,13 +12,13 @@ bug-reports: "https://github.com/puripuri2100/exdesign/issues"
 dev-repo: "git+https://github.com/puripuri2100/exdesign.git"
 
 depends: [
-  "satysfi" {>= "0.0.3" & < "0.0.4"}
-  "satyrographos" {>= "0.0.2" & < "0.0.3"}
+  "satysfi" {>= "0.0.3" & < "0.0.7"}
+  "satyrographos" {>= "0.0.2.6" & < "0.0.3"}
 ]
 build: [ ]
 install: [
   ["satyrographos" "opam" "install"
-   "-name" "class-exdesign"
-   "-prefix" "%{prefix}%"
-   "-script" "%{build}%/Satyristes"]
+   "--name" "class-exdesign"
+   "--prefix" "%{prefix}%"
+   "--script" "%{build}%/Satyristes"]
 ]
