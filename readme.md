@@ -7,33 +7,25 @@ SATySFiに付属するstdjaやstdjabook等のクラスファイルをかなり�
 
 # 動作する環境
 
-[SATySFi v0.0.3](https://github.com/gfngfn/SATySFi/releases/tag/v0.0.3)での動作を確認しています。
+[SATySFi v0.0.6](https://github.com/gfngfn/SATySFi/releases/tag/v0.0.6)での動作を確認しています。
 
 # 導入のしかた
 
-`exdesign.satyh`と補助パッケージをSATySFiの読み込める場所においてください。
+opamとsatyrographosをインストールした状態で
 
-Linux系統のOSであるならば、
+```
+opam update
+opam install satysfi-class-mdbook-satysfi
+satyrographos install
+```
 
-~~~
-$ sudo ./Installer.sh
-~~~
-
-を実行することで導入することが可能です。
-
-削除したい時は
-
-~~~
-$ sudo ./UnInstaller.sh
-~~~
-
-です。
+を実行します。
 
 # 使い方
 
 ~~~
 @require: class-exdesign/exdesign
-@import: class-exdesign/article-ja
+@require: class-exdesign/article-ja
 
 document (|
         title = {title};
@@ -53,7 +45,7 @@ document (|
 などのようにすれば使うことができます。
 
 stdjaを使用するのに対して、`style`・`design`・`header-footer`・`fonts`が追加されています（`date`も追加されていますが割愛します）。
-ここには本来ならばレコード型が書かれるはずですが、`@import: article-ja`によって読み込まれている、補助パッケージであるarticle-jaパッケージによって事前に値が定められているため、短い文字で容易に指定することが可能になっています。
+ここには本来ならばレコード型が書かれるはずですが、`@require: class-exdesign/article-ja`によって読み込まれている、補助パッケージであるarticle-jaパッケージによって事前に値が定められているため、短い文字で容易に指定することが可能になっています。
 
 この補助パッケージは今後増やしていく予定です。
 
@@ -70,6 +62,6 @@ stdjaを使用するのに対して、`style`・`design`・`header-footer`・`fo
 
 ---
 
-(c) Naoki Kaneko and T. Suwa 2018
+(c) Naoki Kaneko and T. Suwa 2018-2021
 
 https://github.com/puripuri2100/exdesign
