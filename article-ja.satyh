@@ -88,11 +88,7 @@ val report : (|
 
     part-fontsize : length;
     part-page-break-1 : bool;
-    part-text-1 : string;
-    part-text-2 : string;
-    show-num-part : bool;
-    part-text-3 : string;
-    part-text-4 : string;
+    part-num-function: (int -> string);
     part-top-space : length;
     part-bottom-space : length;
     part-left-space : length;
@@ -102,11 +98,7 @@ val report : (|
 
     chapter-fontsize : length;
     chapter-page-break-1 : bool;
-    chapter-text-1 : string;
-    chapter-text-2 : string;
-    show-num-chapter : bool;
-    chapter-text-3 : string;
-    chapter-text-4 : string;
+    chapter-num-function: (int -> string);
     chapter-top-space : length;
     chapter-bottom-space : length;
     chapter-left-space : length;
@@ -115,13 +107,7 @@ val report : (|
     chapter-page-break-2 : bool;
 
     section-fontsize : length;
-    section-text-1 : string;
-    section-text-2 : string;
-    show-num-chapter-sec : bool;
-    section-text-3 : string;
-    show-num-section : bool;
-    section-text-4 : string;
-    section-text-5 : string;
+    section-num-function: (int -> int -> string);
     section-top-space : length;
     section-bottom-space : length;
     section-left-space : length;
@@ -129,15 +115,7 @@ val report : (|
     section-right-space : length;
 
     subsection-fontsize : length;
-    subsection-text-1 : string;
-    subsection-text-2 : string;
-    show-num-chapter-subsec : bool;
-    subsection-text-3 : string;
-    show-num-section-subsec : bool;
-    subsection-text-4 : string;
-    show-num-subsection : bool;
-    subsection-text-5 : string;
-    subsection-text-6 : string;
+    subsection-num-function: (int -> int -> int -> string);
     subsection-top-space : length;
     subsection-bottom-space : length;
     subsection-left-space : length;
@@ -145,17 +123,7 @@ val report : (|
     subsection-right-space : length;
 
     subsubsection-fontsize : length;
-    subsubsection-text-1 : string;
-    subsubsection-text-2 : string;
-    show-num-chapter-subsubsec : bool;
-    subsubsection-text-3 : string;
-    show-num-section-subsubsec : bool;
-    subsubsection-text-4 : string;
-    show-num-subsection-subsubsec : bool;
-    subsubsection-text-5 : string;
-    show-num-subsubsection : bool;
-    subsubsection-text-6 : string;
-    subsubsection-text-7 : string;
+    subsubsection-num-function: (int -> int -> int -> int -> string);
     subsubsection-top-space : length;
     subsubsection-bottom-space : length;
     subsubsection-left-space : length;
@@ -203,11 +171,7 @@ val article : (|
 
     part-fontsize : length;
     part-page-break-1 : bool;
-    part-text-1 : string;
-    part-text-2 : string;
-    show-num-part : bool;
-    part-text-3 : string;
-    part-text-4 : string;
+    part-num-function: (int -> string);
     part-top-space : length;
     part-bottom-space : length;
     part-left-space : length;
@@ -217,11 +181,7 @@ val article : (|
 
     chapter-fontsize : length;
     chapter-page-break-1 : bool;
-    chapter-text-1 : string;
-    chapter-text-2 : string;
-    show-num-chapter : bool;
-    chapter-text-3 : string;
-    chapter-text-4 : string;
+    chapter-num-function: (int -> string);
     chapter-top-space : length;
     chapter-bottom-space : length;
     chapter-left-space : length;
@@ -230,13 +190,7 @@ val article : (|
     chapter-page-break-2 : bool;
 
     section-fontsize : length;
-    section-text-1 : string;
-    section-text-2 : string;
-    show-num-chapter-sec : bool;
-    section-text-3 : string;
-    show-num-section : bool;
-    section-text-4 : string;
-    section-text-5 : string;
+    section-num-function: (int -> int -> string);
     section-top-space : length;
     section-bottom-space : length;
     section-left-space : length;
@@ -244,15 +198,7 @@ val article : (|
     section-right-space : length;
 
     subsection-fontsize : length;
-    subsection-text-1 : string;
-    subsection-text-2 : string;
-    show-num-chapter-subsec : bool;
-    subsection-text-3 : string;
-    show-num-section-subsec : bool;
-    subsection-text-4 : string;
-    show-num-subsection : bool;
-    subsection-text-5 : string;
-    subsection-text-6 : string;
+    subsection-num-function: (int -> int -> int -> string);
     subsection-top-space : length;
     subsection-bottom-space : length;
     subsection-left-space : length;
@@ -260,17 +206,7 @@ val article : (|
     subsection-right-space : length;
 
     subsubsection-fontsize : length;
-    subsubsection-text-1 : string;
-    subsubsection-text-2 : string;
-    show-num-chapter-subsubsec : bool;
-    subsubsection-text-3 : string;
-    show-num-section-subsubsec : bool;
-    subsubsection-text-4 : string;
-    show-num-subsection-subsubsec : bool;
-    subsubsection-text-5 : string;
-    show-num-subsubsection : bool;
-    subsubsection-text-6 : string;
-    subsubsection-text-7 : string;
+    subsubsection-num-function: (int -> int -> int -> int -> string);
     subsubsection-top-space : length;
     subsubsection-bottom-space : length;
     subsubsection-left-space : length;
@@ -431,11 +367,7 @@ let report = (|
 
     part-fontsize = 30pt;
     part-page-break-1 = false;
-    part-text-1 = `第`;
-    part-text-2 = ` `;
-    show-num-part = true;
-    part-text-3 = ` `;
-    part-text-4 = `部`;
+    part-num-function = (fun i -> `第` ^ arabic i ^ `部`);
     part-top-space = 40pt;
     part-bottom-space = 25pt;
     part-left-space = 0pt;
@@ -445,11 +377,7 @@ let report = (|
 
     chapter-fontsize = 25pt;
     chapter-page-break-1 = false;
-    chapter-text-1 = `第`;
-    chapter-text-2 = ` `;
-    show-num-chapter = true;
-    chapter-text-3 = ` `;
-    chapter-text-4 = `章`;
+    chapter-num-function = (fun i -> `第` ^ arabic i ^ `章`);
     chapter-top-space = 35pt;
     chapter-bottom-space = 30pt;
     chapter-left-space = 0pt;
@@ -458,13 +386,7 @@ let report = (|
     chapter-page-break-2 = false;
 
     section-fontsize = 18pt;
-    section-text-1 = ` `;
-    section-text-2 = ` `;
-    show-num-chapter-sec = false;
-    section-text-3 = ` `;
-    show-num-section = true;
-    section-text-4 = ` `;
-    section-text-5 = ` `;
+    section-num-function = (fun _ i -> arabic i);
     section-top-space = 25pt;
     section-bottom-space = 15pt;
     section-left-space = 0pt;
@@ -472,15 +394,7 @@ let report = (|
     section-right-space = 18pt;
 
     subsection-fontsize = 15pt;
-    subsection-text-1 = ` `;
-    subsection-text-2 = ` `;
-    show-num-chapter-subsec = false;
-    subsection-text-3 = ` `;
-    show-num-section-subsec = true;
-    subsection-text-4 = `.`;
-    show-num-subsection = true;
-    subsection-text-5 = ` `;
-    subsection-text-6 = ` `;
+    subsection-num-function = (fun _ i1 i2 -> arabic i1 ^ `.` ^ arabic i2);
     subsection-top-space = 20pt;
     subsection-bottom-space = 15pt;
     subsection-left-space = 0pt;
@@ -488,17 +402,7 @@ let report = (|
     subsection-right-space = 15pt;
 
     subsubsection-fontsize = 13pt;
-    subsubsection-text-1 = ` `;
-    subsubsection-text-2 = ` `;
-    show-num-chapter-subsubsec = false;
-    subsubsection-text-3 = ` `;
-    show-num-section-subsubsec = true;
-    subsubsection-text-4 = `.`;
-    show-num-subsection-subsubsec = true;
-    subsubsection-text-5 = `.`;
-    show-num-subsubsection = true;
-    subsubsection-text-6 = ` `;
-    subsubsection-text-7 = ` `;
+    subsubsection-num-function = (fun _ i1 i2 i3 -> arabic i1 ^ `.` ^ arabic i2 ^ `.` ^ arabic i2);
     subsubsection-top-space = 15pt;
     subsubsection-bottom-space = 10pt;
     subsubsection-left-space = 0pt;
@@ -546,11 +450,7 @@ let article = (|
 
     part-fontsize = 30pt;
     part-page-break-1 = false;
-    part-text-1 = `第`;
-    part-text-2 = ` `;
-    show-num-part = true;
-    part-text-3 = ` `;
-    part-text-4 = `部`;
+    part-num-function = (fun i -> `第` ^ arabic i ^ `部`);
     part-top-space = 50pt;
     part-bottom-space = 35pt;
     part-left-space = 0pt;
@@ -560,11 +460,7 @@ let article = (|
 
     chapter-fontsize = 25pt;
     chapter-page-break-1 = false;
-    chapter-text-1 = `第`;
-    chapter-text-2 = ` `;
-    show-num-chapter = true;
-    chapter-text-3 = ` `;
-    chapter-text-4 = `章`;
+    chapter-num-function = (fun i -> `第` ^ arabic i ^ `章`);
     chapter-top-space = 40pt;
     chapter-bottom-space = 30pt;
     chapter-left-space = 0pt;
@@ -573,13 +469,7 @@ let article = (|
     chapter-page-break-2 = false;
 
     section-fontsize = 18pt;
-    section-text-1 = ` `;
-    section-text-2 = ` `;
-    show-num-chapter-sec = false;
-    section-text-3 = ` `;
-    show-num-section = true;
-    section-text-4 = ` `;
-    section-text-5 = ` `;
+    section-num-function = (fun _ i -> arabic i);
     section-top-space = 25pt;
     section-bottom-space = 15pt;
     section-left-space = 0pt;
@@ -587,15 +477,7 @@ let article = (|
     section-right-space = 18pt;
 
     subsection-fontsize = 15pt;
-    subsection-text-1 = ` `;
-    subsection-text-2 = ` `;
-    show-num-chapter-subsec = false;
-    subsection-text-3 = ` `;
-    show-num-section-subsec = true;
-    subsection-text-4 = `.`;
-    show-num-subsection = true;
-    subsection-text-5 = ` `;
-    subsection-text-6 = ` `;
+    subsection-num-function = (fun _ i1 i2 -> arabic i1 ^ `.` ^ arabic i2);
     subsection-top-space = 20pt;
     subsection-bottom-space = 15pt;
     subsection-left-space = 0pt;
@@ -603,17 +485,7 @@ let article = (|
     subsection-right-space = 15pt;
 
     subsubsection-fontsize = 13pt;
-    subsubsection-text-1 = ` `;
-    subsubsection-text-2 = ` `;
-    show-num-chapter-subsubsec = false;
-    subsubsection-text-3 = ` `;
-    show-num-section-subsubsec = true;
-    subsubsection-text-4 = `.`;
-    show-num-subsection-subsubsec = true;
-    subsubsection-text-5 = `.`;
-    show-num-subsubsection = true;
-    subsubsection-text-6 = ` `;
-    subsubsection-text-7 = ` `;
+    subsubsection-num-function = (fun _ i1 i2 i3 -> arabic i1 ^ `.` ^ arabic i2 ^ `.` ^ arabic i2);
     subsubsection-top-space = 15pt;
     subsubsection-bottom-space = 10pt;
     subsubsection-left-space = 0pt;

@@ -13,188 +13,156 @@
 module ExDesign : sig
 
 val document : 'a -> block-text -> document
-    constraint 'a :: (|
-        title : inline-text;
-        author : inline-text;
-        date : inline-text;
-        show-title : bool;
-        show-toc : bool;
-        style : (|
-            page-width : length;
-            page-height : length;
-            top-space : length;
-            bottom-space : length;
-            left-space : length;
-            right-space : length;
-            header-left-space : length;
-            header-right-space : length;
-            header-height : length;
-            footer-left-space : length;
-            footer-right-space : length;
-            footer-height : length;
-            titlepage-top-space : length;
-            titlepage-bottom-space : length;
-            titlepage-left-space : length;
-            titlepage-right-space : length;
-            tocpage-top-space : length;
-            tocpage-bottom-space : length;
-            tocpage-left-space : length;
-            tocpage-right-space : length;
-            normal-fontsize : length;
-            language-japanese : bool;
-        |);
-        design : (|
-            oneside : bool;
+  constraint 'a :: (|
+    title : inline-text;
+    author : inline-text;
+    date : inline-text;
+    show-title : bool;
+    show-toc : bool;
+    style : (|
+      page-width : length;
+      page-height : length;
+      top-space : length;
+      bottom-space : length;
+      left-space : length;
+      right-space : length;
+      header-left-space : length;
+      header-right-space : length;
+      header-height : length;
+      footer-left-space : length;
+      footer-right-space : length;
+      footer-height : length;
+      titlepage-top-space : length;
+      titlepage-bottom-space : length;
+      titlepage-left-space : length;
+      titlepage-right-space : length;
+      tocpage-top-space : length;
+      tocpage-bottom-space : length;
+      tocpage-left-space : length;
+      tocpage-right-space : length;
+      normal-fontsize : length;
+      language-japanese : bool;
+    |);
+    design : (|
+      oneside : bool;
 
-            titlepage : bool;
-            title-fontsize : length;
-            author-fontsize : length;
-            date-fontsize : length;
+      titlepage : bool;
+      title-fontsize : length;
+      author-fontsize : length;
+      date-fontsize : length;
 
-            tocpage : bool;
+      tocpage : bool;
 
-            toc-fontsize : length;
-            toc-line-text-part : inline-text;
-            toc-line-text-chapter : inline-text;
-            toc-line-text-section : inline-text;
-            toc-line-text-subsection : inline-text;
-            toc-line-text-subsubsection : inline-text;
-            toc-line-space-part : length;
-            toc-line-space-chapter : length;
-            toc-line-space-section : length;
-            toc-line-space-subsection : length;
-            toc-line-space-subsubsection : length;
-            toc-name-fontsize-part : length;
-            toc-name-fontsize-chapter : length;
-            toc-name-fontsize-section : length;
-            toc-name-fontsize-subsection : length;
-            toc-name-fontsize-subsubsection : length;
-            toc-depth : int;
+      toc-fontsize : length;
+      toc-line-text-part : inline-text;
+      toc-line-text-chapter : inline-text;
+      toc-line-text-section : inline-text;
+      toc-line-text-subsection : inline-text;
+      toc-line-text-subsubsection : inline-text;
+      toc-line-space-part : length;
+      toc-line-space-chapter : length;
+      toc-line-space-section : length;
+      toc-line-space-subsection : length;
+      toc-line-space-subsubsection : length;
+      toc-name-fontsize-part : length;
+      toc-name-fontsize-chapter : length;
+      toc-name-fontsize-section : length;
+      toc-name-fontsize-subsection : length;
+      toc-name-fontsize-subsubsection : length;
+      toc-depth : int;
 
-            part-fontsize : length;
-            part-page-break-1 : bool;
-            part-text-1 : string;
-            part-text-2 : string;
-            show-num-part : bool;
-            part-text-3 : string;
-            part-text-4 : string;
-            part-top-space : length;
-            part-bottom-space : length;
-            part-left-space : length;
-            part-line-break : bool;
-            part-right-space : length;
-            part-page-break-2 : bool;
+      part-fontsize : length;
+      part-page-break-1 : bool;
+      part-num-function: (int -> string);
+      part-top-space : length;
+      part-bottom-space : length;
+      part-left-space : length;
+      part-line-break : bool;
+      part-right-space : length;
+      part-page-break-2 : bool;
 
-            chapter-fontsize : length;
-            chapter-page-break-1 : bool;
-            chapter-text-1 : string;
-            chapter-text-2 : string;
-            show-num-chapter : bool;
-            chapter-text-3 : string;
-            chapter-text-4 : string;
-            chapter-top-space : length;
-            chapter-bottom-space : length;
-            chapter-left-space : length;
-            chapter-line-break : bool;
-            chapter-right-space : length;
-            chapter-page-break-2 : bool;
+      chapter-fontsize : length;
+      chapter-page-break-1 : bool;
+      chapter-num-function: (int -> string);
+      chapter-top-space : length;
+      chapter-bottom-space : length;
+      chapter-left-space : length;
+      chapter-line-break : bool;
+      chapter-right-space : length;
+      chapter-page-break-2 : bool;
 
-            section-fontsize : length;
-            section-text-1 : string;
-            section-text-2 : string;
-            show-num-chapter-sec : bool;
-            section-text-3 : string;
-            show-num-section : bool;
-            section-text-4 : string;
-            section-text-5 : string;
-            section-top-space : length;
-            section-bottom-space : length;
-            section-left-space : length;
-            section-line-break : bool;
-            section-right-space : length;
+      section-fontsize : length;
+      section-num-function: (int -> int -> string);
+      section-top-space : length;
+      section-bottom-space : length;
+      section-left-space : length;
+      section-line-break : bool;
+      section-right-space : length;
 
-            subsection-fontsize : length;
-            subsection-text-1 : string;
-            subsection-text-2 : string;
-            show-num-chapter-subsec : bool;
-            subsection-text-3 : string;
-            show-num-section-subsec : bool;
-            subsection-text-4 : string;
-            show-num-subsection : bool;
-            subsection-text-5 : string;
-            subsection-text-6 : string;
-            subsection-top-space : length;
-            subsection-bottom-space : length;
-            subsection-left-space : length;
-            subsection-line-break : bool;
-            subsection-right-space : length;
+      subsection-fontsize : length;
+      subsection-num-function: (int -> int -> int -> string);
+      subsection-top-space : length;
+      subsection-bottom-space : length;
+      subsection-left-space : length;
+      subsection-line-break : bool;
+      subsection-right-space : length;
 
-            subsubsection-fontsize : length;
-            subsubsection-text-1 : string;
-            subsubsection-text-2 : string;
-            show-num-chapter-subsubsec : bool;
-            subsubsection-text-3 : string;
-            show-num-section-subsubsec : bool;
-            subsubsection-text-4 : string;
-            show-num-subsection-subsubsec : bool;
-            subsubsection-text-5 : string;
-            show-num-subsubsection : bool;
-            subsubsection-text-6 : string;
-            subsubsection-text-7 : string;
-            subsubsection-top-space : length;
-            subsubsection-bottom-space : length;
-            subsubsection-left-space : length;
-            subsubsection-line-break : bool;
-            subsubsection-right-space : length;
+      subsubsection-fontsize : length;
+      subsubsection-num-function: (int -> int -> int -> int -> string);
+      subsubsection-top-space : length;
+      subsubsection-bottom-space : length;
+      subsubsection-left-space : length;
+      subsubsection-line-break : bool;
+      subsubsection-right-space : length;
 
-            figure-caption-fontsize : length;
-            figure-caption-right-title : inline-text;
-            figure-caption-left-title : inline-text;
-            show-figure-caption-num : bool;
+      figure-caption-fontsize : length;
+      figure-caption-right-title : inline-text;
+      figure-caption-left-title : inline-text;
+      show-figure-caption-num : bool;
 
-            table-caption-fontsize : length;
-            table-caption-right-title : inline-text;
-            table-caption-left-title : inline-text;
-            show-table-caption-num : bool;
-        |);
-        header-footer : (|
-            lhead : inline-text;
-            chead : inline-text;
-            rhead : inline-text;
-            header-line : length;
-            lfoot : inline-text;
-            cfoot : inline-text;
-            rfoot : inline-text;
-            footer-line : length;
+      table-caption-fontsize : length;
+      table-caption-right-title : inline-text;
+      table-caption-left-title : inline-text;
+      show-table-caption-num : bool;
+    |);
+    header-footer : (|
+      lhead : inline-text;
+      chead : inline-text;
+      rhead : inline-text;
+      header-line : length;
+      lfoot : inline-text;
+      cfoot : inline-text;
+      rfoot : inline-text;
+      footer-line : length;
 
-            tocpage-lhead : inline-text;
-            tocpage-chead : inline-text;
-            tocpage-rhead : inline-text;
-            tocpage-header-line : length;
-            tocpage-lfoot : inline-text;
-            tocpage-cfoot : inline-text;
-            tocpage-rfoot : inline-text;
-            tocpage-footer-line : length;
-        |);
-        fonts : (|
-            latin-roman : string;
-            latin-bold : string;
-            latin-italic : string;
-            latin-sans : string;
-            latin-mono : string;
-            cjk-mincho-l : string;
-            cjk-mincho-m : string;
-            cjk-mincho-bx : string;
-            cjk-gothic-m : string;
-            cjk-gothic-bx : string;
-            cjk-gothic-eb : string;
-            math-font : string;
-            ratio-latin : float;
-            ratio-cjk : float;
-            correction-latin : float;
-            correction-cjk : float;
-        |)
+      tocpage-lhead : inline-text;
+      tocpage-chead : inline-text;
+      tocpage-rhead : inline-text;
+      tocpage-header-line : length;
+      tocpage-lfoot : inline-text;
+      tocpage-cfoot : inline-text;
+      tocpage-rfoot : inline-text;
+      tocpage-footer-line : length;
+    |);
+    fonts : (|
+      latin-roman : string;
+      latin-bold : string;
+      latin-italic : string;
+      latin-sans : string;
+      latin-mono : string;
+      cjk-mincho-l : string;
+      cjk-mincho-m : string;
+      cjk-mincho-bx : string;
+      cjk-gothic-m : string;
+      cjk-gothic-bx : string;
+      cjk-gothic-eb : string;
+      math-font : string;
+      ratio-latin : float;
+      ratio-cjk : float;
+      correction-latin : float;
+      correction-cjk : float;
     |)
+  |)
 
 % 提供コマンド
 
@@ -223,109 +191,77 @@ direct \table : [string?; inline-text; block-text] inline-cmd
 direct +table : [string?; inline-text; block-text] block-cmd
 
 
-    val title-ref : inline-text ref
-    val author-ref : inline-text ref
-    val date-ref : inline-text ref
-    val show-title-ref : bool ref
-    val  show-toc-ref : bool ref
-    val page-width-ref : length ref
-    val page-height-ref : length ref
-    val top-space-ref : length ref
-    val bottom-space-ref : length ref
-    val left-space-ref : length ref
-    val right-space-ref : length ref
-    val header-left-space-ref : length ref
-    val header-right-space-ref : length ref
-    val header-height-ref : length ref
-    val footer-left-space-ref : length ref
-    val footer-right-space-ref : length ref
-    val footer-height-ref : length ref
-    val titlepage-top-space-ref : length ref
-    val titlepage-bottom-space-ref : length ref
-    val titlepage-left-space-ref : length ref
-    val titlepage-right-space-ref : length ref
-    val tocpage-top-space-ref : length ref
-    val tocpage-bottom-space-ref : length ref
-    val tocpage-left-space-ref : length ref
-    val tocpage-right-space-ref : length ref
-    val normal-fontsize-ref : length ref
-    val language-japanese-ref : bool ref
+  val title-ref : inline-text ref
+  val author-ref : inline-text ref
+  val date-ref : inline-text ref
+  val show-title-ref : bool ref
+  val  show-toc-ref : bool ref
+  val page-width-ref : length ref
+  val page-height-ref : length ref
+  val top-space-ref : length ref
+  val bottom-space-ref : length ref
+  val left-space-ref : length ref
+  val right-space-ref : length ref
+  val header-left-space-ref : length ref
+  val header-right-space-ref : length ref
+  val header-height-ref : length ref
+  val footer-left-space-ref : length ref
+  val footer-right-space-ref : length ref
+  val footer-height-ref : length ref
+  val titlepage-top-space-ref : length ref
+  val titlepage-bottom-space-ref : length ref
+  val titlepage-left-space-ref : length ref
+  val titlepage-right-space-ref : length ref
+  val tocpage-top-space-ref : length ref
+  val tocpage-bottom-space-ref : length ref
+  val tocpage-left-space-ref : length ref
+  val tocpage-right-space-ref : length ref
+  val normal-fontsize-ref : length ref
+  val language-japanese-ref : bool ref
 
 %% design
-    val titlepage-ref : bool ref
-    val title-fontsize-ref : length ref
-    val author-fontsize-ref : length ref
-    val date-fontsize-ref : length ref
+  val titlepage-ref : bool ref
+  val title-fontsize-ref : length ref
+  val author-fontsize-ref : length ref
+  val date-fontsize-ref : length ref
 
-    val tocpage-ref : bool ref
-    val toc-fontsize-ref : length ref
+  val tocpage-ref : bool ref
+  val toc-fontsize-ref : length ref
 
-    val part-fontsize-ref : length ref
-    val part-text-1-ref : string ref
-    val part-text-2-ref : string ref
-    val show-num-part-ref : bool ref
-    val part-text-3-ref : string ref
-    val part-text-4-ref : string ref
-    val part-top-space-ref : length ref
-    val part-bottom-space-ref : length ref
-    val part-left-space-ref : length ref
-    val part-right-space-ref : length ref
+  val part-fontsize-ref : length ref
+  val part-num-function-ref : (int -> string) ref
+  val part-top-space-ref : length ref
+  val part-bottom-space-ref : length ref
+  val part-left-space-ref : length ref
+  val part-right-space-ref : length ref
 
-    val chapter-fontsize-ref : length ref
-    val chapter-text-1-ref : string ref
-    val chapter-text-2-ref : string ref
-    val show-num-chapter-ref : bool ref
-    val chapter-text-3-ref : string ref
-    val chapter-text-4-ref : string ref
-    val chapter-top-space-ref : length ref
-    val chapter-bottom-space-ref : length ref
-    val chapter-left-space-ref : length ref
-    val chapter-right-space-ref : length ref
+  val chapter-fontsize-ref : length ref
+  val chapter-num-function-ref : (int -> string) ref
+  val chapter-top-space-ref : length ref
+  val chapter-bottom-space-ref : length ref
+  val chapter-left-space-ref : length ref
+  val chapter-right-space-ref : length ref
 
-    val section-fontsize-ref : length ref
-    val section-text-1-ref : string ref
-    val section-text-2-ref : string ref
-    val show-num-chapter-sec-ref : bool ref
-    val section-text-3-ref : string ref
-    val show-num-section-ref : bool ref
-    val section-text-4-ref : string ref
-    val section-text-5-ref : string ref
-    val section-top-space-ref : length ref
-    val section-bottom-space-ref : length ref
-    val section-left-space-ref : length ref
-    val section-right-space-ref : length ref
+  val section-fontsize-ref : length ref
+  val section-num-function-ref : (int -> int -> string) ref
+  val section-top-space-ref : length ref
+  val section-bottom-space-ref : length ref
+  val section-left-space-ref : length ref
+  val section-right-space-ref : length ref
 
-    val subsection-fontsize-ref : length ref
-    val subsection-text-1-ref : string ref
-    val subsection-text-2-ref : string ref
-    val show-num-chapter-subsec-ref : bool ref
-    val subsection-text-3-ref : string ref
-    val show-num-section-subsec-ref : bool ref
-    val subsection-text-4-ref : string ref
-    val show-num-subsection-ref : bool ref
-    val subsection-text-5-ref : string ref
-    val subsection-text-6-ref : string ref
-    val subsection-top-space-ref : length ref
-    val subsection-bottom-space-ref : length ref
-    val subsection-left-space-ref : length ref
-    val subsection-right-space-ref : length ref
+  val subsection-fontsize-ref : length ref
+  val subsection-num-function-ref : (int -> int -> int -> string) ref
+  val subsection-top-space-ref : length ref
+  val subsection-bottom-space-ref : length ref
+  val subsection-left-space-ref : length ref
+  val subsection-right-space-ref : length ref
 
-    val subsubsection-fontsize-ref : length ref
-    val subsubsection-text-1-ref : string ref
-    val subsubsection-text-2-ref : string ref
-    val show-num-chapter-subsubsec-ref : bool ref
-    val subsubsection-text-3-ref : string ref
-    val show-num-section-subsubsec-ref : bool ref
-    val subsubsection-text-4-ref : string ref
-    val show-num-subsection-subsubsec-ref : bool ref
-    val subsubsection-text-5-ref : string ref
-    val show-num-subsubsection-ref : bool ref
-    val subsubsection-text-6-ref : string ref
-    val subsubsection-text-7-ref : string ref
-    val subsubsection-top-space-ref : length ref
-    val subsubsection-bottom-space-ref : length ref
-    val subsubsection-left-space-ref : length ref
-    val subsubsection-right-space-ref : length ref
+  val subsubsection-fontsize-ref : length ref
+  val subsubsection-num-function-ref : (int -> int -> int -> int -> string) ref
+  val subsubsection-top-space-ref : length ref
+  val subsubsection-bottom-space-ref : length ref
+  val subsubsection-left-space-ref : length ref
+  val subsubsection-right-space-ref : length ref
 
 %% header-footer
     val lhead-ref : inline-text ref
@@ -514,11 +450,7 @@ end = struct
 
     let-mutable part-fontsize-ref <- 0pt
     let-mutable part-page-break-1-ref <- true
-    let-mutable part-text-1-ref <- ` `
-    let-mutable part-text-2-ref <- ` `
-    let-mutable show-num-part-ref <- true
-    let-mutable part-text-3-ref <- ` `
-    let-mutable part-text-4-ref <- ` `
+    let-mutable part-num-function-ref <- (fun _ -> ` `)
     let-mutable part-top-space-ref <- 0pt
     let-mutable part-bottom-space-ref <- 0pt
     let-mutable part-left-space-ref <- 0pt
@@ -528,11 +460,7 @@ end = struct
 
     let-mutable chapter-fontsize-ref <- 0pt
     let-mutable chapter-page-break-1-ref <- true
-    let-mutable chapter-text-1-ref <- ` `
-    let-mutable chapter-text-2-ref <- ` `
-    let-mutable show-num-chapter-ref <- true
-    let-mutable chapter-text-3-ref <- ` `
-    let-mutable chapter-text-4-ref <- ` `
+    let-mutable chapter-num-function-ref <- (fun _ -> ` `)
     let-mutable chapter-top-space-ref <- 0pt
     let-mutable chapter-bottom-space-ref <- 0pt
     let-mutable chapter-left-space-ref <- 0pt
@@ -541,13 +469,7 @@ end = struct
     let-mutable chapter-page-break-2-ref <- true
 
     let-mutable section-fontsize-ref <- 0pt
-    let-mutable section-text-1-ref <- ` `
-    let-mutable section-text-2-ref <- ` `
-    let-mutable show-num-chapter-sec-ref <- true
-    let-mutable section-text-3-ref <- ` `
-    let-mutable show-num-section-ref <- true
-    let-mutable section-text-4-ref <- ` `
-    let-mutable section-text-5-ref <- ` `
+    let-mutable section-num-function-ref <- (fun _ _ -> ` `)
     let-mutable section-top-space-ref <- 0pt
     let-mutable section-bottom-space-ref <- 0pt
     let-mutable section-left-space-ref <- 0pt
@@ -555,15 +477,7 @@ end = struct
     let-mutable section-right-space-ref <- 0pt
 
     let-mutable subsection-fontsize-ref <- 0pt
-    let-mutable subsection-text-1-ref <- ` `
-    let-mutable subsection-text-2-ref <- ` `
-    let-mutable show-num-chapter-subsec-ref <- true
-    let-mutable subsection-text-3-ref <- ` `
-    let-mutable show-num-section-subsec-ref <- true
-    let-mutable subsection-text-4-ref <- ` `
-    let-mutable show-num-subsection-ref <- true
-    let-mutable subsection-text-5-ref <- ` `
-    let-mutable subsection-text-6-ref <- ` `
+    let-mutable subsection-num-function-ref <- (fun _ _ _ -> ` `)
     let-mutable subsection-top-space-ref <- 0pt
     let-mutable subsection-bottom-space-ref <- 0pt
     let-mutable subsection-left-space-ref <- 0pt
@@ -571,17 +485,7 @@ end = struct
     let-mutable subsection-right-space-ref <- 0pt
 
     let-mutable subsubsection-fontsize-ref <- 0pt
-    let-mutable subsubsection-text-1-ref <- ` `
-    let-mutable subsubsection-text-2-ref <- ` `
-    let-mutable show-num-chapter-subsubsec-ref <- true
-    let-mutable subsubsection-text-3-ref <- ` `
-    let-mutable show-num-section-subsubsec-ref <- true
-    let-mutable subsubsection-text-4-ref <- ` `
-    let-mutable show-num-subsection-subsubsec-ref <- true
-    let-mutable subsubsection-text-5-ref <- ` `
-    let-mutable show-num-subsubsection-ref <- true
-    let-mutable subsubsection-text-6-ref <- ` `
-    let-mutable subsubsection-text-7-ref <- ` `
+    let-mutable subsubsection-num-function-ref <- (fun _ _ _ _ -> ` `)
     let-mutable subsubsection-top-space-ref <- 0pt
     let-mutable subsubsection-bottom-space-ref <- 0pt
     let-mutable subsubsection-left-space-ref <- 0pt
@@ -735,11 +639,7 @@ let document record inner =
 
     let () = part-fontsize-ref <- record#design#part-fontsize in
     let () = part-page-break-1-ref <- record#design#part-page-break-1 in
-    let () = part-text-1-ref <- record#design#part-text-1 in
-    let () = part-text-2-ref <- record#design#part-text-2 in
-    let () = show-num-part-ref <- record#design#show-num-part in
-    let () = part-text-3-ref <- record#design#part-text-3 in
-    let () = part-text-4-ref <- record#design#part-text-4 in
+    let () = part-num-function-ref <- record#design#part-num-function in
     let () = part-top-space-ref <- record#design#part-top-space in
     let () = part-bottom-space-ref <- record#design#part-bottom-space in
     let () = part-left-space-ref <- record#design#part-left-space in
@@ -749,11 +649,7 @@ let document record inner =
 
     let () = chapter-fontsize-ref <- record#design#chapter-fontsize in
     let () = chapter-page-break-1-ref <- record#design#chapter-page-break-1 in
-    let () = chapter-text-1-ref <- record#design#chapter-text-1 in
-    let () = chapter-text-2-ref <- record#design#chapter-text-2 in
-    let () = show-num-chapter-ref <- record#design#show-num-chapter in
-    let () = chapter-text-3-ref <- record#design#chapter-text-3 in
-    let () = chapter-text-4-ref <- record#design#chapter-text-4 in
+    let () = chapter-num-function-ref <- record#design#chapter-num-function in
     let () = chapter-top-space-ref <- record#design#chapter-top-space in
     let () = chapter-bottom-space-ref <- record#design#chapter-bottom-space in
     let () = chapter-left-space-ref <- record#design#chapter-left-space in
@@ -762,13 +658,7 @@ let document record inner =
     let () = chapter-page-break-2-ref <- record#design#chapter-page-break-2 in
 
     let () = section-fontsize-ref <- record#design#section-fontsize in
-    let () = section-text-1-ref <- record#design#section-text-1 in
-    let () = section-text-2-ref <- record#design#section-text-2 in
-    let () = show-num-chapter-sec-ref <- record#design#show-num-chapter-sec in
-    let () = section-text-3-ref <- record#design#section-text-3 in
-    let () = show-num-section-ref <- record#design#show-num-section in
-    let () = section-text-4-ref <- record#design#section-text-4 in
-    let () = section-text-5-ref <- record#design#section-text-5 in
+    let () = section-num-function-ref <- record#design#section-num-function in
     let () = section-top-space-ref <- record#design#section-top-space in
     let () = section-bottom-space-ref <- record#design#section-bottom-space in
     let () = section-left-space-ref <- record#design#section-left-space in
@@ -776,15 +666,7 @@ let document record inner =
     let () = section-right-space-ref <- record#design#section-right-space in
 
     let () = subsection-fontsize-ref <- record#design#subsection-fontsize in
-    let () = subsection-text-1-ref <- record#design#subsection-text-1 in
-    let () = subsection-text-2-ref <- record#design#subsection-text-2 in
-    let () = show-num-chapter-subsec-ref <- record#design#show-num-chapter-subsec in
-    let () = subsection-text-3-ref <- record#design#subsection-text-3 in
-    let () = show-num-section-subsec-ref <- record#design#show-num-section-subsec in
-    let () = subsection-text-4-ref <- record#design#subsection-text-4 in
-    let () = show-num-subsection-ref <- record#design#show-num-subsection in
-    let () = subsection-text-5-ref <- record#design#subsection-text-5 in
-    let () = subsection-text-6-ref <- record#design#subsection-text-6 in
+    let () = subsection-num-function-ref <- record#design#subsection-num-function in
     let () = subsection-top-space-ref <- record#design#subsection-top-space in
     let () = subsection-bottom-space-ref <- record#design#subsection-bottom-space in
     let () = subsection-left-space-ref <- record#design#subsection-left-space in
@@ -792,17 +674,7 @@ let document record inner =
     let () = subsection-right-space-ref <- record#design#subsection-right-space in
 
     let () = subsubsection-fontsize-ref <- record#design#subsubsection-fontsize in
-    let () = subsubsection-text-1-ref <- record#design#subsubsection-text-1 in
-    let () = subsubsection-text-2-ref <- record#design#subsubsection-text-2 in
-    let () = show-num-chapter-subsubsec-ref <- record#design#show-num-chapter-subsubsec in
-    let () = subsubsection-text-3-ref <- record#design#subsubsection-text-3 in
-    let () = show-num-section-subsubsec-ref <- record#design#show-num-section-subsubsec in
-    let () = subsubsection-text-4-ref <- record#design#subsubsection-text-4 in
-    let () = show-num-subsection-subsubsec-ref <- record#design#show-num-subsection-subsubsec in
-    let () = subsubsection-text-5-ref <- record#design#subsubsection-text-5 in
-    let () = show-num-subsubsection-ref <- record#design#show-num-subsubsection in
-    let () = subsubsection-text-6-ref <- record#design#subsubsection-text-6 in
-    let () = subsubsection-text-7-ref <- record#design#subsubsection-text-7 in
+    let () = subsubsection-num-function-ref <- record#design#subsubsection-num-function in
     let () = subsubsection-top-space-ref <- record#design#subsubsection-top-space in
     let () = subsubsection-bottom-space-ref <- record#design#subsubsection-bottom-space in
     let () = subsubsection-left-space-ref <- record#design#subsubsection-left-space in
@@ -1383,8 +1255,7 @@ let document record inner =
     let () = num-part-ref <- !num-part-ref + 1 in
     let () = num-chapter-ref <- 0 in
     let () = needs-indentation-ref <- false in
-      let num-part = if !show-num-part-ref then arabic (!num-part-ref) else ` ` in
-    let part-title = !part-text-1-ref ^ !part-text-2-ref ^ (num-part) ^ !part-text-3-ref ^ !part-text-4-ref in
+    let part-title = !part-num-function-ref !num-part-ref in
     let () = register-cross-reference (label ^ `:num`) part-title in
     let () = if !toc-depth-ref < 0 then toc-acc-ref <- !toc-acc-ref else toc-acc-ref <- (TocPart(label, title)) :: !toc-acc-ref in
     let ib-num =
@@ -1429,8 +1300,7 @@ let document record inner =
     let () = num-chapter-ref <- !num-chapter-ref + 1 in
     let () = num-section-ref <- 0 in
     let () = needs-indentation-ref <- false in
-      let num-chapter = if !show-num-chapter-ref then arabic (!num-chapter-ref) else ` ` in
-    let chapter-title = !chapter-text-1-ref ^ !chapter-text-2-ref ^ (num-chapter) ^ !chapter-text-3-ref ^ !chapter-text-4-ref in
+    let chapter-title = !chapter-num-function-ref !num-chapter-ref in
     let () = register-cross-reference (label ^ `:num`) chapter-title in
     let () = if !toc-depth-ref < 1 then toc-acc-ref <- !toc-acc-ref else toc-acc-ref <- (TocChapter(label, title)) :: !toc-acc-ref in
     let ib-num =
@@ -1475,9 +1345,7 @@ let document record inner =
     let () = num-section-ref <- !num-section-ref + 1 in
     let () = num-subsection-ref <- 0 in
     let () = needs-indentation-ref <- false in
-      let num-chapter-sec = if !show-num-chapter-sec-ref then arabic(!num-chapter-ref) else ` ` in
-      let num-section = if !show-num-section-ref then arabic(!num-section-ref) else ` ` in
-    let section-title = !section-text-1-ref ^ !section-text-2-ref ^ (num-chapter-sec) ^ !section-text-3-ref ^ (num-section) ^ !section-text-4-ref ^ !section-text-5-ref in
+    let section-title = !section-num-function-ref !num-chapter-ref !num-section-ref in
     let () = register-cross-reference (label ^ `:num`) section-title in
     let () = if !toc-depth-ref < 2 then toc-acc-ref <- !toc-acc-ref else toc-acc-ref <- (TocSection(label, title)) :: !toc-acc-ref in
     let ib-num =
@@ -1512,10 +1380,7 @@ let document record inner =
     let () = num-subsection-ref <- !num-subsection-ref + 1 in
     let () = num-subsubsection-ref <- 0 in
     let () = needs-indentation-ref <- false in
-      let num-chapter-subsec = if !show-num-chapter-subsec-ref then arabic(!num-chapter-ref) else ` ` in
-      let num-section-subsec = if !show-num-section-subsec-ref then arabic(!num-section-ref) else ` ` in
-      let num-subsection = if !show-num-subsection-ref then arabic(!num-subsection-ref) else ` ` in
-    let subsection-title = !subsection-text-1-ref ^ !subsection-text-2-ref ^ (num-chapter-subsec) ^ !subsection-text-3-ref ^ (num-section-subsec) ^ !subsection-text-4-ref ^ (num-subsection) ^ !subsection-text-5-ref ^ !subsection-text-6-ref in
+    let subsection-title = !subsection-num-function-ref !num-chapter-ref !num-section-ref !num-subsection-ref in
     let () = register-cross-reference (label ^ `:num`) subsection-title in
     let () = if !toc-depth-ref < 3 then toc-acc-ref <- !toc-acc-ref else toc-acc-ref <- (TocSubSection(label, title)) :: !toc-acc-ref in
     let ib-num =
@@ -1550,11 +1415,7 @@ let document record inner =
     let ctx-title = make-subsubsection-title ctx in
     let () = num-subsubsection-ref <- !num-subsubsection-ref + 1 in
     let () = needs-indentation-ref <- false in
-      let num-chapter-subsubsec = if !show-num-chapter-subsubsec-ref then arabic(!num-chapter-ref) else ` ` in
-      let num-section-subsubsec = if !show-num-section-subsubsec-ref then arabic(!num-section-ref) else ` ` in
-      let num-subsection-subsubsec = if !show-num-subsection-subsubsec-ref then arabic(!num-subsection-ref) else ` ` in
-      let num-subsubsection = if !show-num-subsubsection-ref then arabic(!num-subsubsection-ref) else ` ` in
-    let subsubsection-title = !subsubsection-text-1-ref ^ !subsubsection-text-2-ref ^ (num-chapter-subsubsec) ^ !subsubsection-text-3-ref ^ (num-section-subsubsec) ^ !subsubsection-text-4-ref ^ (num-subsection-subsubsec) ^ !subsubsection-text-5-ref ^ (num-subsubsection) ^ !subsubsection-text-6-ref ^ !subsubsection-text-7-ref in
+    let subsubsection-title = !subsubsection-num-function-ref !num-chapter-ref !num-section-ref !num-subsection-ref !num-subsubsection-ref in
     let () = register-cross-reference (label ^ `:num`) subsubsection-title in
     let () = if !toc-depth-ref < 4 then toc-acc-ref <- !toc-acc-ref else toc-acc-ref <- (TocSubSubSection(label, title)) :: !toc-acc-ref in
     let ib-num =
