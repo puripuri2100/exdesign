@@ -1,6 +1,6 @@
 opam-version: "2.0"
 name: "satysfi-class-exdesign-doc"
-version: "0.2"
+version: "0.3.0"
 synopsis: "Documentation: A class file easy to customize with SATySFi"
 description: """Documentation: A class file easy to customize with SATySFi."""
 
