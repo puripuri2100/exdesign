@@ -5,7 +5,7 @@
   (name "class-exdesign")
   (version "0.2")
   (sources
-    ((package "article-ja.satyh" "article-ja.satyh")
+    ((package "article-ja.satyg" "article-ja.satyg")
      (package "exdesign.satyh" "exdesign.satyh")))
   (opam "satysfi-class-exdesign.opam")
   (dependencies (
