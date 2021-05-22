@@ -6,7 +6,7 @@
 @require: itemize
 
 document (|
-        title = {ExDesignパッケージ v0.3};
+        title = {ExDesignパッケージ v0.3.1};
         author = {Naoki Kaneko (puripuri2100)};
         date = {2021/05/22};
         show-title = true;

@@ -3,7 +3,7 @@
 
 (library
   (name "class-exdesign")
-  (version "0.2")
+  (version "0.3.1")
   (sources
     ((package "article-ja.satyg" "article-ja.satyg")
      (package "exdesign.satyh" "exdesign.satyh")))
@@ -15,7 +15,7 @@
 
 (libraryDoc
   (name "class-exdesign-doc")
-  (version "0.2")
+  (version "0.3.1")
   (workingDirectory "doc")
   (build
     ((satysfi "manual.saty" "-o" "manual.pdf")))
