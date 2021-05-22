@@ -263,7 +263,7 @@ val normalHF : (|
     tocpage-footer-line : length;
   |)
 
-val empty : (|
+val emptyHF : (|
     lhead : inline-text;
     chead : inline-text;
     rhead : inline-text;
@@ -542,7 +542,7 @@ let normalHF = (|
     tocpage-footer-line = (0pt);
   |)
 
-let empty = (|
+let emptyHF = (|
     lhead = {};
     chead = {};
     rhead = {};
